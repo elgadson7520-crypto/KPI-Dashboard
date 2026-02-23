@@ -101,12 +101,14 @@
   .stat-val.m { color:var(--muted); }
 
   /* ── MONTH BAR ── */
-  .month-bar { display:flex; gap:4px; margin-bottom:20px; align-items:center; flex-wrap:wrap; }
-  .month-lbl { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-right:6px; }
+  .month-bar { display:flex; gap:4px; margin-bottom:8px; align-items:center; flex-wrap:wrap; }
+  .month-lbl { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-right:6px; flex-shrink:0; }
   .mpill { padding:5px 10px; border-radius:2px; font-size:12px; cursor:pointer; background:var(--surface); border:1px solid var(--border); color:var(--muted); transition:all .12s; font-family:'Barlow Condensed',sans-serif; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
   .mpill:hover { border-color:var(--red); color:var(--red); }
   .mpill.active { background:var(--red); border-color:var(--red); color:#fff; }
   .mpill.filled { border-color:var(--border-dk); color:var(--grey); }
+  /* smaller pills for day numbers */
+  .mpill.day { padding:4px 7px; font-size:11px; }
 
   /* ── KPI CARDS ── */
   .kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; margin-bottom:22px; }
@@ -323,7 +325,7 @@
 <div class="modal-bg" id="dataModal">
   <div class="modal" style="width:820px">
     <div class="mod-title" id="dataModalTitle">Enter Monthly Data</div>
-    <div class="mod-sub">Fill values per month. Leave blank if unavailable.</div>
+    <div class="mod-sub">Fill values per period. Leave blank if unavailable.</div>
     <div id="dataModalBody"></div>
     <div class="mod-foot">
       <button class="btn btn-light" onclick="closeModal('dataModal')">Cancel</button>
@@ -338,17 +340,39 @@
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const WEEKS=['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13','W14','W15','W16','W17','W18','W19','W20','W21','W22','W23','W24','W25','W26','W27','W28','W29','W30','W31','W32','W33','W34','W35','W36','W37','W38','W39','W40','W41','W42','W43','W44','W45','W46','W47','W48','W49','W50','W51','W52'];
 const QUARTERS=['Q1','Q2','Q3','Q4'];
+// 2026 is not a leap year → 365 days
+const DAYS=Array.from({length:365},(_,i)=>'D'+(i+1));
+const DAYS_IN_MONTH=[31,28,31,30,31,30,31,31,30,31,30,31]; // 2026
+const MONTH_DAY_OFFSET=[0,31,59,90,120,151,181,212,243,273,304,334]; // cumulative start index for each month
 const COLORS=['#c8102e','#2d2d2d','#b45309','#1a5276','#6b2fa0','#145a32','#7f1d1d','#1a3c6e'];
+
 let state={machines:[],activeMachine:null,editingMachine:null};
 window._activeMonth=4;
 window._activePeriod=4;
-window._viewMode='monthly'; // weekly, monthly, quarterly, yearly
+window._viewMode='monthly'; // daily, weekly, monthly, quarterly, yearly
+window._dailyMonth=0; // which month is shown in the daily day-picker (0=Jan)
+
+// helper: today's day-of-year index (0-based)
+function todayDayIdx(){
+  const now=new Date();
+  const start=new Date(now.getFullYear(),0,0);
+  const diff=now-start;
+  return Math.min(Math.floor(diff/86400000)-1,364);
+}
 
 function seedData(){
+  // Helper to build empty daily data object for a set of kpi codes
+  const emptyDaily=(codes)=>{
+    const obj={cyActual:{},cyTarget:{},pyActual:{}};
+    codes.forEach(c=>{obj.cyActual[c]=new Array(365).fill(null);obj.cyTarget[c]=new Array(365).fill(null);obj.pyActual[c]=new Array(365).fill(null);});
+    return obj;
+  };
+
   state.machines=[
     { id:'apstar',name:'Apstar',code:'210',label:'210 APSTAR 66x110 RDC',color:'#c8102e',
       kpis:[{code:'101',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'102',name:'Downtime',criteria:'% of time APSTAR is down',unit:'%',lowerBetter:true},{code:'103',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'104',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
       data:{
+        daily: emptyDaily(['101','102','103','104']),
         weekly:{cyActual:{101:new Array(52).fill(null),102:new Array(52).fill(null),103:new Array(52).fill(null),104:new Array(52).fill(null)},cyTarget:{101:new Array(52).fill(.87),102:new Array(52).fill(2.4),103:new Array(52).fill(2.8),104:new Array(52).fill(null)},pyActual:{101:new Array(52).fill(null),102:new Array(52).fill(null),103:new Array(52).fill(null),104:new Array(52).fill(null)}},
         monthly:{cyActual:{101:[.82998,.81338,.75644,.74132,.78579,.78579,null,null,null,null,null,null],102:[2.376,2.44728,2.22703,2.07113,2.19540,2.06368,null,null,null,null,null,null],103:[3.0492,3.29314,3.09555,3.00268,3.12279,2.84174,null,null,null,null,null,null],104:[null,null,null,null,null,null,null,null,null,null,null,null]},cyTarget:{101:[.87,.87,.87,.87,.87,.87,.87,.87,.87,.87,.87,.87],102:[2.4,2.4,2.4,2.4,2.4,2.4,2.4,2.4,2.4,2.4,2.4,2.4],103:[2.8,2.8,2.8,2.8,2.8,2.8,2.8,2.8,2.8,2.8,2.8,2.8],104:[null,null,null,null,null,null,null,null,null,null,null,null]},pyActual:{101:[.7743,.87,.7134,.7482,.7308,.783,.8352,.783,.7569,.8091,.7308,.7134],102:[2.832,2.328,2.76,2.856,2.376,2.424,2.664,2.352,2.544,2.64,2.856,2.88],103:[3.248,3.192,2.968,2.828,3.332,3.192,2.996,2.8,3.276,2.66,3.332,2.912],104:[null,null,null,null,null,null,null,null,null,null,null,null]}},
         quarterly:{cyActual:{101:[.79993,.76622,null,null],102:[2.35010,2.12674,null,null],103:[3.14531,2.99074,null,null],104:[null,null,null,null]},cyTarget:{101:[.87,.87,.87,.87],102:[2.4,2.4,2.4,2.4],103:[2.8,2.8,2.8,2.8],104:[null,null,null,null]},pyActual:{101:[.78623,.77033,null,null],102:[2.64,2.54533,null,null],103:[3.13600,3.01467,null,null],104:[null,null,null,null]}},
@@ -357,6 +381,7 @@ function seedData(){
     { id:'serenco',name:'Serenco',code:'120',label:'120 SERENCO 55x110 FFG',color:'#2d2d2d',
       kpis:[{code:'201',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'202',name:'Downtime',criteria:'% of time Serenco is down',unit:'%',lowerBetter:true},{code:'203',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'204',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
       data:{
+        daily: emptyDaily(['201','202','203','204']),
         weekly:{cyActual:{201:new Array(52).fill(null),202:new Array(52).fill(null),203:new Array(52).fill(null),204:new Array(52).fill(null)},cyTarget:{201:new Array(52).fill(null),202:new Array(52).fill(.91),203:new Array(52).fill(.036),204:new Array(52).fill(.88)},pyActual:{201:new Array(52).fill(null),202:new Array(52).fill(null),203:new Array(52).fill(null),204:new Array(52).fill(null)}},
         monthly:{cyActual:{201:[null,null,null,null,null,null,null,null,null,null,null,null],202:[.74529,.74746,.82936,.882,.855,.864,null,null,null,null,null,null],203:[.039204,.042732,.046578,.043318,.045484,.0423,null,null,null,null,null,null],204:[.792,.7524,.782496,.766846,.774515,.836476,null,null,null,null,null,null]},cyTarget:{201:[null,null,null,null,null,null,null,null,null,null,null,null],202:[.91,.91,.91,.91,.91,.91,.91,.91,.91,.91,.91,.91],203:[.036,.036,.036,.036,.036,.036,.036,.036,.036,.036,.036,.036],204:[.88,.88,.88,.88,.88,.88,.88,.88,.88,.88,.88,.88]},pyActual:{201:[.9191,.9555,.7462,.8827,.728,.9464,.7644,.9282,.7735,.8281,.8099,.8463],202:[.04068,.03744,.03492,.03852,.04104,.03852,.0396,.04068,.04068,.03996,.03744,.03456],203:[.924,.7128,.9152,.7568,.7656,.88,.8272,.8712,.748,.7656,.7216,.9064],204:[null,null,null,null,null,null,null,null,null,null,null,null]}},
         quarterly:{cyActual:{201:[null,null,null,null],202:[.77404,.86700,null,null],203:[.042838,.043463,null,null],204:[.775632,.773651,null,null]},cyTarget:{201:[null,null,null,null],202:[.91,.91,.91,.91],203:[.036,.036,.036,.036],204:[.88,.88,.88,.88]},pyActual:{201:[.87360,.84630,null,null],202:[.03768,.03852,null,null],203:[.85267,.81488,null,null],204:[null,null,null,null]}},
@@ -365,6 +390,7 @@ function seedData(){
     { id:'mckinley',name:'McKinley',code:'220',label:'220 MCKINLEY 66x110 RDC',color:'#b45309',
       kpis:[{code:'301',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'302',name:'Downtime',criteria:'% of time McKinley is down',unit:'%',lowerBetter:true},{code:'303',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'304',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
       data:{
+        daily: emptyDaily(['301','302','303','304']),
         weekly:{cyActual:{301:new Array(52).fill(null),302:new Array(52).fill(null),303:new Array(52).fill(null),304:new Array(52).fill(null)},cyTarget:{301:new Array(52).fill(null),302:new Array(52).fill(null),303:new Array(52).fill(450),304:new Array(52).fill(.86)},pyActual:{301:new Array(52).fill(null),302:new Array(52).fill(null),303:new Array(52).fill(null),304:new Array(52).fill(null)}},
         monthly:{cyActual:{301:[null,null,null,null,null,null,null,null,null,null,null,null],302:[null,null,null,null,null,null,null,null,null,null,null,null],303:[392.85,392.85,373.21,347.08,319.32,328.9,null,null,null,null,null,null],304:[.75852,.77369,.71180,.73315,.66717,.60045,null,null,null,null,null,null]},cyTarget:{301:[null,null,null,null,null,null,null,null,null,null,null,null],302:[null,null,null,null,null,null,null,null,null,null,null,null],303:[450,450,450,450,450,450,450,450,450,450,450,450],304:[.86,.86,.86,.86,.86,.86,.86,.86,.86,.86,.86,.86]},pyActual:{301:[423,400.5,463.5,396,378,409.5,441,405,414,468,414,369],302:[.7052,.8342,.86,.6966,.7482,.8858,.86,.7568,.7052,.8858,.8686,.6966],303:[.8262,.7695,.6561,.8019,.6642,.729,.8262,.7128,.7128,.7047,.8019,.6804],304:[.6622,.6853,.6622,.616,.7392,.6853,.693,.7546,.77,.7854,.7546,.693]}},
         quarterly:{cyActual:{301:[null,null,null,null],302:[null,null,null,null],303:[386.30333,331.76667,null,null],304:[.74800,.70692,null,null]},cyTarget:{301:[null,null,null,null],302:[null,null,null,null],303:[450,450,450,450],304:[.86,.86,.86,.86]},pyActual:{301:[429,394.5,null,null],302:[.79973,.76120,null,null],303:[.75060,.71740,null,null],304:[.66590,.67262,null,null]}},
@@ -373,6 +399,7 @@ function seedData(){
     { id:'ward',name:'Ward',code:'230',label:'230 WARD 66x110 RDC',color:'#1a5276',
       kpis:[{code:'401',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'402',name:'Downtime',criteria:'% of time Ward is down',unit:'%',lowerBetter:true},{code:'403',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'404',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
       data:{
+        daily: emptyDaily(['401','402','403','404']),
         weekly:{cyActual:{401:new Array(52).fill(null),402:new Array(52).fill(null),403:new Array(52).fill(null),404:new Array(52).fill(null)},cyTarget:{401:new Array(52).fill(.81),402:new Array(52).fill(.77),403:new Array(52).fill(.955),404:new Array(52).fill(null)},pyActual:{401:new Array(52).fill(null),402:new Array(52).fill(null),403:new Array(52).fill(null),404:new Array(52).fill(null)}},
         monthly:{cyActual:{401:[.67068,.69751,.74633,.75380,.82918,.87063,null,null,null,null,null,null],402:[.63063,.58018,.52216,.49083,.44666,.49132,null,null,null,null,null,null],403:[.83372,.76702,.74401,.77377,.78151,.81277,null,null,null,null,null,null],404:[null,null,null,null,null,null,null,null,null,null,null,null]},cyTarget:{401:[.81,.81,.81,.81,.81,.81,.81,.81,.81,.81,.81,.81],402:[.77,.77,.77,.77,.77,.77,.77,.77,.77,.77,.77,.77],403:[.955,.955,.955,.955,.955,.955,.955,.955,.955,.955,.955,.955],404:[null,null,null,null,null,null,null,null,null,null,null,null]},pyActual:{401:[null,null,null,null,null,null,null,null,null,null,null,null],402:[null,null,null,null,null,null,null,null,null,null,null,null],403:[null,null,null,null,null,null,null,null,null,null,null,null],404:[null,null,null,null,null,null,null,null,null,null,null,null]}},
         quarterly:{cyActual:{401:[.70484,.78454,null,null],402:[.57766,.47627,null,null],403:[.78158,.78913,null,null],404:[null,null,null,null]},cyTarget:{401:[.81,.81,.81,.81],402:[.77,.77,.77,.77],403:[.955,.955,.955,.955],404:[null,null,null,null]},pyActual:{401:[null,null,null,null],402:[null,null,null,null],403:[null,null,null,null],404:[null,null,null,null]}},
@@ -407,6 +434,18 @@ function deleteMachine(id){
   renderSidebar();renderDashboard();toast('Machine deleted');
 }
 
+// ─ DAILY HELPERS ─
+// Convert flat day index (0-364) to {month, dayOfMonth}
+function dayIdxToMonthDay(idx){
+  let m=0;
+  while(m<11 && idx>=MONTH_DAY_OFFSET[m+1])m++;
+  return{month:m,day:idx-MONTH_DAY_OFFSET[m]+1};
+}
+// Get a label like "Jan 15"
+function dayIdxLabel(idx){const{month,day}=dayIdxToMonthDay(idx);return MONTHS[month]+' '+day;}
+// Get current _dailyMonth's active period index (day within month, 0-based) 
+function dailyDayWithinMonth(){return window._activePeriod-MONTH_DAY_OFFSET[window._dailyMonth];}
+
 // ─ DASHBOARD ─
 let charts={};
 
@@ -422,11 +461,60 @@ function renderDashboard(){
   
   // Get period labels based on mode
   let periodLabels, periodCount;
-  if(mode==='weekly'){periodLabels=WEEKS;periodCount=52;}
+  if(mode==='daily'){periodLabels=DAYS;periodCount=365;}
+  else if(mode==='weekly'){periodLabels=WEEKS;periodCount=52;}
   else if(mode==='monthly'){periodLabels=MONTHS;periodCount=12;}
   else if(mode==='quarterly'){periodLabels=QUARTERS;periodCount=4;}
   else{periodLabels=['2026'];periodCount=1;}
-  
+
+  // Build period selector HTML
+  let periodSelectorHTML='';
+  if(mode==='daily'){
+    // Two-level: month row + day row
+    const monthPills=MONTHS.map((lbl,mi)=>{
+      const monthHasData=m.kpis.some(k=>{
+        const arr=m.data.daily.cyActual[k.code]||[];
+        const start=MONTH_DAY_OFFSET[mi],end=start+DAYS_IN_MONTH[mi];
+        return arr.slice(start,end).some(v=>v!=null);
+      });
+      return`<div class="mpill ${mi===window._dailyMonth?'active':''}${monthHasData?' filled':''}" onclick="switchDailyMonth(${mi})">${lbl}</div>`;
+    }).join('');
+
+    const dm=window._dailyMonth;
+    const dayCount=DAYS_IN_MONTH[dm];
+    const monthOffset=MONTH_DAY_OFFSET[dm];
+    const dayPills=Array.from({length:dayCount},(_,di)=>{
+      const globalIdx=monthOffset+di;
+      const hasDayData=m.kpis.some(k=>(m.data.daily.cyActual[k.code]||[])[globalIdx]!=null);
+      return`<div class="mpill day ${globalIdx===pi?'active':''}${hasDayData?' filled':''}" onclick="switchPeriod(${globalIdx})">${di+1}</div>`;
+    }).join('');
+
+    periodSelectorHTML=`
+      <div class="month-bar" style="margin-bottom:6px;">
+        <span class="month-lbl">Month:</span>
+        ${monthPills}
+      </div>
+      <div class="month-bar" style="margin-bottom:14px;">
+        <span class="month-lbl">Day:</span>
+        ${dayPills}
+      </div>`;
+  } else if(mode!=='yearly'){
+    const pills=periodLabels.map((lbl,i)=>{
+      const has=m.kpis.some(k=>(m.data[mode].cyActual[k.code]||[])[i]!=null);
+      return`<div class="mpill ${i===pi?'active':''}${has?' filled':''}" onclick="switchPeriod(${i})" id="pp${i}">${lbl}</div>`;
+    }).join('');
+    periodSelectorHTML=`<div class="month-bar" style="margin-bottom:14px;">
+      <span class="month-lbl">${mode==='weekly'?'Week':mode==='quarterly'?'Quarter':'Month'}:</span>
+      ${pills}
+    </div>`;
+  }
+
+  // Period label for table header
+  let periodDisplayLabel;
+  if(mode==='yearly') periodDisplayLabel='Year 2026';
+  else if(mode==='daily') periodDisplayLabel=dayIdxLabel(pi)+' 2026';
+  else periodDisplayLabel=periodLabels[pi]+' 2026';
+
   dash.innerHTML=`
     <div class="mach-hdr">
       <div class="mach-hdr-l">
@@ -448,6 +536,7 @@ function renderDashboard(){
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">View:</div>
       <div class="vtabs">
+        <button class="vtab ${mode==='daily'?'active':''}" onclick="switchViewMode('daily')">Daily</button>
         <button class="vtab ${mode==='weekly'?'active':''}" onclick="switchViewMode('weekly')">Weekly</button>
         <button class="vtab ${mode==='monthly'?'active':''}" onclick="switchViewMode('monthly')">Monthly</button>
         <button class="vtab ${mode==='quarterly'?'active':''}" onclick="switchViewMode('quarterly')">Quarterly</button>
@@ -455,18 +544,12 @@ function renderDashboard(){
       </div>
     </div>
     
-    ${mode!=='yearly'?`<div class="month-bar">
-      <span class="month-lbl">${mode==='weekly'?'Week':mode==='quarterly'?'Quarter':'Month'}:</span>
-      ${periodLabels.map((lbl,i)=>{
-        const has=m.kpis.some(k=>(m.data[mode].cyActual[k.code]||[])[i]!=null);
-        return`<div class="mpill ${i===pi?'active':''}${has?' filled':''}" onclick="switchPeriod(${i})" id="pp${i}">${lbl}</div>`;
-      }).join('')}
-    </div>`:''}
+    ${periodSelectorHTML}
     
     <div id="statStrip" class="stat-strip"></div>
     <div class="kpi-grid" id="kpiCards"></div>
     <div class="sec-hdr">
-      <div class="sec-title">${mode==='weekly'?'Weekly':mode==='quarterly'?'Quarterly':mode==='yearly'?'Yearly':'Monthly'} Trends <span class="sec-tag">CY Actual · Target · PY</span></div>
+      <div class="sec-title">${mode==='daily'?'Daily':mode==='weekly'?'Weekly':mode==='quarterly'?'Quarterly':mode==='yearly'?'Yearly':'Monthly'} Trends <span class="sec-tag">CY Actual · Target · PY</span></div>
       <div class="vtabs">
         <button class="vtab active" onclick="switchChartView('actual',this)">Actual</button>
         <button class="vtab" onclick="switchChartView('cumulative',this)">Cumulative</button>
@@ -474,10 +557,10 @@ function renderDashboard(){
     </div>
     <div class="charts-grid" id="chartsGrid"></div>
     <div class="sec-hdr">
-      <div class="sec-title">Performance Table <span class="sec-tag">${mode==='yearly'?'Year 2026':periodLabels[pi]+' 2026'}</span></div>
+      <div class="sec-title">Performance Table <span class="sec-tag">${periodDisplayLabel}</span></div>
     </div>
     <div class="tbl-wrap">
-      <div class="tbl-bar"><div class="tbl-bar-title">${m.name} · All KPIs</div><div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace">Period: ${mode==='yearly'?'Year 2026':periodLabels[pi]}</div></div>
+      <div class="tbl-bar"><div class="tbl-bar-title">${m.name} · All KPIs</div><div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace">Period: ${periodDisplayLabel}</div></div>
       <div id="tblBody"></div>
     </div>`;
   renderStrip(m,pi,mode); renderCards(m,pi,mode); renderCharts(m,mode); renderTable(m,pi,mode);
@@ -523,30 +606,61 @@ function renderCards(m,pi,mode){
 
 function switchPeriod(idx){
   window._activePeriod=idx;
+  // For daily mode, also keep _dailyMonth in sync
+  if(window._viewMode==='daily'){
+    window._dailyMonth=dayIdxToMonthDay(idx).month;
+    // Re-render just the pills section by rebuilding the whole dashboard
+    // (simpler than partial DOM surgery)
+    renderDashboard();
+    return;
+  }
   document.querySelectorAll('.mpill').forEach((p,i)=>{p.classList.toggle('active',i===idx);});
   const m=window._activeMachine;
   const mode=window._viewMode;
   if(m){renderCards(m,idx,mode);renderStrip(m,idx,mode);renderTable(m,idx,mode);}
 }
 
+function switchDailyMonth(monthIdx){
+  window._dailyMonth=monthIdx;
+  // Set activePeriod to first day of that month
+  window._activePeriod=MONTH_DAY_OFFSET[monthIdx];
+  renderDashboard();
+}
+
 function switchViewMode(newMode){
   window._viewMode=newMode;
-  window._activePeriod=newMode==='yearly'?0:newMode==='quarterly'?1:newMode==='weekly'?20:4;
+  if(newMode==='daily'){
+    const today=todayDayIdx();
+    window._activePeriod=today;
+    window._dailyMonth=dayIdxToMonthDay(today).month;
+  } else if(newMode==='yearly'){
+    window._activePeriod=0;
+  } else if(newMode==='quarterly'){
+    window._activePeriod=1;
+  } else if(newMode==='weekly'){
+    window._activePeriod=20;
+  } else {
+    window._activePeriod=4;
+  }
   renderDashboard();
 }
 
 function renderCharts(m,mode){
   const grid=document.getElementById('chartsGrid');if(!grid)return;
-  const periodLabels=mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
+  const isDaily=mode==='daily';
+  const periodLabels=isDaily?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
   grid.innerHTML=m.kpis.map(kpi=>`<div class="chart-card"><div class="chart-title">${kpi.code} · ${kpi.name}</div><div class="chart-sub">${kpi.criteria}</div><div class="chart-wrap"><canvas id="ch_${kpi.code}"></canvas></div></div>`).join('');
   m.kpis.forEach(kpi=>{
     const ctx=document.getElementById(`ch_${kpi.code}`);if(!ctx)return;
     const cy=m.data[mode].cyActual[kpi.code]||[],tgt=m.data[mode].cyTarget[kpi.code]||[],py=m.data[mode].pyActual[kpi.code]||[];
+    const isCompact=isDaily||mode==='weekly';
+    // For daily: only show a label every 30 days to avoid clutter
+    const tickCallback=isDaily?function(val,idx){return idx%30===0?MONTHS[dayIdxToMonthDay(idx).month]+' '+dayIdxToMonthDay(idx).day:'';}:undefined;
     charts[kpi.code]=new Chart(ctx,{type:'line',data:{labels:periodLabels,datasets:[
-      {label:'CY Actual',data:cy,borderColor:m.color,backgroundColor:m.color+'18',fill:true,tension:.4,borderWidth:2.5,pointRadius:mode==='weekly'?2:4,pointHoverRadius:6,pointBackgroundColor:m.color,pointBorderColor:'#fff',pointBorderWidth:2},
-      {label:'Target',data:tgt,borderColor:'#bbb',borderDash:[5,4],fill:false,tension:.3,borderWidth:1.5,pointRadius:mode==='weekly'?1:2,pointBackgroundColor:'#bbb'},
-      {label:'PY Actual',data:py,borderColor:'#ddd',fill:false,tension:.4,borderWidth:1.5,pointRadius:mode==='weekly'?1:2,pointBackgroundColor:'#ddd'}
-    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'Barlow Condensed',size:mode==='weekly'?8:11},maxRotation:mode==='weekly'?90:0,minRotation:mode==='weekly'?45:0}},y:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'JetBrains Mono',size:10}}}}}});
+      {label:'CY Actual',data:cy,borderColor:m.color,backgroundColor:m.color+'18',fill:true,tension:.4,borderWidth:isDaily?1.5:2.5,pointRadius:isDaily?0:isCompact?2:4,pointHoverRadius:isDaily?4:6,pointBackgroundColor:m.color,pointBorderColor:'#fff',pointBorderWidth:2},
+      {label:'Target',data:tgt,borderColor:'#bbb',borderDash:[5,4],fill:false,tension:.3,borderWidth:1.5,pointRadius:isDaily?0:isCompact?1:2,pointBackgroundColor:'#bbb'},
+      {label:'PY Actual',data:py,borderColor:'#ddd',fill:false,tension:.4,borderWidth:1.5,pointRadius:isDaily?0:isCompact?1:2,pointBackgroundColor:'#ddd'}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2,callbacks:{title:function(items){if(isDaily)return dayIdxLabel(items[0].dataIndex)+' 2026';return items[0].label;}}}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'Barlow Condensed',size:isDaily?8:isCompact?8:11},maxRotation:isCompact?90:0,minRotation:isCompact?45:0,callback:tickCallback,maxTicksLimit:isDaily?14:undefined}},y:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'JetBrains Mono',size:10}}}}}});
   });
 }
 
@@ -632,8 +746,8 @@ function saveMachine(){
     const m=state.machines.find(x=>x.id===state.editingMachine);
     m.name=name;m.code=code;m.label=label||`${code} ${name.toUpperCase()}`;m.color=color;m.kpis=kpis;
     kpis.forEach(k=>{
-      ['weekly','monthly','quarterly','yearly'].forEach(mode=>{
-        const len=mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12;
+      ['daily','weekly','monthly','quarterly','yearly'].forEach(mode=>{
+        const len=mode==='daily'?365:mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12;
         if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};
         if(!m.data[mode].cyActual[k.code])m.data[mode].cyActual[k.code]=new Array(len).fill(null);
         if(!m.data[mode].cyTarget[k.code])m.data[mode].cyTarget[k.code]=new Array(len).fill(null);
@@ -643,8 +757,11 @@ function saveMachine(){
     toast('Machine updated');
   } else {
     const id=name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();
-    const data={weekly:{cyActual:{},cyTarget:{},pyActual:{}},monthly:{cyActual:{},cyTarget:{},pyActual:{}},quarterly:{cyActual:{},cyTarget:{},pyActual:{}},yearly:{cyActual:{},cyTarget:{},pyActual:{}}};
+    const data={daily:{cyActual:{},cyTarget:{},pyActual:{}},weekly:{cyActual:{},cyTarget:{},pyActual:{}},monthly:{cyActual:{},cyTarget:{},pyActual:{}},quarterly:{cyActual:{},cyTarget:{},pyActual:{}},yearly:{cyActual:{},cyTarget:{},pyActual:{}}};
     kpis.forEach(k=>{
+      data.daily.cyActual[k.code]=new Array(365).fill(null);
+      data.daily.cyTarget[k.code]=new Array(365).fill(k.target||null);
+      data.daily.pyActual[k.code]=new Array(365).fill(null);
       data.weekly.cyActual[k.code]=new Array(52).fill(null);
       data.weekly.cyTarget[k.code]=new Array(52).fill(k.target||null);
       data.weekly.pyActual[k.code]=new Array(52).fill(null);
@@ -675,10 +792,10 @@ function openDataModal(mid){
   document.getElementById('dataModalTitle').textContent=`Enter Data · ${m.name}`;
   const body=document.getElementById('dataModalBody');
   
-  // View mode selector
   let modeHTML=`<div style="margin-bottom:16px;">
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Data View Mode</div>
     <div class="vtabs">
+      <button class="vtab" id="dataTabDaily" onclick="switchDataTab('daily')">Daily</button>
       <button class="vtab" id="dataTabWeekly" onclick="switchDataTab('weekly')">Weekly</button>
       <button class="vtab active" id="dataTabMonthly" onclick="switchDataTab('monthly')">Monthly</button>
       <button class="vtab" id="dataTabQuarterly" onclick="switchDataTab('quarterly')">Quarterly</button>
@@ -701,6 +818,10 @@ function switchDataTab(mode){
 
 function renderDataTab(m,mode){
   const el=document.getElementById('dataTabContent');
+  if(mode==='daily'){
+    renderDailyDataTab(m,el);
+    return;
+  }
   const periods=mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
   el.innerHTML=m.kpis.map(kpi=>{
     const cyA=m.data[mode].cyActual[kpi.code]||new Array(periods.length).fill(null);
@@ -745,13 +866,49 @@ function renderDataTab(m,mode){
   }).join('');
 }
 
+function renderDailyDataTab(m, el){
+  // Split by month — 12 sections, each with up to 31 day columns
+  el.innerHTML=m.kpis.map(kpi=>{
+    const cyA=m.data.daily.cyActual[kpi.code]||new Array(365).fill(null);
+    const cyT=m.data.daily.cyTarget[kpi.code]||new Array(365).fill(null);
+    const pyA=m.data.daily.pyActual[kpi.code]||new Array(365).fill(null);
+
+    const row=(arr,offset,count,type)=>Array.from({length:count},(_,i)=>{
+      const idx=offset+i;
+      return`<input class="mci" data-kpi="${kpi.code}" data-type="${type}" data-mode="daily" data-idx="${idx}" value="${arr[idx]??''}" type="number" step="any" placeholder="—">`;
+    }).join('');
+
+    const monthSections=MONTHS.map((mname,mi)=>{
+      const offset=MONTH_DAY_OFFSET[mi];
+      const count=DAYS_IN_MONTH[mi];
+      const cols=`repeat(${count},1fr)`;
+      const dayHeaders=Array.from({length:count},(_,d)=>`<div class="mhc">${d+1}</div>`).join('');
+      return`<div style="margin-bottom:12px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:4px;padding:4px 8px;background:#eeecea;border-radius:2px;">${mname}</div>
+        <div class="mhrow" style="grid-template-columns:${cols}">${dayHeaders}</div>
+        <div class="dsec">CY Actual</div>
+        <div class="mgrid" style="grid-template-columns:${cols};margin-bottom:5px">${row(cyA,offset,count,'cyActual')}</div>
+        <div class="dsec">CY Target</div>
+        <div class="mgrid" style="grid-template-columns:${cols};margin-bottom:5px">${row(cyT,offset,count,'cyTarget')}</div>
+        <div class="dsec">PY Actual</div>
+        <div class="mgrid" style="grid-template-columns:${cols}">${row(pyA,offset,count,'pyActual')}</div>
+      </div>`;
+    }).join('');
+
+    return`<div style="margin-bottom:16px;padding:13px 15px;background:var(--bg);border-radius:3px;border:1px solid var(--border);">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">${kpi.code} · ${kpi.name}</div>
+      ${monthSections}
+    </div>`;
+  }).join('');
+}
+
 function saveMonthlyData(){
   const m=state.machines.find(x=>x.id===dataMachId);if(!m)return;
   document.querySelectorAll('[data-kpi][data-mode]').forEach(inp=>{
     const {kpi,type,mode,idx}=inp.dataset;
     if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};
     if(!m.data[mode][type])m.data[mode][type]={};
-    const periods=mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12;
+    const periods=mode==='daily'?365:mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12;
     if(!m.data[mode][type][kpi])m.data[mode][type][kpi]=new Array(periods).fill(null);
     const v=inp.value.trim();
     m.data[mode][type][kpi][parseInt(idx)]=v===''?null:parseFloat(v);
@@ -781,7 +938,6 @@ function processFile(file){
 function parseXLSX(wb){
   const gs=n=>{const s=wb.Sheets[n];return s?XLSX.utils.sheet_to_json(s,{header:1,defval:null}):null;};
   
-  // Check if this is a production efficiency report
   const firstSheet = wb.SheetNames[0];
   const firstData = gs(firstSheet);
   const isProductionReport = firstData && firstData[0] && String(firstData[0][0]||'').includes('Production Efficiency');
@@ -791,7 +947,6 @@ function parseXLSX(wb){
     return;
   }
   
-  // Original KPI format parsing
   const monthly={cyA:gs('CY Actual Monthly'),cyT:gs('CY Target Monthly'),pyA:gs('PY Actual Monthly')};
   const quarterly={cyA:gs('CY Actual Quarterly'),cyT:gs('CY Target Quarterly'),pyA:gs('PY Actual Quarterly')};
   const yearly={cyA:gs('CY Actual Yearly'),cyT:gs('CY Target Yearly'),pyA:gs('PY Actual Yearly')};
@@ -811,7 +966,7 @@ function parseXLSX(wb){
   
   monthly.cyA.slice(4).forEach((row,ri)=>{
     const c=String(row[1]||'').trim();if(!c||isNaN(c))return;
-    const p=c[0];if(!mmap[p])mmap[p]={};if(!mmap[p][c])mmap[p][c]={monthly:{},quarterly:{},yearly:{},weekly:{}};
+    const p=c[0];if(!mmap[p])mmap[p]={};if(!mmap[p][c])mmap[p][c]={daily:{},monthly:{},quarterly:{},yearly:{},weekly:{}};
     mmap[p][c].monthly.cyActual=parseRow(row,4,12);
     const tRow=monthly.cyT.slice(4)[ri];mmap[p][c].monthly.cyTarget=tRow?parseRow(tRow,4,12):new Array(12).fill(null);
     if(monthly.pyA){const pRow=monthly.pyA.slice(4)[ri];mmap[p][c].monthly.pyActual=pRow?parseRow(pRow,4,12):new Array(12).fill(null);}
@@ -842,7 +997,8 @@ function parseXLSX(wb){
     Object.keys(mmap[prefix]).forEach(code=>{
       if(!mmap[prefix][code].quarterly.cyActual)mmap[prefix][code].quarterly={cyActual:new Array(4).fill(null),cyTarget:new Array(4).fill(null),pyActual:new Array(4).fill(null)};
       if(!mmap[prefix][code].yearly.cyActual)mmap[prefix][code].yearly={cyActual:[null],cyTarget:[null],pyActual:[null]};
-      if(!mmap[prefix][code].weekly)mmap[prefix][code].weekly={cyActual:new Array(52).fill(null),cyTarget:new Array(52).fill(null),pyActual:new Array(52).fill(null)};
+      if(!mmap[prefix][code].weekly.cyActual)mmap[prefix][code].weekly={cyActual:new Array(52).fill(null),cyTarget:new Array(52).fill(null),pyActual:new Array(52).fill(null)};
+      if(!mmap[prefix][code].daily.cyActual)mmap[prefix][code].daily={cyActual:new Array(365).fill(null),cyTarget:new Array(365).fill(null),pyActual:new Array(365).fill(null)};
     });
   });
   
@@ -850,12 +1006,13 @@ function parseXLSX(wb){
     const codes=Object.keys(mmap[prefix]);
     const existing=state.machines.find(m=>m.code&&m.code[0]===prefix);
     const kpis=codes.map(c=>({code:c,name:meta[c]?.name||c,criteria:meta[c]?.criteria||'',unit:meta[c]?.unit||'Avg',lowerBetter:meta[c]?.lowerBetter||false}));
-    const data={weekly:{cyActual:{},cyTarget:{},pyActual:{}},monthly:{cyActual:{},cyTarget:{},pyActual:{}},quarterly:{cyActual:{},cyTarget:{},pyActual:{}},yearly:{cyActual:{},cyTarget:{},pyActual:{}}};
+    const data={daily:{cyActual:{},cyTarget:{},pyActual:{}},weekly:{cyActual:{},cyTarget:{},pyActual:{}},monthly:{cyActual:{},cyTarget:{},pyActual:{}},quarterly:{cyActual:{},cyTarget:{},pyActual:{}},yearly:{cyActual:{},cyTarget:{},pyActual:{}}};
     codes.forEach(c=>{
-      ['weekly','monthly','quarterly','yearly'].forEach(mode=>{
-        data[mode].cyActual[c]=mmap[prefix][c][mode].cyActual||new Array(mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12).fill(null);
-        data[mode].cyTarget[c]=mmap[prefix][c][mode].cyTarget||new Array(mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12).fill(null);
-        data[mode].pyActual[c]=mmap[prefix][c][mode].pyActual||new Array(mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12).fill(null);
+      ['daily','weekly','monthly','quarterly','yearly'].forEach(mode=>{
+        const defLen=mode==='daily'?365:mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12;
+        data[mode].cyActual[c]=mmap[prefix][c][mode].cyActual||new Array(defLen).fill(null);
+        data[mode].cyTarget[c]=mmap[prefix][c][mode].cyTarget||new Array(defLen).fill(null);
+        data[mode].pyActual[c]=mmap[prefix][c][mode].pyActual||new Array(defLen).fill(null);
       });
     });
     if(existing){existing.kpis=kpis;existing.data=data;}
@@ -864,7 +1021,6 @@ function parseXLSX(wb){
 }
 
 function parseProductionEfficiencyReport(wb, data){
-  // Find machine name from row 10 (format: "415 J&L SFG 115")
   let machineName = '';
   let machineCode = '';
   for(let i=0;i<data.length;i++){
@@ -875,51 +1031,37 @@ function parseProductionEfficiencyReport(wb, data){
       break;
     }
   }
-  
   if(!machineName){toast('Could not find machine name in report','error');return;}
   
-  // Find data row (row with shift number, usually row 11)
   let dataRow = null;
   for(let i=10;i<data.length;i++){
     const cell = String(data[i][0]||'').trim();
-    if(cell && !isNaN(cell) && parseInt(cell)>=1 && parseInt(cell)<=3){
-      dataRow = data[i];
-      break;
-    }
+    if(cell && !isNaN(cell) && parseInt(cell)>=1 && parseInt(cell)<=3){dataRow=data[i];break;}
   }
-  
   if(!dataRow){toast('Could not find data in report','error');return;}
   
-  // Parse metrics (based on column positions from analysis)
-  // Col 3: Production Qty, Col 5: Setups, Col 7: Waste Qty
-  // Col 8: Setup Hrs, Col 9: Run Hrs, Col 16: Down Time
-  // Col 17: Utilization, Col 18: Setup Eff, Col 19: Run Eff, Col 20: Total Eff
-  
   const metrics = {
-    setupTime: parseFloat(dataRow[8])||null,        // Setup Hrs
-    downtime: (parseFloat(dataRow[16])||0)*100,     // Down Time (convert to %)
-    feedsRunHr: parseFloat(dataRow[6])||null,       // Rate Qty/Hr
-    utilization: (parseFloat(dataRow[17])||0)*100,  // Utilization (convert to %)
-    efficiency: (parseFloat(dataRow[20])||0)*100,   // Total Efficiency (convert to %)
-    waste: parseFloat(dataRow[7])||null,            // Waste Qty
-    productionQty: parseFloat(dataRow[3])||null,    // Production Qty
-    runHours: parseFloat(dataRow[9])||null          // Run Hours
+    setupTime: parseFloat(dataRow[8])||null,
+    downtime: (parseFloat(dataRow[16])||0)*100,
+    feedsRunHr: parseFloat(dataRow[6])||null,
+    utilization: (parseFloat(dataRow[17])||0)*100,
+    efficiency: (parseFloat(dataRow[20])||0)*100,
+    waste: parseFloat(dataRow[7])||null,
   };
   
-  // Get or extract week number from date range in report
   const dateRange = String(data[1][10]||'');
   const weekMatch = dateRange.match(/(\d+)\/(\d+)\/(\d+)/);
-  let weekNum = 6; // Default to week 6 (mid-Feb)
+  let weekNum = 6;
+  let dayIdx = 38; // default Feb 8 ish
   if(weekMatch){
     const month = parseInt(weekMatch[1]);
     const day = parseInt(weekMatch[2]);
     weekNum = Math.ceil((month*30 + day)/7);
     if(weekNum>52) weekNum=52;
+    dayIdx = Math.min(MONTH_DAY_OFFSET[month-1]+(day-1),364);
   }
   
-  // Create or update machine
   const existing = state.machines.find(m=>m.name===machineName || m.code===machineCode);
-  
   const kpis = [
     {code:'101',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Hrs',lowerBetter:true},
     {code:'102',name:'Downtime',criteria:'% of time machine is down',unit:'%',lowerBetter:true},
@@ -930,7 +1072,6 @@ function parseProductionEfficiencyReport(wb, data){
   ];
   
   if(existing){
-    // Update existing machine with new data
     const mode='weekly';
     if(!existing.data[mode])existing.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};
     existing.data[mode].cyActual['101'][weekNum-1]=metrics.setupTime;
@@ -939,30 +1080,41 @@ function parseProductionEfficiencyReport(wb, data){
     existing.data[mode].cyActual['104'][weekNum-1]=metrics.utilization;
     existing.data[mode].cyActual['105'][weekNum-1]=metrics.efficiency;
     existing.data[mode].cyActual['106'][weekNum-1]=metrics.waste;
-    toast(`Updated ${machineName} - Week ${weekNum} data`);
+    // Also populate daily
+    if(!existing.data.daily)existing.data.daily={cyActual:{},cyTarget:{},pyActual:{}};
+    ['101','102','103','104','105','106'].forEach(c=>{if(!existing.data.daily.cyActual[c])existing.data.daily.cyActual[c]=new Array(365).fill(null);});
+    existing.data.daily.cyActual['101'][dayIdx]=metrics.setupTime;
+    existing.data.daily.cyActual['102'][dayIdx]=metrics.downtime;
+    existing.data.daily.cyActual['103'][dayIdx]=metrics.feedsRunHr;
+    existing.data.daily.cyActual['104'][dayIdx]=metrics.utilization;
+    existing.data.daily.cyActual['105'][dayIdx]=metrics.efficiency;
+    existing.data.daily.cyActual['106'][dayIdx]=metrics.waste;
+    toast(`Updated ${machineName} — Week ${weekNum} / ${dayIdxLabel(dayIdx)}`);
   } else {
-    // Create new machine
-    const data={weekly:{cyActual:{},cyTarget:{},pyActual:{}},monthly:{cyActual:{},cyTarget:{},pyActual:{}},quarterly:{cyActual:{},cyTarget:{},pyActual:{}},yearly:{cyActual:{},cyTarget:{},pyActual:{}}};
+    const d={daily:{cyActual:{},cyTarget:{},pyActual:{}},weekly:{cyActual:{},cyTarget:{},pyActual:{}},monthly:{cyActual:{},cyTarget:{},pyActual:{}},quarterly:{cyActual:{},cyTarget:{},pyActual:{}},yearly:{cyActual:{},cyTarget:{},pyActual:{}}};
     kpis.forEach(k=>{
-      ['weekly','monthly','quarterly','yearly'].forEach(mode=>{
-        const len=mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12;
-        data[mode].cyActual[k.code]=new Array(len).fill(null);
-        data[mode].cyTarget[k.code]=new Array(len).fill(null);
-        data[mode].pyActual[k.code]=new Array(len).fill(null);
+      ['daily','weekly','monthly','quarterly','yearly'].forEach(mode=>{
+        const len=mode==='daily'?365:mode==='weekly'?52:mode==='quarterly'?4:mode==='yearly'?1:12;
+        d[mode].cyActual[k.code]=new Array(len).fill(null);
+        d[mode].cyTarget[k.code]=new Array(len).fill(null);
+        d[mode].pyActual[k.code]=new Array(len).fill(null);
       });
     });
-    
-    // Set the weekly data
-    data.weekly.cyActual['101'][weekNum-1]=metrics.setupTime;
-    data.weekly.cyActual['102'][weekNum-1]=metrics.downtime;
-    data.weekly.cyActual['103'][weekNum-1]=metrics.feedsRunHr;
-    data.weekly.cyActual['104'][weekNum-1]=metrics.utilization;
-    data.weekly.cyActual['105'][weekNum-1]=metrics.efficiency;
-    data.weekly.cyActual['106'][weekNum-1]=metrics.waste;
-    
+    d.weekly.cyActual['101'][weekNum-1]=metrics.setupTime;
+    d.weekly.cyActual['102'][weekNum-1]=metrics.downtime;
+    d.weekly.cyActual['103'][weekNum-1]=metrics.feedsRunHr;
+    d.weekly.cyActual['104'][weekNum-1]=metrics.utilization;
+    d.weekly.cyActual['105'][weekNum-1]=metrics.efficiency;
+    d.weekly.cyActual['106'][weekNum-1]=metrics.waste;
+    d.daily.cyActual['101'][dayIdx]=metrics.setupTime;
+    d.daily.cyActual['102'][dayIdx]=metrics.downtime;
+    d.daily.cyActual['103'][dayIdx]=metrics.feedsRunHr;
+    d.daily.cyActual['104'][dayIdx]=metrics.utilization;
+    d.daily.cyActual['105'][dayIdx]=metrics.efficiency;
+    d.daily.cyActual['106'][dayIdx]=metrics.waste;
     const id='prod_'+machineCode+'_'+Date.now();
-    state.machines.push({id,name:machineName,code:machineCode,label:machineName,color:COLORS[state.machines.length%COLORS.length],kpis,data});
-    toast(`Imported ${machineName} - Week ${weekNum} data`);
+    state.machines.push({id,name:machineName,code:machineCode,label:machineName,color:COLORS[state.machines.length%COLORS.length],kpis,data:d});
+    toast(`Imported ${machineName} — Week ${weekNum} / ${dayIdxLabel(dayIdx)}`);
   }
 }
 
@@ -971,12 +1123,19 @@ function exportData(){
   if(!m){toast('Select a machine first','error');return;}
   const mode=window._viewMode;
   const wb=XLSX.utils.book_new();
-  const periods=mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
+  let periods;
+  if(mode==='daily'){
+    // Export with "Mon DD" labels for readability
+    periods=DAYS.map((_,i)=>dayIdxLabel(i));
+  } else {
+    periods=mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
+  }
   const hdr=['KPI Code','KPI Name','Criteria','Unit',...periods];
   ['cyActual','cyTarget','pyActual'].forEach((type,ti)=>{
     const label=['CY Actual','CY Target','PY Actual'][ti];
     const rows=[hdr,...m.kpis.map(kpi=>[kpi.code,kpi.name,kpi.criteria,kpi.unit,...(m.data[mode][type][kpi.code]||new Array(periods.length).fill(null))])];
-    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),`${label} ${mode.charAt(0).toUpperCase()+mode.slice(1)}`);
+    const sheetName=`${label} ${mode==='daily'?'Daily':mode.charAt(0).toUpperCase()+mode.slice(1)}`;
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),sheetName.slice(0,31));
   });
   XLSX.writeFile(wb,`KPI_${m.name}_${mode}_${new Date().toISOString().slice(0,10)}.xlsx`);
   toast('Exported');
