@@ -6,6 +6,7 @@
 <title>SupplyOne · KPI Dashboard 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
 :root{--bg:#f2f1ef;--surface:#fff;--card:#fff;--sidebar:#1a1a1a;--sidebar-h:#242424;--border:#e0ddd8;--border-dk:#c8c4bc;--accent:#c8102e;--accent-dk:#9e0a22;--accent-lt:#fce8ec;--grey:#6b6b6b;--grey-lt:#adadad;--charcoal:#1a1a1a;--text:#1a1a1a;--muted:#7a7a7a;--green:#1a7a46;--green-bg:#e8f5ee;--shadow-sm:0 1px 3px rgba(0,0,0,.07);--shadow:0 2px 10px rgba(0,0,0,.09);--shadow-lg:0 6px 24px rgba(0,0,0,.12);--hdr:#1a1a1a;}
@@ -175,15 +176,85 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
 .empty-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--charcoal);margin-bottom:6px;}
 .empty-sub{font-size:13px;color:var(--muted);margin-bottom:18px;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px;}.sidebar::-webkit-scrollbar-thumb{background:#2e2e2e;}
+/* ── MOBILE / RESPONSIVE ─────────────────────────────────────────────────── */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;backdrop-filter:blur(2px);}
+.sidebar-overlay.open{display:block;}
+.hamburger{display:none;background:transparent;border:1px solid #383838;border-radius:3px;padding:6px 8px;cursor:pointer;color:#999;align-items:center;justify-content:center;flex-shrink:0;}
+.hamburger:hover{border-color:#777;color:#fff;}
+.hdr-meta-mobile{display:none;}
+.sp-status{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;padding:4px 8px;border-radius:2px;transition:background .14s;}
+.sp-status:hover{background:rgba(255,255,255,.06);}
+.sp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sp-dot.connected{background:#4ec98a;}
+.sp-dot.disconnected{background:#555;}
+.sp-dot.syncing{background:#f59e0b;animation:pulse .8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.wake-indicator{font-size:13px;cursor:pointer;opacity:.5;transition:opacity .2s;line-height:1;padding:4px 6px;}
+.wake-indicator.active{opacity:1;}
+
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .hdr-sep,.hdr-meta{display:none;}
+  .hdr-meta-mobile{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:#555;}
+  .hdr-left{gap:10px;}
+  .hdr-actions{gap:5px;}
+  .hdr-actions .btn-ghost span,.hdr-actions .btn-ghost svg+*{display:none;}
+  .hdr-actions .btn-ghost{padding:6px 10px;}
+  .plant-sw .plant-btn{padding:5px 8px;font-size:10px;}
+  .btn-accent span{display:none;}
+  .btn-accent{padding:7px 10px;}
+  .sidebar{position:fixed;left:-226px;top:57px;height:calc(100vh - 57px);z-index:95;transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:none;}
+  .sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.4);}
+  .main{height:calc(100vh - 57px);}
+  .content{padding:14px 14px;}
+  .mach-hdr{flex-direction:column;gap:10px;}
+  .mach-big-title{font-size:20px;}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .charts-grid{grid-template-columns:1fr;}
+  .stat-strip{flex-wrap:wrap;}
+  .stat-cell{min-width:50%;flex:unset;}
+  .ytd-cells{flex-wrap:wrap;}
+  .ytd-cell{min-width:50%;flex:unset;border-bottom:1px solid rgba(255,255,255,.06);}
+  .month-bar{gap:3px;}
+  .mpill{padding:4px 7px;font-size:11px;}
+  .mpill.day{padding:3px 5px;font-size:10px;}
+  .tbl-wrap{overflow-x:auto;}
+  table{min-width:560px;}
+  .vtabs .vtab{padding:5px 8px;font-size:11px;}
+  .modal{padding:20px 16px;}
+  .modal[style*="820px"]{width:calc(100vw - 20px)!important;}
+  .modal[style*="700px"]{width:calc(100vw - 20px)!important;}
+  .kpi-fr{grid-template-columns:55px 1fr 60px 40px 60px 80px 22px;gap:3px;}
+  .mci{font-size:9px;padding:4px 2px;}
+}
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr;}
+  .ytd-cell{min-width:100%;}
+  .stat-cell{min-width:100%;}
+  .hdr-title{font-size:14px;}
+  .plant-sw .plant-btn{padding:5px 6px;font-size:10px;letter-spacing:.02em;}
+}
+
+/* ── SHAREPOINT CONFIG MODAL ─────────────────────────────────────────────── */
+.sp-config-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.sp-info-box{background:#f5f4f2;border:1px solid var(--border);border-radius:3px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+.sp-info-box strong{color:var(--charcoal);display:block;margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.06em;}
+.sp-step{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;}
+.sp-step-num{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
 </style>
 </head>
 <body data-plant="okc">
 <header class="header">
   <div class="hdr-left">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <div class="hdr-bar"></div>
     <div><div class="hdr-title" id="hdrPlantName">Oklahoma City</div><div class="hdr-sub">Manufacturing KPI Dashboard</div></div>
     <div class="hdr-sep"></div>
-    <div class="hdr-meta">FY 2026</div>
+    <div class="hdr-meta">FY 2026 &nbsp;·&nbsp; <span id="saveIndicator" style="color:#3a3a3a;">not saved</span></div>
+    <div class="hdr-meta-mobile">FY 2026</div>
   </div>
   <div class="hdr-actions">
     <div class="plant-sw">
@@ -194,9 +265,19 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     </div>
     <button class="btn btn-ghost" onclick="openImportModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import</button>
     <button class="btn btn-ghost" onclick="exportData()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
-    <button class="btn btn-accent" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Machine</button>
+    <button class="btn btn-ghost" onclick="clearState()" title="Reset all data to factory defaults" style="color:#555;border-color:#2a2a2a;font-size:11px;padding:6px 10px;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset
+    </button>
+    <button class="btn btn-accent" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Add Machine</span></button>
+    <div class="sp-status" id="spStatus" onclick="openSPModal()" title="SharePoint sync settings">
+      <div class="sp-dot disconnected" id="spDot"></div>
+      <span id="spLabel" style="color:#555;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">SharePoint</span>
+    </div>
+    <span class="wake-indicator" id="wakeBtn" onclick="toggleWakeLock()" title="Screen wake lock">&#128261;</span>
   </div>
 </header>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="main">
   <aside class="sidebar">
     <div class="sb-head"><div class="sb-head-lbl">Fleet</div><div class="sb-head-val" id="machCount">0 machines</div></div>
@@ -252,6 +333,51 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <div class="mod-foot"><button class="btn btn-light" onclick="closeModal('dataModal')">Cancel</button><button class="btn btn-accent" onclick="saveDataEntry()">Save Data</button></div>
   </div>
 </div>
+
+<!-- SHAREPOINT CONFIG MODAL -->
+<div class="modal-bg" id="spModal">
+  <div class="modal" style="width:580px">
+    <div class="mod-title">SharePoint Sync</div>
+    <div class="mod-sub" id="spModalSub">Connect to Microsoft 365 to save data as a shared team file</div>
+    <div id="spConfigBody">
+      <div class="sp-info-box">
+        <strong>Setup Required (one-time, ~10 min with IT)</strong>
+        <div class="sp-step"><div class="sp-step-num">1</div><div>In Azure Portal, go to <b>App registrations</b> → New registration. Name it "KPI Dashboard". Set redirect URI to <b>Single-page application (SPA)</b> → <code>https://kpi-dashboard-delta-roan.vercel.app</code></div></div>
+        <div class="sp-step"><div class="sp-step-num">2</div><div>Under <b>API permissions</b>, add Microsoft Graph → Delegated → <b>Sites.ReadWrite.All</b> and <b>Files.ReadWrite.All</b>. Grant admin consent.</div></div>
+        <div class="sp-step"><div class="sp-step-num">3</div><div>Copy the <b>Application (client) ID</b> and <b>Directory (tenant) ID</b> from the Overview page and enter below.</div></div>
+      </div>
+      <div class="sp-config-row">
+        <div class="frow"><label class="flbl">Tenant ID</label><input class="finp" id="spTenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></div>
+        <div class="frow"><label class="flbl">Client ID</label><input class="finp" id="spClientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></div>
+      </div>
+      <div class="frow"><label class="flbl">SharePoint Site URL</label><input class="finp" id="spSiteUrl" placeholder="https://supplyone.sharepoint.com/sites/Manufacturing"></div>
+      <div class="frow"><label class="flbl">Data File Path (in SharePoint)</label><input class="finp" id="spFilePath" value="KPI-Dashboard/kpi-data.json" placeholder="KPI-Dashboard/kpi-data.json"></div>
+    </div>
+    <div id="spSignedInBody" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:#f0faf4;border:1px solid #b8e6cc;border-radius:3px;margin-bottom:16px;">
+        <div style="width:10px;height:10px;border-radius:50%;background:#1a7a46;flex-shrink:0;"></div>
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#1a7a46;">Connected to SharePoint</div><div id="spSignedInUser" style="font-size:12px;color:var(--muted);margin-top:2px;"></div></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-outline" onclick="spSyncNow()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Sync Now
+        </button>
+        <button class="btn btn-light" onclick="spSignOut()">Sign Out</button>
+        <button class="btn btn-light" onclick="spDisconnect()">Disconnect SharePoint</button>
+      </div>
+      <div id="spSyncStatus" style="font-size:12px;color:var(--muted);margin-top:12px;font-family:'JetBrains Mono',monospace;"></div>
+    </div>
+    <div class="mod-foot">
+      <button class="btn btn-light" onclick="closeModal('spModal')">Cancel</button>
+      <button class="btn btn-accent" id="spConnectBtn" onclick="spConnect()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign in with Microsoft
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <script>
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -327,6 +453,60 @@ function seedData(){
 const f=(v,d=3)=>{if(v===null||v===undefined||isNaN(v))return'--';return Number(v).toLocaleString('en-US',{maximumFractionDigits:d});};
 function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.className='toast',3200);}
 function calcYTD(arr,pi){const vals=(arr||[]).slice(0,pi+1).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;}
+
+// ── LOCALSTORAGE PERSISTENCE ──────────────────────────────────────────────────
+const LS_KEY='supplyone_kpi_v1';
+function saveState(){
+  try{
+    const payload={
+      machines:state.machines,
+      plant:state.plant,
+      activeMachine:state.activeMachine,
+      savedAt:new Date().toISOString()
+    };
+    localStorage.setItem(LS_KEY,JSON.stringify(payload));
+    const ind=document.getElementById('saveIndicator');
+    if(ind){const now=new Date();ind.textContent='Saved '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ind.style.color='#3a5c3a';}
+  }catch(e){console.warn('localStorage save failed:',e);}
+}
+function loadState(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw){seedData();return;}
+    const payload=JSON.parse(raw);
+    if(!payload.machines||!payload.machines.length){seedData();return;}
+    state.machines=payload.machines;
+    state.plant=payload.plant||'okc';
+    state.activeMachine=payload.activeMachine||null;
+    // Restore plant button UI
+    document.body.setAttribute('data-plant',state.plant);
+    document.getElementById('hdrPlantName').textContent=PLANT_NAMES[state.plant];
+    // Show last saved time
+    if(payload.savedAt){
+      const ind=document.getElementById('saveIndicator');
+      if(ind){const d=new Date(payload.savedAt);ind.textContent='Last saved '+d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ind.style.color='#3a5c3a';}
+    }
+    document.querySelectorAll('.plant-btn').forEach(b=>{
+      b.classList.toggle('active',b.textContent.trim().toLowerCase()===state.plant||
+        (state.plant==='okc'&&b.textContent.trim()==='OKC')||
+        (state.plant==='dallas'&&b.textContent.trim()==='DAL')||
+        (state.plant==='abq'&&b.textContent.trim()==='ABQ')||
+        (state.plant==='tus'&&b.textContent.trim()==='TUS'));
+    });
+  }catch(e){console.warn('localStorage load failed, using defaults:',e);seedData();}
+}
+function clearState(){
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.')){return;}
+  localStorage.removeItem(LS_KEY);
+  state.plant='okc';state.activeMachine=null;
+  document.body.setAttribute('data-plant','okc');
+  document.getElementById('hdrPlantName').textContent='Oklahoma City';
+  document.querySelectorAll('.plant-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  seedData();saveState();renderSidebar();
+  const firstOKC=state.machines.find(m=>m.plant==='okc');
+  if(firstOKC)selectMachine(firstOKC.id);
+  toast('Reset to factory defaults');
+}
 function switchPlant(plant,btn){
   state.plant=plant;state.activeMachine=null;
   document.body.setAttribute('data-plant',plant);
@@ -334,6 +514,7 @@ function switchPlant(plant,btn){
   document.querySelectorAll('.plant-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   renderSidebar();renderDashboard();
+  saveState();
   toast(PLANT_NAMES[plant]+' selected');
 }
 function renderSidebar(){
@@ -342,8 +523,8 @@ function renderSidebar(){
   document.getElementById('machCount').textContent=ms.length+' machine'+(ms.length!==1?'s':'');
   document.getElementById('machList').innerHTML=ms.map(m=>`<div class="mach-item ${m.id===state.activeMachine?'active':''}" onclick="selectMachine('${m.id}')"><div class="mach-left"><div class="mach-pip" style="background:${m.color}"></div><div><div class="mach-name">${m.name}</div><div class="mach-code">${m.code}</div></div></div><button class="mach-del" onclick="event.stopPropagation();deleteMachine('${m.id}')">x</button></div>`).join('');
 }
-function selectMachine(id){state.activeMachine=id;renderSidebar();renderDashboard();}
-function deleteMachine(id){if(!confirm('Delete this machine?'))return;state.machines=state.machines.filter(m=>m.id!==id);if(state.activeMachine===id)state.activeMachine=null;renderSidebar();renderDashboard();toast('Machine deleted');}
+function selectMachine(id){state.activeMachine=id;renderSidebar();renderDashboard();saveState();}
+function deleteMachine(id){if(!confirm('Delete this machine?'))return;state.machines=state.machines.filter(m=>m.id!==id);if(state.activeMachine===id)state.activeMachine=null;renderSidebar();renderDashboard();saveState();toast('Machine deleted');}
 function renderYTDStrip(m,pi,mode){
   const el=document.getElementById('ytdStrip');if(!el)return;
   const thru=mode==='yearly'?'Year 2026':mode==='daily'?dayIdxLabel(pi)+' 2026':mode==='weekly'?'W'+(pi+1)+' 2026':mode==='quarterly'?QUARTERS[pi]+' 2026':MONTHS[pi]+' 2026';
@@ -438,7 +619,7 @@ function saveMachine(){
     const data={};LENS.forEach(([len,mode])=>{data[mode]={cyActual:{},cyTarget:{},pyActual:{}};kpis.forEach(k=>{data[mode].cyActual[k.code]=new Array(len).fill(null);data[mode].cyTarget[k.code]=new Array(len).fill(k.target||null);data[mode].pyActual[k.code]=new Array(len).fill(null);});});
     state.machines.push({id,plant:state.plant,name,code,label:label||code+' '+name.toUpperCase(),color,kpis,data});toast('Machine added');
   }
-  closeModal('addMachModal');renderSidebar();if(!state.activeMachine){const ms=state.machines.filter(m=>m.plant===state.plant);if(ms.length)selectMachine(ms[ms.length-1].id);}else renderDashboard();
+  saveState();closeModal('addMachModal');renderSidebar();if(!state.activeMachine){const ms=state.machines.filter(m=>m.plant===state.plant);if(ms.length)selectMachine(ms[ms.length-1].id);}else renderDashboard();
 }
 let dataMachId=null;
 function openDataModal(mid){dataMachId=mid;const m=state.machines.find(x=>x.id===mid);if(!m)return;document.getElementById('dataModalTitle').textContent='Enter Data - '+m.name;document.getElementById('dataModalBody').innerHTML='<div style="margin-bottom:16px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Period</div><div class="vtabs"><button class="vtab" id="dataTabDaily" onclick="switchDataTab(\'daily\')">Daily</button><button class="vtab" id="dataTabWeekly" onclick="switchDataTab(\'weekly\')">Weekly</button><button class="vtab active" id="dataTabMonthly" onclick="switchDataTab(\'monthly\')">Monthly</button><button class="vtab" id="dataTabQuarterly" onclick="switchDataTab(\'quarterly\')">Quarterly</button><button class="vtab" id="dataTabYearly" onclick="switchDataTab(\'yearly\')">Yearly</button></div></div><div id="dataTabContent"></div>';window._dataModalMode='monthly';renderDataTab(m,'monthly');document.getElementById('dataModal').classList.add('open');}
@@ -462,7 +643,7 @@ function renderDailyDataTab(m,el){
     return'<div style="margin-bottom:16px;padding:13px 15px;background:var(--bg);border-radius:3px;border:1px solid var(--border);"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">'+kpi.code+' - '+kpi.name+'</div>'+secs+'</div>';
   }).join('');
 }
-function saveDataEntry(){const m=state.machines.find(x=>x.id===dataMachId);if(!m)return;document.querySelectorAll('[data-kpi][data-mode]').forEach(inp=>{const kpi=inp.dataset.kpi,type=inp.dataset.type,mode=inp.dataset.mode,idx=parseInt(inp.dataset.idx);if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!m.data[mode][type])m.data[mode][type]={};const len={daily:365,weekly:52,monthly:12,quarterly:4,yearly:1}[mode]||12;if(!m.data[mode][type][kpi])m.data[mode][type][kpi]=new Array(len).fill(null);const v=inp.value.trim();m.data[mode][type][kpi][idx]=v===''?null:parseFloat(v);});closeModal('dataModal');renderDashboard();toast('Data saved');}
+function saveDataEntry(){const m=state.machines.find(x=>x.id===dataMachId);if(!m)return;document.querySelectorAll('[data-kpi][data-mode]').forEach(inp=>{const kpi=inp.dataset.kpi,type=inp.dataset.type,mode=inp.dataset.mode,idx=parseInt(inp.dataset.idx);if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!m.data[mode][type])m.data[mode][type]={};const len={daily:365,weekly:52,monthly:12,quarterly:4,yearly:1}[mode]||12;if(!m.data[mode][type][kpi])m.data[mode][type][kpi]=new Array(len).fill(null);const v=inp.value.trim();m.data[mode][type][kpi][idx]=v===''?null:parseFloat(v);});closeModal('dataModal');renderDashboard();saveState();toast('Data saved');}
 function openImportModal(){document.getElementById('importModal').classList.add('open');}
 const dz=document.getElementById('dropZone');
 dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag');});
@@ -504,6 +685,7 @@ function parsePEFS(data){
   }
   var setVal=function(nameHint,val){var k=mach.kpis.find(function(x){return x.name.toLowerCase().includes(nameHint.toLowerCase());});if(!k||val==null)return;['weekly','daily'].forEach(function(mode){var len=mode==='daily'?365:52,idx=mode==='daily'?dayIdx:weekIdx;if(!mach.data[mode])mach.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!mach.data[mode].cyActual[k.code])mach.data[mode].cyActual[k.code]=new Array(len).fill(null);mach.data[mode].cyActual[k.code][idx]=val;});};
   setVal('Setup',setupTime);setVal('Downtime',downtime);setVal('RunHr',feedsRunHr);setVal('SchHr',feedsSchHr);
+  saveState();
   toast(machineName+' - Week '+(weekIdx+1)+' - '+dayIdxLabel(dayIdx)+' imported');
   state.activeMachine=mach.id;
 }
@@ -517,11 +699,246 @@ function exportData(){
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-bg').forEach(function(bg){bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('open');});});
-seedData();
+loadState();
 renderSidebar();
-// Auto-select first OKC machine
-var firstOKC=state.machines.find(function(m){return m.plant==='okc';});
-if(firstOKC)selectMachine(firstOKC.id);
+initSharePoint();
+// Auto-select if no machine remembered or remembered machine not found
+if(!state.activeMachine||!state.machines.find(function(m){return m.id===state.activeMachine;})){
+  var firstPlant=state.machines.find(function(m){return m.plant===state.plant;});
+  if(firstPlant)selectMachine(firstPlant.id);
+}else{
+  renderDashboard();
+}
+
+// ── WAKE LOCK ─────────────────────────────────────────────────────────────────
+let wakeLock=null;
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator)){return;}
+  try{
+    wakeLock=await navigator.wakeLock.request('screen');
+    const btn=document.getElementById('wakeBtn');
+    if(btn){btn.classList.add('active');btn.title='Screen stay-awake: ON (tap to turn off)';}
+    wakeLock.addEventListener('release',()=>{
+      const btn=document.getElementById('wakeBtn');
+      if(btn){btn.classList.remove('active');btn.title='Screen stay-awake: OFF (tap to turn on)';}
+    });
+  }catch(e){console.log('Wake lock failed:',e);}
+}
+async function toggleWakeLock(){
+  if(wakeLock){wakeLock.release();wakeLock=null;}
+  else{await requestWakeLock();}
+}
+// Re-acquire wake lock when tab becomes visible again
+document.addEventListener('visibilitychange',async()=>{
+  if(document.visibilityState==='visible'&&wakeLock===null){
+    await requestWakeLock();
+  }
+});
+// Auto-enable wake lock on load
+requestWakeLock();
+
+// ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
+function toggleSidebar(){
+  const sb=document.querySelector('.sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+}
+function closeSidebar(){
+  const sb=document.querySelector('.sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  sb.classList.remove('open');
+  ov.classList.remove('open');
+}
+// Close sidebar on machine select (mobile)
+const _origSelect=selectMachine;
+function selectMachine(id){state.activeMachine=id;renderSidebar();renderDashboard();saveState();closeSidebar();}
+
+// ── SHAREPOINT / MSAL ─────────────────────────────────────────────────────────
+const SP_CFG_KEY='supplyone_sp_cfg_v1';
+let msalApp=null,spCfg=null,spUser=null;
+
+function loadSpConfig(){
+  try{const raw=localStorage.getItem(SP_CFG_KEY);if(raw)spCfg=JSON.parse(raw);}catch(e){}
+}
+function saveSpConfig(cfg){
+  spCfg=cfg;
+  localStorage.setItem(SP_CFG_KEY,JSON.stringify(cfg));
+}
+function initMsal(tenantId,clientId){
+  if(msalApp)return;
+  msalApp=new msal.PublicClientApplication({
+    auth:{clientId,authority:'https://login.microsoftonline.com/'+tenantId,redirectUri:window.location.origin+window.location.pathname},
+    cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}
+  });
+}
+function openSPModal(){
+  const body=document.getElementById('spConfigBody');
+  const signedIn=document.getElementById('spSignedInBody');
+  const btn=document.getElementById('spConnectBtn');
+  if(spCfg){
+    document.getElementById('spTenantId').value=spCfg.tenantId||'';
+    document.getElementById('spClientId').value=spCfg.clientId||'';
+    document.getElementById('spSiteUrl').value=spCfg.siteUrl||'';
+    document.getElementById('spFilePath').value=spCfg.filePath||'KPI-Dashboard/kpi-data.json';
+  }
+  if(spUser){
+    body.style.display='none';signedIn.style.display='';btn.style.display='none';
+    document.getElementById('spSignedInUser').textContent=spUser.username||spUser.name||'';
+  }else{
+    body.style.display='';signedIn.style.display='none';btn.style.display='';
+  }
+  document.getElementById('spModal').classList.add('open');
+}
+async function spConnect(){
+  const tenantId=document.getElementById('spTenantId').value.trim();
+  const clientId=document.getElementById('spClientId').value.trim();
+  const siteUrl=document.getElementById('spSiteUrl').value.trim().replace(/\/$/,'');
+  const filePath=document.getElementById('spFilePath').value.trim()||'KPI-Dashboard/kpi-data.json';
+  if(!tenantId||!clientId||!siteUrl){toast('All fields are required','error');return;}
+  saveSpConfig({tenantId,clientId,siteUrl,filePath});
+  initMsal(tenantId,clientId);
+  try{
+    const btn=document.getElementById('spConnectBtn');
+    btn.textContent='Signing in...';btn.disabled=true;
+    const result=await msalApp.loginPopup({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All']});
+    spUser=result.account;
+    updateSpStatus(true,'syncing');
+    await spSyncNow();
+    closeModal('spModal');
+    openSPModal();
+    toast('Connected to SharePoint as '+spUser.username);
+  }catch(e){
+    toast('Sign-in failed: '+e.message,'error');
+    document.getElementById('spConnectBtn').textContent='Sign in with Microsoft';
+    document.getElementById('spConnectBtn').disabled=false;
+  }
+}
+async function getSpToken(){
+  if(!msalApp||!spUser)return null;
+  try{
+    const r=await msalApp.acquireTokenSilent({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All'],account:spUser});
+    return r.accessToken;
+  }catch(e){
+    try{const r=await msalApp.acquireTokenPopup({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All']});return r.accessToken;}
+    catch(e2){return null;}
+  }
+}
+async function getSpSiteId(token,siteUrl){
+  // Extract hostname and path from siteUrl
+  const url=new URL(siteUrl);
+  const hostname=url.hostname;
+  const sitePath=url.pathname;
+  const resp=await fetch(`https://graph.microsoft.com/v1.0/sites/${hostname}:${sitePath}`,{headers:{'Authorization':'Bearer '+token}});
+  if(!resp.ok)throw new Error('Could not find SharePoint site. Check URL.');
+  const data=await resp.json();
+  return data.id;
+}
+async function spSaveToSharePoint(){
+  if(!spCfg||!spUser)return;
+  const token=await getSpToken();if(!token)return;
+  updateSpStatus(true,'syncing');
+  try{
+    const siteId=await getSpSiteId(token,spCfg.siteUrl);
+    const payload=JSON.stringify({machines:state.machines,plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString(),version:'v1'});
+    const resp=await fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:/${spCfg.filePath}:/content`,{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:payload
+    });
+    if(!resp.ok)throw new Error('Save failed: '+resp.status);
+    updateSpStatus(true,'connected');
+    const syncEl=document.getElementById('spSyncStatus');
+    if(syncEl)syncEl.textContent='Last synced: '+new Date().toLocaleTimeString();
+  }catch(e){
+    console.warn('SP save error:',e);
+    updateSpStatus(true,'error');
+    toast('SharePoint save failed: '+e.message,'error');
+  }
+}
+async function spLoadFromSharePoint(){
+  if(!spCfg||!spUser)return false;
+  const token=await getSpToken();if(!token)return false;
+  updateSpStatus(true,'syncing');
+  try{
+    const siteId=await getSpSiteId(token,spCfg.siteUrl);
+    const resp=await fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:/${spCfg.filePath}:/content`,{
+      headers:{'Authorization':'Bearer '+token}
+    });
+    if(resp.status===404){updateSpStatus(true,'connected');return false;}
+    if(!resp.ok)throw new Error('Load failed: '+resp.status);
+    const data=await resp.json();
+    if(data.machines&&data.machines.length){
+      state.machines=data.machines;
+      state.plant=data.plant||'okc';
+      state.activeMachine=data.activeMachine||null;
+      document.body.setAttribute('data-plant',state.plant);
+      document.getElementById('hdrPlantName').textContent=PLANT_NAMES[state.plant]||'Oklahoma City';
+      document.querySelectorAll('.plant-btn').forEach(b=>{
+        const map={OKC:'okc',DAL:'dallas',ABQ:'abq',TUS:'tus'};
+        b.classList.toggle('active',map[b.textContent.trim()]===state.plant);
+      });
+    }
+    updateSpStatus(true,'connected');
+    return true;
+  }catch(e){
+    console.warn('SP load error:',e);
+    updateSpStatus(true,'error');
+    return false;
+  }
+}
+async function spSyncNow(){
+  const loaded=await spLoadFromSharePoint();
+  await spSaveToSharePoint();
+  if(loaded){renderSidebar();if(!state.activeMachine||!state.machines.find(m=>m.id===state.activeMachine)){const first=state.machines.find(m=>m.plant===state.plant);if(first)selectMachine(first.id);}else renderDashboard();}
+  toast('SharePoint sync complete','success');
+}
+function spSignOut(){
+  if(!msalApp||!spUser)return;
+  msalApp.logoutPopup({account:spUser}).then(()=>{spUser=null;updateSpStatus(false,'disconnected');closeModal('spModal');toast('Signed out of Microsoft');});
+}
+function spDisconnect(){
+  if(!confirm('Disconnect SharePoint? Data stays in localStorage.'))return;
+  localStorage.removeItem(SP_CFG_KEY);
+  spCfg=null;spUser=null;msalApp=null;
+  updateSpStatus(false,'disconnected');
+  closeModal('spModal');
+  toast('SharePoint disconnected');
+}
+function updateSpStatus(configured,status){
+  const dot=document.getElementById('spDot');
+  const lbl=document.getElementById('spLabel');
+  if(!dot||!lbl)return;
+  dot.className='sp-dot '+status;
+  if(status==='connected'){lbl.textContent='SharePoint';lbl.style.color='#4ec98a';}
+  else if(status==='syncing'){lbl.textContent='Syncing...';lbl.style.color='#f59e0b';}
+  else if(status==='error'){lbl.textContent='Sync Error';lbl.style.color='var(--accent)';}
+  else{lbl.textContent='SharePoint';lbl.style.color='#555';}
+}
+
+// Override saveState to also push to SharePoint
+const _origSaveState=saveState;
+function saveState(){
+  _origSaveState();
+  if(spCfg&&spUser){spSaveToSharePoint();}
+}
+
+// Init SharePoint on load if previously configured
+async function initSharePoint(){
+  loadSpConfig();
+  if(!spCfg)return;
+  initMsal(spCfg.tenantId,spCfg.clientId);
+  try{
+    const accounts=msalApp.getAllAccounts();
+    if(accounts.length){
+      spUser=accounts[0];
+      updateSpStatus(true,'syncing');
+      const loaded=await spLoadFromSharePoint();
+      if(loaded){renderSidebar();if(!state.activeMachine||!state.machines.find(m=>m.id===state.activeMachine)){const first=state.machines.find(m=>m.plant===state.plant);if(first)selectMachine(first.id);}else renderDashboard();}
+    }else{updateSpStatus(true,'disconnected');}
+  }catch(e){console.warn('SP init error:',e);}
+}
+
 </script>
 </body>
 </html>
