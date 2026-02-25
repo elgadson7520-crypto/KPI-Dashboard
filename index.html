@@ -9,7 +9,7 @@
 <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
-:root{--bg:#f2f1ef;--surface:#fff;--card:#fff;--sidebar:#1a1a1a;--sidebar-h:#242424;--border:#e0ddd8;--border-dk:#c8c4bc;--accent:#c8102e;--accent-dk:#9e0a22;--accent-lt:#fce8ec;--grey:#6b6b6b;--grey-lt:#adadad;--charcoal:#1a1a1a;--text:#1a1a1a;--muted:#7a7a7a;--green:#1a7a46;--green-bg:#e8f5ee;--shadow-sm:0 1px 3px rgba(0,0,0,.07);--shadow:0 2px 10px rgba(0,0,0,.09);--shadow-lg:0 6px 24px rgba(0,0,0,.12);--hdr:#1a1a1a;}
+:root{--bg:#f2f1ef;--surface:#fff;--card:#fff;--sidebar:#1a1a1a;--sidebar-h:#242424;--border:#e0ddd8;--border-dk:#c8c4bc;--accent:#c8102e;--accent-dk:#9e0a22;--accent-lt:#fce8ec;--grey:#6b6b6b;--grey-lt:#adadad;--charcoal:#1a1a1a;--text:#1a1a1a;--muted:#7a7a7a;--green:#1a7a46;--green-bg:#e8f5ee;--amber:#b45309;--amber-bg:#fef3c7;--shadow-sm:0 1px 3px rgba(0,0,0,.07);--shadow:0 2px 10px rgba(0,0,0,.09);--shadow-lg:0 6px 24px rgba(0,0,0,.12);--hdr:#1a1a1a;}
 body[data-plant="dallas"]{--accent:#0055a4;--accent-dk:#003d7a;--accent-lt:#e6eeff;--sidebar:#0c1a2e;--sidebar-h:#152440;--hdr:#0c1a2e;}
 body[data-plant="abq"]{--accent:#006b54;--accent-dk:#004d3c;--accent-lt:#e0f5ef;--sidebar:#0d1f1a;--sidebar-h:#162e26;--hdr:#0d1f1a;}
 body[data-plant="tus"]{--accent:#ea580c;--accent-dk:#c2410c;--accent-lt:#fff3ed;--sidebar:#1f110a;--sidebar-h:#2e1a10;--hdr:#1f110a;}
@@ -58,6 +58,13 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .sb-add{display:flex;align-items:center;gap:8px;padding:11px 18px;cursor:pointer;color:#404040;font-family:'Barlow Condensed',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.08em;border-top:1px solid rgba(255,255,255,.05);margin-top:6px;transition:color .12s;}
 .sb-add:hover{color:var(--accent);}
 .sb-plus{width:16px;height:16px;border:1px solid currentColor;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+/* ── Sidebar nav tabs ── */
+.sb-nav{padding:12px 14px 8px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-nav-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;border:none;background:transparent;color:#555;cursor:pointer;border-radius:3px;transition:all .12s;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;}
+.sb-nav-btn:hover{background:rgba(255,255,255,.04);color:#999;}
+.sb-nav-btn.active{background:rgba(255,255,255,.08);color:var(--accent);}
+.sb-nav-ico{font-size:13px;width:18px;text-align:center;flex-shrink:0;}
+
 .content{flex:1;overflow-y:auto;padding:22px 26px;background:var(--bg);}
 .mach-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;padding-bottom:18px;border-bottom:2px solid var(--border);flex-wrap:wrap;gap:12px;}
 .mach-hdr-l{display:flex;align-items:center;gap:12px;}
@@ -108,6 +115,9 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .kri-val.good{color:var(--green);}.kri-val.bad{color:var(--accent);}.kri-val.neu{color:var(--muted);}
 .kpi-prog{height:3px;background:var(--bg);border-radius:2px;margin-top:10px;}
 .kpi-prog-bar{height:100%;border-radius:2px;transition:width .5s;}
+/* ── NEW: Trend delta arrow ── */
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.03em;margin-left:6px;vertical-align:middle;}
+.kpi-delta.up-good{color:var(--green);}.kpi-delta.up-bad{color:var(--accent);}.kpi-delta.dn-good{color:var(--green);}.kpi-delta.dn-bad{color:var(--accent);}.kpi-delta.flat{color:var(--muted);}
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .sec-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);display:flex;align-items:center;gap:10px;}
 .sec-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;transition:background .3s;}
@@ -137,6 +147,7 @@ tr:last-child td{border-bottom:none;}
 tr:hover td{background:#fafaf8;}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;}
 .bg{background:var(--green-bg);color:var(--green);}.br{background:var(--accent-lt);color:var(--accent);}.bm{background:#efefed;color:var(--muted);}
+.ba{background:var(--amber-bg);color:var(--amber);}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(10,10,10,.55);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
 .modal-bg.open{display:flex;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:26px 28px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
@@ -148,6 +159,7 @@ tr:hover td{background:#fafaf8;}
 .finp{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .13s;}
 .finp:focus{border-color:var(--charcoal);background:#fff;}
 .frow2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 .mod-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
 .kpi-fl{border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px;}
 .kpi-fr{display:grid;grid-template-columns:65px 1fr 80px 55px 75px 95px 26px;gap:5px;padding:7px 10px;align-items:center;border-bottom:1px solid var(--border);}
@@ -176,7 +188,68 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
 .empty-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--charcoal);margin-bottom:6px;}
 .empty-sub{font-size:13px;color:var(--muted);margin-bottom:18px;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px;}.sidebar::-webkit-scrollbar-thumb{background:#2e2e2e;}
-/* ── MOBILE / RESPONSIVE ─────────────────────────────────────────────────── */
+
+/* ── NEW: Narrative block ── */
+.narrative-block{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 4px 4px 0;padding:16px 20px;margin-bottom:20px;box-shadow:var(--shadow-sm);transition:border-color .3s;}
+.narrative-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.narrative-hdr-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);transition:color .3s;}
+.narrative-hdr-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);background:var(--bg);padding:1px 6px;border-radius:2px;}
+.narrative-text{font-family:'Barlow',sans-serif;font-size:13px;line-height:1.7;color:var(--text);}
+
+/* ── NEW: OEE strip ── */
+.oee-strip{background:var(--charcoal);border-radius:4px;margin-bottom:16px;overflow:hidden;border:1px solid #2a2a2a;box-shadow:var(--shadow);display:flex;align-items:stretch;}
+.oee-main{flex:0 0 180px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;border-right:1px solid rgba(255,255,255,.08);}
+.oee-ring{position:relative;width:80px;height:80px;}
+.oee-ring svg{transform:rotate(-90deg);}
+.oee-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:#fff;}
+.oee-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#666;margin-top:6px;}
+.oee-factors{flex:1;display:flex;}
+.oee-factor{flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;justify-content:center;}
+.oee-factor:last-child{border-right:none;}
+.oee-f-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#555;margin-bottom:4px;}
+.oee-f-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;color:#fff;line-height:1;}
+.oee-f-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:#444;margin-top:3px;}
+
+/* ── NEW: Date range picker ── */
+.dr-bar{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.dr-pill{padding:4px 10px;border-radius:2px;font-size:11px;cursor:pointer;background:var(--surface);border:1px solid var(--border);color:var(--muted);transition:all .12s;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
+.dr-pill:hover{border-color:var(--accent);color:var(--accent);}
+.dr-pill.active{background:var(--charcoal);border-color:var(--charcoal);color:#fff;}
+.dr-custom{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.dr-sel{background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);cursor:pointer;}
+
+/* ── NEW: Comparison view ── */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:22px;}
+.comp-card{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.comp-card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.comp-plant-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;text-transform:uppercase;letter-spacing:.04em;}
+.comp-plant-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;}
+.comp-oee-badge{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;padding:6px 14px;border-radius:4px;line-height:1;}
+.comp-body{padding:14px 18px;}
+.comp-kpi-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);}
+.comp-kpi-row:last-child{border-bottom:none;}
+.comp-kpi-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--grey);}
+.comp-kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;}
+
+/* ── NEW: Alert config ── */
+.alert-rule{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:3px;margin-bottom:8px;}
+.alert-rule-text{flex:1;font-size:13px;font-family:'Barlow',sans-serif;}
+.alert-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:3px 8px;border-radius:2px;text-transform:uppercase;letter-spacing:.06em;}
+.alert-badge.teams{background:#e8e5fc;color:#5b47a5;}
+.alert-badge.email{background:#e6f0ff;color:#2563eb;}
+.alert-toggle{width:36px;height:20px;border-radius:10px;background:#ddd;border:none;cursor:pointer;position:relative;transition:background .2s;}
+.alert-toggle.on{background:var(--green);}
+.alert-toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.alert-toggle.on::after{transform:translateX(16px);}
+
+/* ── NEW: Drill-down highlight ── */
+.chart-card.drilled{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow);}
+.drill-banner{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--accent-lt);border:1px solid var(--accent);border-radius:3px;margin-bottom:12px;transition:all .3s;}
+.drill-banner-text{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;flex:1;transition:color .3s;}
+.drill-clear{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--accent);cursor:pointer;text-transform:uppercase;letter-spacing:.06em;border:none;background:none;padding:2px 6px;transition:color .3s;}
+.drill-clear:hover{text-decoration:underline;}
+
+/* ── MOBILE / RESPONSIVE ── */
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90;backdrop-filter:blur(2px);}
 .sidebar-overlay.open{display:block;}
 .hamburger{display:none;background:transparent;border:1px solid #383838;border-radius:3px;padding:6px 8px;cursor:pointer;color:#999;align-items:center;justify-content:center;flex-shrink:0;}
@@ -215,6 +288,10 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
   .stat-cell{min-width:50%;flex:unset;}
   .ytd-cells{flex-wrap:wrap;}
   .ytd-cell{min-width:50%;flex:unset;border-bottom:1px solid rgba(255,255,255,.06);}
+  .oee-strip{flex-direction:column;}
+  .oee-main{flex:none;border-right:none;border-bottom:1px solid rgba(255,255,255,.08);padding:14px;}
+  .oee-factors{flex-wrap:wrap;}
+  .oee-factor{min-width:50%;border-bottom:1px solid rgba(255,255,255,.06);}
   .month-bar{gap:3px;}
   .mpill{padding:4px 7px;font-size:11px;}
   .mpill.day{padding:3px 5px;font-size:10px;}
@@ -226,6 +303,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
   .modal[style*="700px"]{width:calc(100vw - 20px)!important;}
   .kpi-fr{grid-template-columns:55px 1fr 60px 40px 60px 80px 22px;gap:3px;}
   .mci{font-size:9px;padding:4px 2px;}
+  .comp-grid{grid-template-columns:1fr;}
 }
 @media(max-width:480px){
   .kpi-grid{grid-template-columns:1fr;}
@@ -235,13 +313,29 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
   .plant-sw .plant-btn{padding:5px 6px;font-size:10px;letter-spacing:.02em;}
 }
 
-/* ── SHAREPOINT CONFIG MODAL ─────────────────────────────────────────────── */
+/* ── SHAREPOINT CONFIG MODAL ── */
 .sp-config-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
 .sp-info-box{background:#f5f4f2;border:1px solid var(--border);border-radius:3px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
 .sp-info-box strong{color:var(--charcoal);display:block;margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.06em;}
 .sp-step{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;}
 .sp-step-num{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 
+/* ── PRINT STYLES ── */
+@media print{
+  body{background:#fff!important;}
+  .header,.sidebar,.sidebar-overlay,.hamburger,.modal-bg,.toast,.btn,.vtabs,.month-bar,.dr-bar,.sb-nav,.wake-indicator,.sp-status{display:none!important;}
+  .main{height:auto!important;}
+  .content{padding:0!important;overflow:visible!important;}
+  .mach-hdr{page-break-after:avoid;}
+  .chart-card,.kpi-card,.tbl-wrap,.narrative-block,.oee-strip,.ytd-strip,.stat-strip{break-inside:avoid;box-shadow:none!important;border-color:#ddd!important;}
+  .print-hdr{display:flex!important;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:3px solid var(--accent);margin-bottom:16px;}
+  .print-logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:10px;}
+  .print-logo-bar{width:4px;height:22px;background:var(--accent);border-radius:2px;}
+  .print-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:#999;text-align:right;}
+  .print-footer{display:block!important;margin-top:30px;padding-top:10px;border-top:2px solid #eee;font-family:'JetBrains Mono',monospace;font-size:9px;color:#bbb;display:flex;justify-content:space-between;}
+}
+.print-hdr{display:none;}
+.print-footer{display:none;}
 </style>
 </head>
 <body data-plant="okc">
@@ -265,6 +359,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     </div>
     <button class="btn btn-ghost" onclick="openImportModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import</button>
     <button class="btn btn-ghost" onclick="exportData()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+    <button class="btn btn-ghost" onclick="printReport()" title="Print/PDF executive report"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
     <button class="btn btn-ghost" onclick="clearState()" title="Reset all data to factory defaults" style="color:#555;border-color:#2a2a2a;font-size:11px;padding:6px 10px;">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       Reset
@@ -280,6 +375,11 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="main">
   <aside class="sidebar">
+    <div class="sb-nav">
+      <button class="sb-nav-btn active" id="navDash" onclick="switchView('dashboard')"><span class="sb-nav-ico">&#9881;</span>Dashboard</button>
+      <button class="sb-nav-btn" id="navComp" onclick="switchView('comparison')"><span class="sb-nav-ico">&#9878;</span>Plant Comparison</button>
+      <button class="sb-nav-btn" id="navAlerts" onclick="switchView('alerts')"><span class="sb-nav-ico">&#9888;</span>Alert Thresholds</button>
+    </div>
     <div class="sb-head"><div class="sb-head-lbl">Fleet</div><div class="sb-head-val" id="machCount">0 machines</div></div>
     <div class="sb-sec">
       <div class="sb-lbl">Select Machine</div>
@@ -288,14 +388,24 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     </div>
   </aside>
   <main class="content">
+    <!-- Print header (only shows in print) -->
+    <div class="print-hdr"><div class="print-logo"><div class="print-logo-bar"></div>SupplyOne · KPI Executive Report</div><div class="print-meta" id="printMeta"></div></div>
+
     <div class="empty" id="emptyState">
       <div class="empty-ico">&#9881;</div><div class="empty-title">No Machine Selected</div>
       <div class="empty-sub">Select a machine from the sidebar or add a new one</div>
       <button class="btn btn-accent" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add First Machine</button>
     </div>
     <div id="dashContent" style="display:none"></div>
+    <div id="compContent" style="display:none"></div>
+    <div id="alertContent" style="display:none"></div>
+
+    <!-- Print footer (only shows in print) -->
+    <div class="print-footer"><span>SupplyOne Packaging — Southwest Region Operations</span><span>Confidential — For Internal Use Only</span></div>
   </main>
 </div>
+
+<!-- IMPORT MODAL -->
 <div class="modal-bg" id="importModal">
   <div class="modal">
     <div class="mod-title">Import Excel Data</div>
@@ -308,6 +418,8 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <div class="mod-foot"><button class="btn btn-light" onclick="closeModal('importModal')">Cancel</button></div>
   </div>
 </div>
+
+<!-- ADD/EDIT MACHINE MODAL -->
 <div class="modal-bg" id="addMachModal">
   <div class="modal" style="width:700px">
     <div class="mod-title" id="machModalTitle">Add New Machine</div>
@@ -325,12 +437,24 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <div class="mod-foot"><button class="btn btn-light" onclick="closeModal('addMachModal')">Cancel</button><button class="btn btn-accent" onclick="saveMachine()">Save Machine</button></div>
   </div>
 </div>
+
+<!-- DATA ENTRY MODAL -->
 <div class="modal-bg" id="dataModal">
   <div class="modal" style="width:820px">
     <div class="mod-title" id="dataModalTitle">Enter Data</div>
     <div class="mod-sub">Fill values per period. Leave blank if unavailable.</div>
     <div id="dataModalBody"></div>
     <div class="mod-foot"><button class="btn btn-light" onclick="closeModal('dataModal')">Cancel</button><button class="btn btn-accent" onclick="saveDataEntry()">Save Data</button></div>
+  </div>
+</div>
+
+<!-- GOAL-SETTING MODAL -->
+<div class="modal-bg" id="goalModal">
+  <div class="modal" style="width:620px">
+    <div class="mod-title">KPI Targets &amp; Thresholds</div>
+    <div class="mod-sub" id="goalModalSub">Set green/amber/red thresholds per KPI. Gauges and cards will update dynamically.</div>
+    <div id="goalModalBody"></div>
+    <div class="mod-foot"><button class="btn btn-light" onclick="closeModal('goalModal')">Cancel</button><button class="btn btn-accent" onclick="saveGoals()">Save Targets</button></div>
   </div>
 </div>
 
@@ -342,7 +466,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <div id="spConfigBody">
       <div class="sp-info-box">
         <strong>Setup Required (one-time, ~10 min with IT)</strong>
-        <div class="sp-step"><div class="sp-step-num">1</div><div>In Azure Portal, go to <b>App registrations</b> → New registration. Name it "KPI Dashboard". Set redirect URI to <b>Single-page application (SPA)</b> → <code>https://kpi-dashboard-delta-roan.vercel.app</code></div></div>
+        <div class="sp-step"><div class="sp-step-num">1</div><div>In Azure Portal, go to <b>App registrations</b> → New registration. Name it "KPI Dashboard". Set redirect URI to <b>Single-page application (SPA)</b> → your dashboard URL</div></div>
         <div class="sp-step"><div class="sp-step-num">2</div><div>Under <b>API permissions</b>, add Microsoft Graph → Delegated → <b>Sites.ReadWrite.All</b> and <b>Files.ReadWrite.All</b>. Grant admin consent.</div></div>
         <div class="sp-step"><div class="sp-step-num">3</div><div>Copy the <b>Application (client) ID</b> and <b>Directory (tenant) ID</b> from the Overview page and enter below.</div></div>
       </div>
@@ -390,7 +514,18 @@ const PLANT_NAMES={okc:'Oklahoma City',dallas:'Dallas',abq:'Albuquerque',tus:'Tu
 const PLANT_COLORS={okc:'#c8102e',dallas:'#0055a4',abq:'#006b54',tus:'#ea580c'};
 const COLORS=['#c8102e','#2d2d2d','#b45309','#1a5276','#6b2fa0','#145a32','#7f1d1d','#1a3c6e','#ea580c','#0e7490'];
 let state={machines:[],activeMachine:null,editingMachine:null,plant:'okc'};
-window._activePeriod=4;window._viewMode='monthly';window._dailyMonth=0;
+window._activePeriod=4;window._viewMode='monthly';window._dailyMonth=0;window._activeView='dashboard';window._drillPeriod=null;window._dateRange='ytd';window._dateStart=0;window._dateEnd=11;
+
+// ── ALERT THRESHOLDS STATE ──
+const ALERTS_KEY='supplyone_alerts_v1';
+let alertRules=[];
+function loadAlerts(){try{const r=localStorage.getItem(ALERTS_KEY);if(r)alertRules=JSON.parse(r);}catch(e){}}
+function saveAlerts(){try{localStorage.setItem(ALERTS_KEY,JSON.stringify(alertRules));}catch(e){}}
+
+// ── GOAL/TARGET THRESHOLDS STATE ──
+// Stored per machine: machine.goals = { kpiCode: { green: val, amber: val } }
+// green = target (good), amber = caution threshold
+
 function todayDayIdx(){const n=new Date(),s=new Date(n.getFullYear(),0,0);return Math.min(Math.floor((n-s)/86400000)-1,364);}
 function dayIdxToMonthDay(idx){let m=0;while(m<11&&idx>=MONTH_DAY_OFFSET[m+1])m++;return{month:m,day:idx-MONTH_DAY_OFFSET[m]+1};}
 function dayIdxLabel(idx){const{month,day}=dayIdxToMonthDay(idx);return MONTHS[month]+' '+day;}
@@ -398,72 +533,50 @@ function emptyMode(codes,len){const o={cyActual:{},cyTarget:{},pyActual:{}};code
 function mkBlank(id,plant,name,code,label,color){
   const kpis=[{code:'001',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Hrs',lowerBetter:true},{code:'002',name:'Downtime',criteria:'% of scheduled time machine is down',unit:'%',lowerBetter:true},{code:'003',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Qty/Hr',lowerBetter:false},{code:'004',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Qty/Hr',lowerBetter:false}];
   const codes=['001','002','003','004'];
-  return{id,plant,name,code,label,color,kpis,data:{daily:emptyMode(codes,365),weekly:emptyMode(codes,52),monthly:emptyMode(codes,12),quarterly:emptyMode(codes,4),yearly:emptyMode(codes,1)}};
+  return{id,plant,name,code,label,color,kpis,goals:{},data:{daily:emptyMode(codes,365),weekly:emptyMode(codes,52),monthly:emptyMode(codes,12),quarterly:emptyMode(codes,4),yearly:emptyMode(codes,1)}};
 }
 function seedData(){
   const N=null;
-  // OKC - full seeded data
   const okcMachines=[
-    {id:'apstar',plant:'okc',name:'Apstar',code:'210',label:'210 APSTAR 66x110 RDC',color:'#c8102e',
+    {id:'apstar',plant:'okc',name:'Apstar',code:'210',label:'210 APSTAR 66x110 RDC',color:'#c8102e',goals:{},
      kpis:[{code:'101',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'102',name:'Downtime',criteria:'% of time APSTAR is down',unit:'%',lowerBetter:true},{code:'103',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'104',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
      data:{daily:emptyMode(['101','102','103','104'],365),weekly:emptyMode(['101','102','103','104'],52),
       monthly:{cyActual:{101:[.82998,.81338,.75644,.74132,.78579,.78579,N,N,N,N,N,N],102:[2.376,2.44728,2.22703,2.07113,2.19540,2.06368,N,N,N,N,N,N],103:[3.0492,3.29314,3.09555,3.00268,3.12279,2.84174,N,N,N,N,N,N],104:new Array(12).fill(N)},cyTarget:{101:new Array(12).fill(.87),102:new Array(12).fill(2.4),103:new Array(12).fill(2.8),104:new Array(12).fill(N)},pyActual:{101:[.7743,.87,.7134,.7482,.7308,.783,.8352,.783,.7569,.8091,.7308,.7134],102:[2.832,2.328,2.76,2.856,2.376,2.424,2.664,2.352,2.544,2.64,2.856,2.88],103:[3.248,3.192,2.968,2.828,3.332,3.192,2.996,2.8,3.276,2.66,3.332,2.912],104:new Array(12).fill(N)}},
       quarterly:{cyActual:{101:[.79993,.76622,N,N],102:[2.35010,2.12674,N,N],103:[3.14531,2.99074,N,N],104:new Array(4).fill(N)},cyTarget:{101:new Array(4).fill(.87),102:new Array(4).fill(2.4),103:new Array(4).fill(2.8),104:new Array(4).fill(N)},pyActual:{101:[.78623,.77033,N,N],102:[2.64,2.54533,N,N],103:[3.13600,3.01467,N,N],104:new Array(4).fill(N)}},
       yearly:{cyActual:{101:[.78308],102:[2.23842],103:[3.06803],104:[N]},cyTarget:{101:[.87],102:[2.4],103:[2.8],104:[N]},pyActual:{101:[.77828],102:[2.59267],103:[3.07533],104:[N]}}}},
-    {id:'serenco',plant:'okc',name:'Serenco',code:'120',label:'120 SERENCO 55x110 FFG',color:'#2d2d2d',
+    {id:'serenco',plant:'okc',name:'Serenco',code:'120',label:'120 SERENCO 55x110 FFG',color:'#2d2d2d',goals:{},
      kpis:[{code:'201',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'202',name:'Downtime',criteria:'% of time Serenco is down',unit:'%',lowerBetter:true},{code:'203',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'204',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
      data:{daily:emptyMode(['201','202','203','204'],365),weekly:emptyMode(['201','202','203','204'],52),
       monthly:{cyActual:{201:new Array(12).fill(N),202:[.74529,.74746,.82936,.882,.855,.864,N,N,N,N,N,N],203:[.039204,.042732,.046578,.043318,.045484,.0423,N,N,N,N,N,N],204:[.792,.7524,.782496,.766846,.774515,.836476,N,N,N,N,N,N]},cyTarget:{201:new Array(12).fill(N),202:new Array(12).fill(.91),203:new Array(12).fill(.036),204:new Array(12).fill(.88)},pyActual:{201:[.9191,.9555,.7462,.8827,.728,.9464,.7644,.9282,.7735,.8281,.8099,.8463],202:[.04068,.03744,.03492,.03852,.04104,.03852,.0396,.04068,.04068,.03996,.03744,.03456],203:[.924,.7128,.9152,.7568,.7656,.88,.8272,.8712,.748,.7656,.7216,.9064],204:new Array(12).fill(N)}},
       quarterly:{cyActual:{201:new Array(4).fill(N),202:[.77404,.86700,N,N],203:[.042838,.043463,N,N],204:[.775632,.773651,N,N]},cyTarget:{201:new Array(4).fill(N),202:new Array(4).fill(.91),203:new Array(4).fill(.036),204:new Array(4).fill(.88)},pyActual:{201:[.87360,.84630,N,N],202:[.03768,.03852,N,N],203:[.85267,.81488,N,N],204:new Array(4).fill(N)}},
       yearly:{cyActual:{201:[N],202:[.82052],203:[.043151],204:[.774642]},cyTarget:{201:[N],202:[.91],203:[.036],204:[.88]},pyActual:{201:[.85995],202:[.03810],203:[.83378],204:[N]}}}},
-    {id:'mckinley',plant:'okc',name:'McKinley',code:'220',label:'220 MCKINLEY 66x110 RDC',color:'#b45309',
+    {id:'mckinley',plant:'okc',name:'McKinley',code:'220',label:'220 MCKINLEY 66x110 RDC',color:'#b45309',goals:{},
      kpis:[{code:'301',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'302',name:'Downtime',criteria:'% of time McKinley is down',unit:'%',lowerBetter:true},{code:'303',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'304',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
      data:{daily:emptyMode(['301','302','303','304'],365),weekly:emptyMode(['301','302','303','304'],52),
       monthly:{cyActual:{301:new Array(12).fill(N),302:new Array(12).fill(N),303:[392.85,392.85,373.21,347.08,319.32,328.9,N,N,N,N,N,N],304:[.75852,.77369,.71180,.73315,.66717,.60045,N,N,N,N,N,N]},cyTarget:{301:new Array(12).fill(N),302:new Array(12).fill(N),303:new Array(12).fill(450),304:new Array(12).fill(.86)},pyActual:{301:[423,400.5,463.5,396,378,409.5,441,405,414,468,414,369],302:[.7052,.8342,.86,.6966,.7482,.8858,.86,.7568,.7052,.8858,.8686,.6966],303:[.8262,.7695,.6561,.8019,.6642,.729,.8262,.7128,.7128,.7047,.8019,.6804],304:[.6622,.6853,.6622,.616,.7392,.6853,.693,.7546,.77,.7854,.7546,.693]}},
       quarterly:{cyActual:{301:new Array(4).fill(N),302:new Array(4).fill(N),303:[386.303,331.767,N,N],304:[.748,.70692,N,N]},cyTarget:{301:new Array(4).fill(N),302:new Array(4).fill(N),303:new Array(4).fill(450),304:new Array(4).fill(.86)},pyActual:{301:[429,394.5,N,N],302:[.79973,.76120,N,N],303:[.75060,.71740,N,N],304:[.66590,.67262,N,N]}},
       yearly:{cyActual:{301:[N],302:[N],303:[359.035],304:[.72746]},cyTarget:{301:[N],302:[N],303:[450],304:[.86]},pyActual:{301:[411.75],302:[.78047],303:[.73400],304:[.66926]}}}},
-    {id:'ward',plant:'okc',name:'Ward',code:'230',label:'230 WARD 66x110 RDC',color:'#1a5276',
+    {id:'ward',plant:'okc',name:'Ward',code:'230',label:'230 WARD 66x110 RDC',color:'#1a5276',goals:{},
      kpis:[{code:'401',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Avg',lowerBetter:true},{code:'402',name:'Downtime',criteria:'% of time Ward is down',unit:'%',lowerBetter:true},{code:'403',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Avg',lowerBetter:false},{code:'404',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Avg',lowerBetter:false}],
      data:{daily:emptyMode(['401','402','403','404'],365),weekly:emptyMode(['401','402','403','404'],52),
       monthly:{cyActual:{401:[.67068,.69751,.74633,.75380,.82918,.87063,N,N,N,N,N,N],402:[.63063,.58018,.52216,.49083,.44666,.49132,N,N,N,N,N,N],403:[.83372,.76702,.74401,.77377,.78151,.81277,N,N,N,N,N,N],404:new Array(12).fill(N)},cyTarget:{401:new Array(12).fill(.81),402:new Array(12).fill(.77),403:new Array(12).fill(.955),404:new Array(12).fill(N)},pyActual:{401:new Array(12).fill(N),402:new Array(12).fill(N),403:new Array(12).fill(N),404:new Array(12).fill(N)}},
       quarterly:{cyActual:{401:[.70484,.78454,N,N],402:[.57766,.47627,N,N],403:[.78158,.78913,N,N],404:new Array(4).fill(N)},cyTarget:{401:new Array(4).fill(.81),402:new Array(4).fill(.77),403:new Array(4).fill(.955),404:new Array(4).fill(N)},pyActual:{401:new Array(4).fill(N),402:new Array(4).fill(N),403:new Array(4).fill(N),404:new Array(4).fill(N)}},
       yearly:{cyActual:{401:[.74469],402:[.52697],403:[.78536],404:[N]},cyTarget:{401:[.81],402:[.77],403:[.955],404:[N]},pyActual:{401:[N],402:[N],403:[N],404:[N]}}}}
   ];
-  // Dallas machines
-  const dallasMachines=[
-    mkBlank('dal_130','dallas','130 38x100 FFG','130','130 38x100 FFG','#0055a4'),
-    mkBlank('dal_140','dallas','140 38x100 FFG','140','140 38x100 FFG','#1a6ec7'),
-    mkBlank('dal_220','dallas','220 66x80 RDC','220','220 66x80 RDC','#2d2d2d'),
-    mkBlank('dal_210','dallas','210 66x110 RDC','210','210 66x110 RDC','#1a5276'),
-  ];
-  // Albuquerque machines
-  const abqMachines=[
-    mkBlank('abq_110','abq','110 47x95 FFG','110','110 47x95 FFG','#006b54'),
-    mkBlank('abq_210','abq','210 66x110 RDC','210','210 66x110 RDC','#145a32'),
-    mkBlank('abq_510','abq','510 64x160 Prnt','510','510 64x160 Printer','#2d6e5a'),
-  ];
-  // Tucson machines
-  const tusMachines=[
-    mkBlank('tus_110','tus','110 Emba FFG','110','110 Emba FFG','#ea580c'),
-    mkBlank('tus_210','tus','210 Staley RDC','210','210 Staley RDC','#c2410c'),
-    mkBlank('tus_330','tus','330 Kirby','330','330 Kirby','#9a3412'),
-  ];
+  const dallasMachines=[mkBlank('dal_130','dallas','130 38x100 FFG','130','130 38x100 FFG','#0055a4'),mkBlank('dal_140','dallas','140 38x100 FFG','140','140 38x100 FFG','#1a6ec7'),mkBlank('dal_220','dallas','220 66x80 RDC','220','220 66x80 RDC','#2d2d2d'),mkBlank('dal_210','dallas','210 66x110 RDC','210','210 66x110 RDC','#1a5276')];
+  const abqMachines=[mkBlank('abq_110','abq','110 47x95 FFG','110','110 47x95 FFG','#006b54'),mkBlank('abq_210','abq','210 66x110 RDC','210','210 66x110 RDC','#145a32'),mkBlank('abq_510','abq','510 64x160 Prnt','510','510 64x160 Printer','#2d6e5a')];
+  const tusMachines=[mkBlank('tus_110','tus','110 Emba FFG','110','110 Emba FFG','#ea580c'),mkBlank('tus_210','tus','210 Staley RDC','210','210 Staley RDC','#c2410c'),mkBlank('tus_330','tus','330 Kirby','330','330 Kirby','#9a3412')];
   state.machines=[...okcMachines,...dallasMachines,...abqMachines,...tusMachines];
 }
 const f=(v,d=3)=>{if(v===null||v===undefined||isNaN(v))return'--';return Number(v).toLocaleString('en-US',{maximumFractionDigits:d});};
 function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.className='toast',3200);}
 function calcYTD(arr,pi){const vals=(arr||[]).slice(0,pi+1).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;}
 
-// ── LOCALSTORAGE PERSISTENCE ──────────────────────────────────────────────────
+// ── LOCALSTORAGE PERSISTENCE ──
 const LS_KEY='supplyone_kpi_v1';
 function saveState(){
   try{
-    const payload={
-      machines:state.machines,
-      plant:state.plant,
-      activeMachine:state.activeMachine,
-      savedAt:new Date().toISOString()
-    };
+    const payload={machines:state.machines,plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString()};
     localStorage.setItem(LS_KEY,JSON.stringify(payload));
     const ind=document.getElementById('saveIndicator');
     if(ind){const now=new Date();ind.textContent='Saved '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ind.style.color='#3a5c3a';}
@@ -476,33 +589,29 @@ function loadState(){
     const payload=JSON.parse(raw);
     if(!payload.machines||!payload.machines.length){seedData();return;}
     state.machines=payload.machines;
+    // Ensure goals obj exists on all machines
+    state.machines.forEach(m=>{if(!m.goals)m.goals={};});
     state.plant=payload.plant||'okc';
     state.activeMachine=payload.activeMachine||null;
-    // Restore plant button UI
     document.body.setAttribute('data-plant',state.plant);
     document.getElementById('hdrPlantName').textContent=PLANT_NAMES[state.plant];
-    // Show last saved time
     if(payload.savedAt){
       const ind=document.getElementById('saveIndicator');
       if(ind){const d=new Date(payload.savedAt);ind.textContent='Last saved '+d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ind.style.color='#3a5c3a';}
     }
     document.querySelectorAll('.plant-btn').forEach(b=>{
-      b.classList.toggle('active',b.textContent.trim().toLowerCase()===state.plant||
-        (state.plant==='okc'&&b.textContent.trim()==='OKC')||
-        (state.plant==='dallas'&&b.textContent.trim()==='DAL')||
-        (state.plant==='abq'&&b.textContent.trim()==='ABQ')||
-        (state.plant==='tus'&&b.textContent.trim()==='TUS'));
+      b.classList.toggle('active',b.textContent.trim().toLowerCase()===state.plant||(state.plant==='okc'&&b.textContent.trim()==='OKC')||(state.plant==='dallas'&&b.textContent.trim()==='DAL')||(state.plant==='abq'&&b.textContent.trim()==='ABQ')||(state.plant==='tus'&&b.textContent.trim()==='TUS'));
     });
   }catch(e){console.warn('localStorage load failed, using defaults:',e);seedData();}
 }
 function clearState(){
-  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.')){return;}
-  localStorage.removeItem(LS_KEY);
+  if(!confirm('Reset ALL data to factory defaults? This cannot be undone.'))return;
+  localStorage.removeItem(LS_KEY);localStorage.removeItem(ALERTS_KEY);
   state.plant='okc';state.activeMachine=null;
   document.body.setAttribute('data-plant','okc');
   document.getElementById('hdrPlantName').textContent='Oklahoma City';
   document.querySelectorAll('.plant-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
-  seedData();saveState();renderSidebar();
+  alertRules=[];seedData();saveState();renderSidebar();
   const firstOKC=state.machines.find(m=>m.plant==='okc');
   if(firstOKC)selectMachine(firstOKC.id);
   toast('Reset to factory defaults');
@@ -513,18 +622,144 @@ function switchPlant(plant,btn){
   document.getElementById('hdrPlantName').textContent=PLANT_NAMES[plant];
   document.querySelectorAll('.plant-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  renderSidebar();renderDashboard();
-  saveState();
-  toast(PLANT_NAMES[plant]+' selected');
+  renderSidebar();renderDashboard();saveState();toast(PLANT_NAMES[plant]+' selected');
 }
+
+// ── VIEW SWITCHING (Dashboard / Comparison / Alerts) ──
+function switchView(view){
+  window._activeView=view;
+  document.querySelectorAll('.sb-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(view==='comparison'?'navComp':view==='alerts'?'navAlerts':'navDash').classList.add('active');
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('dashContent').style.display=view==='dashboard'?'':'none';
+  document.getElementById('compContent').style.display=view==='comparison'?'':'none';
+  document.getElementById('alertContent').style.display=view==='alerts'?'':'none';
+  if(view==='dashboard')renderDashboard();
+  else if(view==='comparison')renderComparison();
+  else if(view==='alerts')renderAlertConfig();
+  closeSidebar();
+}
+
 function renderSidebar(){
   const plant=state.plant;
   const ms=state.machines.filter(m=>m.plant===plant);
   document.getElementById('machCount').textContent=ms.length+' machine'+(ms.length!==1?'s':'');
   document.getElementById('machList').innerHTML=ms.map(m=>`<div class="mach-item ${m.id===state.activeMachine?'active':''}" onclick="selectMachine('${m.id}')"><div class="mach-left"><div class="mach-pip" style="background:${m.color}"></div><div><div class="mach-name">${m.name}</div><div class="mach-code">${m.code}</div></div></div><button class="mach-del" onclick="event.stopPropagation();deleteMachine('${m.id}')">x</button></div>`).join('');
 }
-function selectMachine(id){state.activeMachine=id;renderSidebar();renderDashboard();saveState();}
+function selectMachine(id){state.activeMachine=id;window._activeView='dashboard';document.querySelectorAll('.sb-nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('navDash').classList.add('active');document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';window._drillPeriod=null;renderSidebar();renderDashboard();saveState();closeSidebar();}
 function deleteMachine(id){if(!confirm('Delete this machine?'))return;state.machines=state.machines.filter(m=>m.id!==id);if(state.activeMachine===id)state.activeMachine=null;renderSidebar();renderDashboard();saveState();toast('Machine deleted');}
+
+// ── DELTA / TREND ARROW CALCULATION ──
+function calcDelta(curr,prev,lowerBetter){
+  if(curr==null||prev==null||prev===0)return{html:'<span class="kpi-delta flat">—</span>',cls:'flat'};
+  const pct=((curr-prev)/Math.abs(prev)*100);
+  const isUp=pct>=0;
+  const isGood=lowerBetter?!isUp:isUp;
+  const arrow=isUp?'&#9650;':'&#9660;';
+  const cls=isUp?(isGood?'up-good':'up-bad'):(isGood?'dn-good':'dn-bad');
+  return{html:'<span class="kpi-delta '+cls+'">'+arrow+' '+(isUp?'+':'')+pct.toFixed(1)+'% MoM</span>',cls};
+}
+
+// ── OEE CALCULATION ──
+// OEE = Availability × Performance × Quality. We'll map from existing KPIs:
+// - Availability ~ (1 - Downtime%) or the machine's "availability" KPI
+// - Performance ~ Feeds/RunHr vs target ratio
+// - Quality ~ we'll assume 98% default if not tracked
+function calcOEE(m,pi,mode){
+  let avail=null,perf=null,qual=98;
+  m.kpis.forEach(k=>{
+    const a=(m.data[mode].cyActual[k.code]||[])[pi],t=(m.data[mode].cyTarget[k.code]||[])[pi];
+    const nm=k.name.toLowerCase();
+    if(nm.includes('downtime')&&a!=null){
+      // If downtime is in %, availability = 100 - downtime
+      // If it's a decimal < 1, it's already a ratio
+      avail=a>1?(100-a):((1-a)*100);
+    }
+    if((nm.includes('run')&&nm.includes('hr'))||(nm.includes('feeds')&&nm.includes('run'))){
+      if(a!=null&&t!=null&&t>0)perf=Math.min((a/t)*100,120);
+    }
+  });
+  if(avail==null&&perf==null)return null;
+  avail=avail!=null?Math.max(0,Math.min(avail,100)):85;
+  perf=perf!=null?Math.max(0,Math.min(perf,120)):85;
+  return{oee:+((avail/100)*(perf/100)*(qual/100)*100).toFixed(1),avail:+avail.toFixed(1),perf:+perf.toFixed(1),qual};
+}
+function oeeColor(v){return v>=75?'var(--green)':v>=55?'var(--amber)':'var(--accent)';}
+function oeeClass(v){return v>=75?'g':v>=55?'a':'r';}
+
+// ── NARRATIVE GENERATION ──
+function generateNarrative(m,pi,mode){
+  const pd=mode==='yearly'?'FY 2026':mode==='daily'?dayIdxLabel(pi):mode==='weekly'?WEEKS[pi]:mode==='quarterly'?QUARTERS[pi]:MONTHS[pi];
+  const parts=[];
+  const oeeData=calcOEE(m,pi,mode);
+  if(oeeData)parts.push('OEE of '+oeeData.oee+'% ('+oeeData.avail+'% availability, '+oeeData.perf+'% performance)');
+  let onTarget=0,belowTarget=0,concerns=[];
+  m.kpis.forEach(k=>{
+    const a=(m.data[mode].cyActual[k.code]||[])[pi],t=(m.data[mode].cyTarget[k.code]||[])[pi];
+    if(a==null||t==null)return;
+    const good=k.lowerBetter?a<=t:a>=t;
+    if(good)onTarget++;else{belowTarget++;
+      const gap=Math.abs(((a-t)/t)*100).toFixed(1);
+      concerns.push(k.name+' at '+f(a)+' ('+gap+'% '+(k.lowerBetter?'above':'below')+' target of '+f(t)+')');
+    }
+  });
+  let text='In '+pd+', '+m.name+' (Plant '+PLANT_NAMES[state.plant]+')';
+  if(oeeData)text+=' posted an '+parts[0]+'.';
+  else text+=' reported '+onTarget+' KPI'+(onTarget!==1?'s':'')+' on target.';
+  if(concerns.length)text+=' Key concerns: '+concerns.join('; ')+'.';
+  else if(onTarget>0)text+=' All tracked KPIs are within target ranges.';
+  // Prior period comparison
+  const prevPi=pi-1;
+  if(prevPi>=0){
+    let improved=0,declined=0;
+    m.kpis.forEach(k=>{
+      const a=(m.data[mode].cyActual[k.code]||[])[pi],p=(m.data[mode].cyActual[k.code]||[])[prevPi];
+      if(a==null||p==null)return;
+      const better=k.lowerBetter?a<p:a>p;
+      if(better)improved++;else declined++;
+    });
+    if(improved+declined>0)text+=' Period-over-period: '+improved+' improved, '+declined+' declined.';
+  }
+  return text;
+}
+
+// ── DATE RANGE FILTERING ──
+function getDateFilteredRange(mode){
+  if(mode!=='monthly')return null; // date range only applies to monthly for now
+  const dr=window._dateRange;
+  if(dr==='ytd')return{start:0,end:11};
+  if(dr==='last1')return{start:Math.max(0,window._activePeriod),end:Math.min(11,window._activePeriod)};
+  if(dr==='last3'){const e=window._activePeriod;return{start:Math.max(0,e-2),end:e};}
+  if(dr==='last6'){const e=window._activePeriod;return{start:Math.max(0,e-5),end:e};}
+  if(dr==='custom')return{start:window._dateStart,end:window._dateEnd};
+  return{start:0,end:11};
+}
+
+// ── GOAL STATUS (green/amber/red) ──
+function getGoalStatus(m,kpi,value){
+  if(value==null)return'neu';
+  const g=(m.goals||{})[kpi.code];
+  const target=(m.data[window._viewMode]?.cyTarget?.[kpi.code]||[])[window._activePeriod];
+  if(!g||g.amber==null){
+    // Fall back to simple target comparison
+    if(target==null)return'neu';
+    return(kpi.lowerBetter?value<=target:value>=target)?'good':'bad';
+  }
+  const greenVal=g.green!=null?g.green:target;
+  if(greenVal==null)return'neu';
+  if(kpi.lowerBetter){
+    if(value<=greenVal)return'good';
+    if(value<=g.amber)return'amber';
+    return'bad';
+  }else{
+    if(value>=greenVal)return'good';
+    if(value>=g.amber)return'amber';
+    return'bad';
+  }
+}
+function goalBadgeClass(status){return status==='good'?'bg':status==='amber'?'ba':'br';}
+function goalStripeColor(status){return status==='good'?'var(--green)':status==='amber'?'var(--amber)':'var(--accent)';}
+
 function renderYTDStrip(m,pi,mode){
   const el=document.getElementById('ytdStrip');if(!el)return;
   const thru=mode==='yearly'?'Year 2026':mode==='daily'?dayIdxLabel(pi)+' 2026':mode==='weekly'?'W'+(pi+1)+' 2026':mode==='quarterly'?QUARTERS[pi]+' 2026':MONTHS[pi]+' 2026';
@@ -533,7 +768,7 @@ function renderYTDStrip(m,pi,mode){
     const ytdT=calcYTD(m.data[mode].cyTarget[kpi.code],pi);
     const vsT=(ytdA!=null&&ytdT!=null&&ytdT!==0)?ytdA/ytdT*100:null;
     const good=vsT!=null?(kpi.lowerBetter?vsT<=100:vsT>=100):null;
-    const badge=vsT!=null?'<span class="ytd-badge '+(good?'ytd-g':'ytd-r')+'">'+(good?'up':'dn')+' '+vsT.toFixed(1)+'%</span>':'<span class="ytd-badge ytd-m">No Data</span>';
+    const badge=vsT!=null?'<span class="ytd-badge '+(good?'ytd-g':'ytd-r')+'">'+(good?'&#9650;':'&#9660;')+' '+vsT.toFixed(1)+'%</span>':'<span class="ytd-badge ytd-m">No Data</span>';
     return'<div class="ytd-cell"><div class="ytd-kpi-name">'+kpi.name+'</div><div class="ytd-val '+(ytdA==null?'nd':'')+'">'+f(ytdA)+'</div><div class="ytd-row">'+badge+'<span class="ytd-tgt">'+(ytdT!=null?'Tgt '+f(ytdT):'')+'</span></div></div>';
   }).join('');
   el.innerHTML='<div class="ytd-hdr"><span class="ytd-hdr-lbl">YTD Running Average</span><span class="ytd-hdr-period">Jan - '+thru+'</span></div><div class="ytd-cells">'+cells+'</div>';
@@ -541,12 +776,27 @@ function renderYTDStrip(m,pi,mode){
 let charts={};
 function renderDashboard(){
   const emp=document.getElementById('emptyState'),dash=document.getElementById('dashContent');
+  document.getElementById('compContent').style.display='none';
+  document.getElementById('alertContent').style.display='none';
   if(!state.activeMachine){emp.style.display='';dash.style.display='none';return;}
   emp.style.display='none';dash.style.display='';
   const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;
   Object.values(charts).forEach(c=>c.destroy());charts={};
   const mode=window._viewMode,pi=window._activePeriod;
   const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
+  // Date range picker (monthly only)
+  let drBar='';
+  if(mode==='monthly'){
+    const dr=window._dateRange;
+    drBar='<div class="dr-bar"><span class="month-lbl">Range:</span>';
+    [{k:'ytd',l:'Full Year'},{k:'last3',l:'Last 3 Mo'},{k:'last6',l:'Last 6 Mo'},{k:'custom',l:'Custom'}].forEach(r=>{
+      drBar+='<div class="dr-pill '+(dr===r.k?'active':'')+'" onclick="setDateRange(\''+r.k+'\')">'+r.l+'</div>';
+    });
+    if(dr==='custom'){
+      drBar+='<span class="dr-custom">from <select class="dr-sel" onchange="window._dateStart=+this.value;renderDashboard()">'+MONTHS.map((m,i)=>'<option value="'+i+'" '+(i===window._dateStart?'selected':'')+'>'+m+'</option>').join('')+'</select> to <select class="dr-sel" onchange="window._dateEnd=+this.value;renderDashboard()">'+MONTHS.map((m,i)=>'<option value="'+i+'" '+(i===window._dateEnd?'selected':'')+'>'+m+'</option>').join('')+'</select></span>';
+    }
+    drBar+='</div>';
+  }
   let pSel='';
   if(mode==='daily'){
     const mPills=MONTHS.map((lbl,mi)=>{const has=m.kpis.some(k=>{const a=m.data.daily.cyActual[k.code]||[];return a.slice(MONTH_DAY_OFFSET[mi],MONTH_DAY_OFFSET[mi]+DAYS_IN_MONTH[mi]).some(v=>v!=null);});return'<div class="mpill '+(mi===window._dailyMonth?'active':'')+(has?' filled':'')+'" onclick="switchDailyMonth('+mi+')">'+lbl+'</div>';}).join('');
@@ -559,48 +809,223 @@ function renderDashboard(){
   }
   const pd=mode==='yearly'?'Year 2026':mode==='daily'?dayIdxLabel(pi)+' 2026':pl[pi]+' 2026';
   const vl={daily:'Daily',weekly:'Weekly',monthly:'Monthly',quarterly:'Quarterly',yearly:'Yearly'}[mode];
-  dash.innerHTML='<div class="mach-hdr"><div class="mach-hdr-l"><div class="mach-accent-bar" style="background:'+m.color+'"></div><div><div class="mach-big-title">'+m.label+'</div><div class="mach-big-sub">CODE: '+m.code+' &nbsp;·&nbsp; '+m.kpis.length+' KPIs &nbsp;·&nbsp; FY 2026</div></div></div><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-outline" onclick="openDataModal(\''+m.id+'\')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Data</button><button class="btn btn-light" onclick="openEditMachine(\''+m.id+'\')">Edit</button></div></div>'
+  // OEE data
+  const oeeData=calcOEE(m,pi,mode);
+  const prevOee=pi>0?calcOEE(m,pi-1,mode):null;
+  const oeeHtml=oeeData?renderOEEStrip(oeeData,prevOee):'';
+  // Narrative
+  const narr=generateNarrative(m,pi,mode);
+  // Drill-down banner
+  const drillHtml=window._drillPeriod!=null?'<div class="drill-banner"><span class="drill-banner-text">&#128269; Filtered to: '+pl[window._drillPeriod]+'</span><button class="drill-clear" onclick="clearDrill()">&#10005; Clear Filter</button></div>':'';
+
+  dash.innerHTML='<div class="mach-hdr"><div class="mach-hdr-l"><div class="mach-accent-bar" style="background:'+m.color+'"></div><div><div class="mach-big-title">'+m.label+'</div><div class="mach-big-sub">CODE: '+m.code+' &nbsp;·&nbsp; '+m.kpis.length+' KPIs &nbsp;·&nbsp; FY 2026</div></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn btn-outline" onclick="openDataModal(\''+m.id+'\')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Data</button><button class="btn btn-light" onclick="openGoalModal(\''+m.id+'\')">&#9881; Targets</button><button class="btn btn-light" onclick="openEditMachine(\''+m.id+'\')">Edit</button></div></div>'
   +'<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">View:</div><div class="vtabs"><button class="vtab '+(mode==='daily'?'active':'')+'" onclick="switchViewMode(\'daily\')">Daily</button><button class="vtab '+(mode==='weekly'?'active':'')+'" onclick="switchViewMode(\'weekly\')">Weekly</button><button class="vtab '+(mode==='monthly'?'active':'')+'" onclick="switchViewMode(\'monthly\')">Monthly</button><button class="vtab '+(mode==='quarterly'?'active':'')+'" onclick="switchViewMode(\'quarterly\')">Quarterly</button><button class="vtab '+(mode==='yearly'?'active':'')+'" onclick="switchViewMode(\'yearly\')">Yearly</button></div></div>'
-  +pSel
+  +drBar+pSel
+  // Narrative block
+  +'<div class="narrative-block"><div class="narrative-hdr"><span class="narrative-hdr-lbl">Executive Summary</span><span class="narrative-hdr-tag">Auto-generated · '+pd+'</span></div><div class="narrative-text">'+narr+'</div></div>'
+  // OEE strip
+  +oeeHtml
   +'<div class="ytd-strip" id="ytdStrip"></div>'
   +'<div id="statStrip" class="stat-strip"></div>'
   +'<div class="kpi-grid" id="kpiCards"></div>'
   +'<div class="sec-hdr"><div class="sec-title">'+vl+' Trends <span class="sec-tag">CY Actual · Target · PY</span></div><div class="vtabs"><button class="vtab active" onclick="switchChartView(\'actual\',this)">Actual</button><button class="vtab" onclick="switchChartView(\'cumulative\',this)">Cumulative</button></div></div>'
+  +drillHtml
   +'<div class="charts-grid" id="chartsGrid"></div>'
   +'<div class="sec-hdr"><div class="sec-title">Performance Table <span class="sec-tag">'+pd+'</span></div></div>'
   +'<div class="tbl-wrap"><div class="tbl-bar"><div class="tbl-bar-title">'+m.name+' · All KPIs</div><div style="font-size:11px;color:var(--muted);font-family:\'JetBrains Mono\',monospace">Period: '+pd+'</div></div><div id="tblBody"></div></div>';
   renderYTDStrip(m,pi,mode);renderStrip(m,pi,mode);renderCards(m,pi,mode);renderCharts(m,mode);renderTable(m,pi,mode);window._activeMachine=m;
+  // Print meta
+  document.getElementById('printMeta').innerHTML=PLANT_NAMES[state.plant]+' · '+m.label+'<br>'+pd+' · Generated '+new Date().toLocaleDateString();
 }
-function renderStrip(m,pi,mode){const el=document.getElementById('statStrip');if(!el)return;let on=0,bl=0,nd=0;m.kpis.forEach(k=>{const a=(m.data[mode].cyActual[k.code]||[])[pi],t=(m.data[mode].cyTarget[k.code]||[])[pi];if(a==null||t==null){nd++;return;}(k.lowerBetter?a<=t:a>=t)?on++:bl++;});el.innerHTML='<div class="stat-cell"><div class="stat-lbl">On / Above Target</div><div class="stat-val g">'+on+'</div></div><div class="stat-cell"><div class="stat-lbl">Below Target</div><div class="stat-val r">'+bl+'</div></div><div class="stat-cell"><div class="stat-lbl">No Data</div><div class="stat-val m">'+nd+'</div></div><div class="stat-cell"><div class="stat-lbl">Total KPIs</div><div class="stat-val">'+m.kpis.length+'</div></div><div class="stat-cell"><div class="stat-lbl">Machine</div><div class="stat-val" style="font-size:16px">'+m.name+'</div></div>';}
+
+function renderOEEStrip(oee,prevOee){
+  const oc=oeeColor(oee.oee);
+  const delta=prevOee?calcDelta(oee.oee,prevOee.oee,false):{html:''};
+  const r=34,c=2*Math.PI*r,off=c*(1-(oee.oee/100));
+  return'<div class="oee-strip"><div class="oee-main"><div class="oee-ring"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="'+r+'" fill="none" stroke="#2a2a2a" stroke-width="5"/><circle cx="40" cy="40" r="'+r+'" fill="none" stroke="'+oc+'" stroke-width="5" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" stroke-linecap="round"/></svg><div class="oee-ring-val" style="color:'+oc+'">'+oee.oee+'%</div></div><div class="oee-lbl">OEE Score '+delta.html+'</div></div><div class="oee-factors"><div class="oee-factor"><div class="oee-f-lbl">Availability</div><div class="oee-f-val" style="color:'+oeeColor(oee.avail)+'">'+oee.avail+'%</div><div class="oee-f-note">100% - Downtime</div></div><div class="oee-factor"><div class="oee-f-lbl">Performance</div><div class="oee-f-val" style="color:'+oeeColor(oee.perf)+'">'+oee.perf+'%</div><div class="oee-f-note">Actual / Target Rate</div></div><div class="oee-factor"><div class="oee-f-lbl">Quality</div><div class="oee-f-val" style="color:'+oeeColor(oee.qual)+'">'+oee.qual+'%</div><div class="oee-f-note">Good Units / Total</div></div><div class="oee-factor"><div class="oee-f-lbl">Classification</div><div class="oee-f-val" style="color:'+oc+';font-size:16px;">'+(oee.oee>=85?'World Class':oee.oee>=75?'Good':oee.oee>=65?'Average':oee.oee>=55?'Below Avg':'Needs Attention')+'</div><div class="oee-f-note">A × P × Q</div></div></div></div>';
+}
+
+function renderStrip(m,pi,mode){const el=document.getElementById('statStrip');if(!el)return;let on=0,bl=0,nd=0,am=0;m.kpis.forEach(k=>{const a=(m.data[mode].cyActual[k.code]||[])[pi],t=(m.data[mode].cyTarget[k.code]||[])[pi];if(a==null||t==null){nd++;return;}const st=getGoalStatus(m,k,a);if(st==='good')on++;else if(st==='amber')am++;else bl++;});el.innerHTML='<div class="stat-cell"><div class="stat-lbl">On / Above Target</div><div class="stat-val g">'+on+'</div></div><div class="stat-cell"><div class="stat-lbl">Caution</div><div class="stat-val" style="color:var(--amber)">'+am+'</div></div><div class="stat-cell"><div class="stat-lbl">Below Target</div><div class="stat-val r">'+bl+'</div></div><div class="stat-cell"><div class="stat-lbl">No Data</div><div class="stat-val m">'+nd+'</div></div><div class="stat-cell"><div class="stat-lbl">Total KPIs</div><div class="stat-val">'+m.kpis.length+'</div></div><div class="stat-cell"><div class="stat-lbl">Machine</div><div class="stat-val" style="font-size:16px">'+m.name+'</div></div>';}
 function renderCards(m,pi,mode){
   const el=document.getElementById('kpiCards');if(!el)return;
   el.innerHTML=m.kpis.map(kpi=>{
     const a=(m.data[mode].cyActual[kpi.code]||[])[pi]??null,t=(m.data[mode].cyTarget[kpi.code]||[])[pi]??null,p=(m.data[mode].pyActual[kpi.code]||[])[pi]??null;
+    const prev=pi>0?(m.data[mode].cyActual[kpi.code]||[])[pi-1]??null:null;
     const vsT=(a!=null&&t!=null&&t!==0)?a/t*100:null,vsP=(a!=null&&p!=null&&p!==0)?a/p*100:null;
-    const good=vsT!=null?(kpi.lowerBetter?vsT<=100:vsT>=100):null;
-    const sc=good===null?'var(--grey-lt)':good?'var(--green)':'var(--accent)';
-    const vc=good===null?'neu':good?'good':'bad';
+    const status=getGoalStatus(m,kpi,a);
+    const sc=goalStripeColor(status);
+    const vc=status==='good'?'good':status==='amber'?'bad':'bad';
     const pvGood=vsP!=null?(kpi.lowerBetter?vsP<=100:vsP>=100):null;
-    return'<div class="kpi-card"><div class="kpi-card-stripe" style="background:'+sc+'"></div><div class="kpi-code">'+kpi.code+' · '+kpi.unit+'</div><div class="kpi-name">'+kpi.name+'</div><div class="kpi-val">'+f(a)+'</div><div class="kpi-unit-lbl">'+kpi.criteria+'</div><div class="kpi-row"><div class="kpi-row-item"><div class="kri-lbl">vs Target</div><div class="kri-val '+vc+'">'+(vsT!=null?vsT.toFixed(1)+'%':'--')+'</div></div><div class="kpi-row-item"><div class="kri-lbl">vs PY</div><div class="kri-val '+(pvGood===null?'neu':pvGood?'good':'bad')+'">'+(vsP!=null?vsP.toFixed(1)+'%':'--')+'</div></div><div class="kpi-row-item"><div class="kri-lbl">Target</div><div class="kri-val neu">'+f(t)+'</div></div></div><div class="kpi-prog"><div class="kpi-prog-bar" style="width:'+(vsT!=null?Math.min(Math.abs(vsT),150):0)+'%;background:'+sc+'"></div></div></div>';
+    const delta=calcDelta(a,prev,kpi.lowerBetter);
+    return'<div class="kpi-card"><div class="kpi-card-stripe" style="background:'+sc+'"></div><div class="kpi-code">'+kpi.code+' · '+kpi.unit+'</div><div class="kpi-name">'+kpi.name+'</div><div class="kpi-val">'+f(a)+' '+delta.html+'</div><div class="kpi-unit-lbl">'+kpi.criteria+'</div><div class="kpi-row"><div class="kpi-row-item"><div class="kri-lbl">vs Target</div><div class="kri-val '+(status==='good'?'good':status==='amber'?'bad':'bad')+'">'+(vsT!=null?vsT.toFixed(1)+'%':'--')+'</div></div><div class="kpi-row-item"><div class="kri-lbl">vs PY</div><div class="kri-val '+(pvGood===null?'neu':pvGood?'good':'bad')+'">'+(vsP!=null?vsP.toFixed(1)+'%':'--')+'</div></div><div class="kpi-row-item"><div class="kri-lbl">Target</div><div class="kri-val neu">'+f(t)+'</div></div></div><div class="kpi-prog"><div class="kpi-prog-bar" style="width:'+(vsT!=null?Math.min(Math.abs(vsT),150):0)+'%;background:'+sc+'"></div></div></div>';
   }).join('');
 }
-function switchPeriod(idx){window._activePeriod=idx;if(window._viewMode==='daily'){window._dailyMonth=dayIdxToMonthDay(idx).month;renderDashboard();return;}document.querySelectorAll('.mpill').forEach((p,i)=>p.classList.toggle('active',i===idx));const m=window._activeMachine,mode=window._viewMode;if(m){renderYTDStrip(m,idx,mode);renderCards(m,idx,mode);renderStrip(m,idx,mode);renderTable(m,idx,mode);}}
+function switchPeriod(idx){window._activePeriod=idx;window._drillPeriod=null;if(window._viewMode==='daily'){window._dailyMonth=dayIdxToMonthDay(idx).month;renderDashboard();return;}document.querySelectorAll('.mpill').forEach((p,i)=>p.classList.toggle('active',i===idx));const m=window._activeMachine,mode=window._viewMode;if(m){renderYTDStrip(m,idx,mode);renderCards(m,idx,mode);renderStrip(m,idx,mode);renderTable(m,idx,mode);}}
 function switchDailyMonth(mi){window._dailyMonth=mi;window._activePeriod=MONTH_DAY_OFFSET[mi];renderDashboard();}
-function switchViewMode(nm){window._viewMode=nm;if(nm==='daily'){const t=todayDayIdx();window._activePeriod=t;window._dailyMonth=dayIdxToMonthDay(t).month;}else if(nm==='yearly')window._activePeriod=0;else if(nm==='quarterly')window._activePeriod=1;else if(nm==='weekly')window._activePeriod=20;else window._activePeriod=4;renderDashboard();}
+function switchViewMode(nm){window._viewMode=nm;window._drillPeriod=null;if(nm==='daily'){const t=todayDayIdx();window._activePeriod=t;window._dailyMonth=dayIdxToMonthDay(t).month;}else if(nm==='yearly')window._activePeriod=0;else if(nm==='quarterly')window._activePeriod=1;else if(nm==='weekly')window._activePeriod=20;else window._activePeriod=4;renderDashboard();}
+function setDateRange(r){window._dateRange=r;renderDashboard();}
+
+// ── DRILL-DOWN ──
+function drillToPeriod(idx){
+  if(window._drillPeriod===idx)window._drillPeriod=null;else window._drillPeriod=idx;
+  const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;
+  renderTable(m,window._activePeriod,window._viewMode);
+  // Update drill banner
+  const old=document.querySelector('.drill-banner');
+  const pl=window._viewMode==='daily'?DAYS:window._viewMode==='weekly'?WEEKS:window._viewMode==='quarterly'?QUARTERS:window._viewMode==='yearly'?['2026']:MONTHS;
+  if(window._drillPeriod!=null){
+    const html='<div class="drill-banner"><span class="drill-banner-text">&#128269; Table filtered to: '+pl[window._drillPeriod]+'</span><button class="drill-clear" onclick="clearDrill()">&#10005; Clear Filter</button></div>';
+    if(old)old.outerHTML=html;else{const cg=document.getElementById('chartsGrid');if(cg)cg.insertAdjacentHTML('beforebegin',html);}
+  }else if(old)old.remove();
+}
+function clearDrill(){window._drillPeriod=null;const m=state.machines.find(x=>x.id===state.activeMachine);if(m)renderTable(m,window._activePeriod,window._viewMode);const b=document.querySelector('.drill-banner');if(b)b.remove();}
+
 function renderCharts(m,mode){
   const grid=document.getElementById('chartsGrid');if(!grid)return;
   const isD=mode==='daily',isC=isD||mode==='weekly';
   const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
-  grid.innerHTML=m.kpis.map(k=>'<div class="chart-card"><div class="chart-title">'+k.code+' · '+k.name+'</div><div class="chart-sub">'+k.criteria+'</div><div class="chart-wrap"><canvas id="ch_'+k.code+'"></canvas></div></div>').join('');
+  grid.innerHTML=m.kpis.map(k=>'<div class="chart-card" id="cc_'+k.code+'"><div class="chart-title">'+k.code+' · '+k.name+'</div><div class="chart-sub">'+k.criteria+' <span style="font-size:10px;color:var(--accent);cursor:pointer" onclick="clearDrill()">'+(window._drillPeriod!=null?'(click to clear filter)':'(click a bar to drill down)')+'</span></div><div class="chart-wrap"><canvas id="ch_'+k.code+'"></canvas></div></div>').join('');
   m.kpis.forEach(kpi=>{
     const ctx=document.getElementById('ch_'+kpi.code);if(!ctx)return;
     const cy=m.data[mode].cyActual[kpi.code]||[],tgt=m.data[mode].cyTarget[kpi.code]||[],py=m.data[mode].pyActual[kpi.code]||[];
-    charts[kpi.code]=new Chart(ctx,{type:'line',data:{labels:pl,datasets:[{label:'CY Actual',data:cy,borderColor:m.color,backgroundColor:m.color+'18',fill:true,tension:.4,borderWidth:isD?1.5:2.5,pointRadius:isD?0:isC?2:4,pointHoverRadius:isD?4:6,pointBackgroundColor:m.color,pointBorderColor:'#fff',pointBorderWidth:2},{label:'Target',data:tgt,borderColor:'#bbb',borderDash:[5,4],fill:false,tension:.3,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#bbb'},{label:'PY Actual',data:py,borderColor:'#ddd',fill:false,tension:.4,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#ddd'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2,callbacks:{title(items){return isD?dayIdxLabel(items[0].dataIndex)+' 2026':items[0].label;}}}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'Barlow Condensed',size:isD?8:isC?8:11},maxRotation:isC?90:0,minRotation:isC?45:0,maxTicksLimit:isD?14:undefined,callback:isD?function(v,i){return i%30===0?MONTHS[dayIdxToMonthDay(i).month]+' '+dayIdxToMonthDay(i).day:'';}:undefined}},y:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'JetBrains Mono',size:10}}}}}});
+    charts[kpi.code]=new Chart(ctx,{type:'bar',data:{labels:pl,datasets:[{label:'CY Actual',data:cy,backgroundColor:cy.map((_,i)=>{
+      if(window._drillPeriod!=null&&i!==window._drillPeriod)return m.color+'30';
+      return m.color+'cc';
+    }),borderColor:m.color,borderWidth:1,borderRadius:2,order:2},{label:'Target',data:tgt,type:'line',borderColor:'#bbb',borderDash:[5,4],fill:false,tension:.3,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#bbb',order:1},{label:'PY Actual',data:py,type:'line',borderColor:'#ddd',fill:false,tension:.4,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#ddd',order:1}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length){drillToPeriod(items[0].index);}},plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2,callbacks:{title(items){return isD?dayIdxLabel(items[0].dataIndex)+' 2026':items[0].label;}}}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'Barlow Condensed',size:isD?8:isC?8:11},maxRotation:isC?90:0,minRotation:isC?45:0,maxTicksLimit:isD?14:undefined,callback:isD?function(v,i){return i%30===0?MONTHS[dayIdxToMonthDay(i).month]+' '+dayIdxToMonthDay(i).day:'';}:undefined}},y:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'JetBrains Mono',size:10}}}}}});
   });
 }
 function switchChartView(cm,btn){document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const mode=window._viewMode;m.kpis.forEach(kpi=>{const c=charts[kpi.code];if(!c)return;c.data.datasets[0].data=cm==='actual'?m.data[mode].cyActual[kpi.code]||[]:cumAvg(m.data[mode].cyActual[kpi.code]||[]);c.data.datasets[2].data=cm==='actual'?m.data[mode].pyActual[kpi.code]||[]:cumAvg(m.data[mode].pyActual[kpi.code]||[]);c.update();});}
 function cumAvg(arr){let s=0,c=0;return arr.map(v=>{if(v==null)return null;s+=v;c++;return s/c;});}
-function renderTable(m,pi,mode){const el=document.getElementById('tblBody');if(!el)return;const rows=m.kpis.map(kpi=>{const a=(m.data[mode].cyActual[kpi.code]||[])[pi]??null,t=(m.data[mode].cyTarget[kpi.code]||[])[pi]??null,p=(m.data[mode].pyActual[kpi.code]||[])[pi]??null;const vsT=(a!=null&&t!=null&&t!==0)?a/t*100:null,vsP=(a!=null&&p!=null&&p!==0)?a/p*100:null;const good=vsT!=null?(kpi.lowerBetter?vsT<=100:vsT>=100):null;const bc=good===null?'bm':good?'bg':'br';return'<tr><td class="code">'+kpi.code+'</td><td style="font-weight:500">'+kpi.name+'</td><td style="color:var(--muted);font-size:12px">'+kpi.criteria+'</td><td class="r" style="color:var(--muted)">'+kpi.unit+'</td><td class="r" style="font-weight:600">'+f(a)+'</td><td class="r">'+f(t)+'</td><td class="r">'+f(p)+'</td><td class="r"><span class="badge '+bc+'">'+(vsT!=null?(good?'up':'dn')+' '+vsT.toFixed(1)+'%':'--')+'</span></td><td class="r" style="color:var(--muted)">'+(vsP!=null?vsP.toFixed(1)+'%':'--')+'</td></tr>';}).join('');el.innerHTML='<table><thead><tr><th>Code</th><th>KPI</th><th>Criteria</th><th class="r">Unit</th><th class="r">Actual</th><th class="r">Target</th><th class="r">PY Actual</th><th class="r">Act/Target</th><th class="r">Act/PY</th></tr></thead><tbody>'+rows+'</tbody></table>';}
+function renderTable(m,pi,mode){
+  const el=document.getElementById('tblBody');if(!el)return;
+  // If drilled, show all periods for the drilled KPI data, not just pi
+  const drilled=window._drillPeriod;
+  if(drilled!=null){
+    // Show data for the drilled period
+    const usePi=drilled;
+    const rows=m.kpis.map(kpi=>{const a=(m.data[mode].cyActual[kpi.code]||[])[usePi]??null,t=(m.data[mode].cyTarget[kpi.code]||[])[usePi]??null,p=(m.data[mode].pyActual[kpi.code]||[])[usePi]??null;const vsT=(a!=null&&t!=null&&t!==0)?a/t*100:null,vsP=(a!=null&&p!=null&&p!==0)?a/p*100:null;const st=getGoalStatus(m,kpi,a);const bc=goalBadgeClass(st);return'<tr><td class="code">'+kpi.code+'</td><td style="font-weight:500">'+kpi.name+'</td><td style="color:var(--muted);font-size:12px">'+kpi.criteria+'</td><td class="r" style="color:var(--muted)">'+kpi.unit+'</td><td class="r" style="font-weight:600">'+f(a)+'</td><td class="r">'+f(t)+'</td><td class="r">'+f(p)+'</td><td class="r"><span class="badge '+bc+'">'+(vsT!=null?(st==='good'?'&#9650;':st==='amber'?'&#9679;':'&#9660;')+' '+vsT.toFixed(1)+'%':'--')+'</span></td><td class="r" style="color:var(--muted)">'+(vsP!=null?vsP.toFixed(1)+'%':'--')+'</td></tr>';}).join('');
+    const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;
+    el.innerHTML='<table><thead><tr><th>Code</th><th>KPI</th><th>Criteria</th><th class="r">Unit</th><th class="r">Actual ('+pl[usePi]+')</th><th class="r">Target</th><th class="r">PY Actual</th><th class="r">Act/Target</th><th class="r">Act/PY</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }else{
+    const rows=m.kpis.map(kpi=>{const a=(m.data[mode].cyActual[kpi.code]||[])[pi]??null,t=(m.data[mode].cyTarget[kpi.code]||[])[pi]??null,p=(m.data[mode].pyActual[kpi.code]||[])[pi]??null;const vsT=(a!=null&&t!=null&&t!==0)?a/t*100:null,vsP=(a!=null&&p!=null&&p!==0)?a/p*100:null;const st=getGoalStatus(m,kpi,a);const bc=goalBadgeClass(st);return'<tr><td class="code">'+kpi.code+'</td><td style="font-weight:500">'+kpi.name+'</td><td style="color:var(--muted);font-size:12px">'+kpi.criteria+'</td><td class="r" style="color:var(--muted)">'+kpi.unit+'</td><td class="r" style="font-weight:600">'+f(a)+'</td><td class="r">'+f(t)+'</td><td class="r">'+f(p)+'</td><td class="r"><span class="badge '+bc+'">'+(vsT!=null?(st==='good'?'&#9650;':st==='amber'?'&#9679;':'&#9660;')+' '+vsT.toFixed(1)+'%':'--')+'</span></td><td class="r" style="color:var(--muted)">'+(vsP!=null?vsP.toFixed(1)+'%':'--')+'</td></tr>';}).join('');
+    el.innerHTML='<table><thead><tr><th>Code</th><th>KPI</th><th>Criteria</th><th class="r">Unit</th><th class="r">Actual</th><th class="r">Target</th><th class="r">PY Actual</th><th class="r">Act/Target</th><th class="r">Act/PY</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+}
+
+// ── COMPARISON VIEW ──
+function renderComparison(){
+  const el=document.getElementById('compContent');el.style.display='';
+  document.getElementById('dashContent').style.display='none';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('alertContent').style.display='none';
+  const mode=window._viewMode==='yearly'?'yearly':window._viewMode==='quarterly'?'quarterly':'monthly';
+  const pi=mode==='monthly'?window._activePeriod:mode==='quarterly'?Math.min(window._activePeriod,3):0;
+  let html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;">Plant Comparison</div><div style="font-size:12px;color:var(--muted);">Side-by-side overview across all facilities · Latest monthly data</div></div></div>';
+  html+='<div class="comp-grid">';
+  Object.entries(PLANT_NAMES).forEach(([pk,pn])=>{
+    const ms=state.machines.filter(m=>m.plant===pk);
+    if(!ms.length)return;
+    // Aggregate KPIs across all machines for this plant
+    const allKpis={};
+    ms.forEach(m=>{m.kpis.forEach(k=>{
+      const a=(m.data.monthly.cyActual[k.code]||[])[pi];
+      const t=(m.data.monthly.cyTarget[k.code]||[])[pi];
+      if(!allKpis[k.name])allKpis[k.name]={vals:[],targets:[],lb:k.lowerBetter};
+      if(a!=null)allKpis[k.name].vals.push(a);
+      if(t!=null)allKpis[k.name].targets.push(t);
+    });});
+    // Average OEE
+    let oees=[];ms.forEach(m=>{const o=calcOEE(m,pi,'monthly');if(o)oees.push(o.oee);});
+    const avgOee=oees.length?(oees.reduce((a,b)=>a+b,0)/oees.length).toFixed(1):'--';
+    const oeeCl=avgOee!=='--'?oeeColor(parseFloat(avgOee)):'var(--muted)';
+    const oeeBg=avgOee!=='--'?(parseFloat(avgOee)>=75?'var(--green-bg)':parseFloat(avgOee)>=55?'var(--amber-bg)':'var(--accent-lt)'):'var(--bg)';
+    html+='<div class="comp-card"><div class="comp-card-hdr" style="border-top:3px solid '+(PLANT_COLORS[pk]||'var(--accent)')+'"><div><div class="comp-plant-name">'+pn+'</div><div class="comp-plant-sub">'+ms.length+' machine'+(ms.length!==1?'s':'')+'</div></div><div class="comp-oee-badge" style="background:'+oeeBg+';color:'+oeeCl+'">'+avgOee+'%<div style="font-size:9px;font-weight:600;text-align:center;margin-top:2px;">OEE</div></div></div><div class="comp-body">';
+    // KPI averages
+    Object.entries(allKpis).forEach(([name,data])=>{
+      if(!data.vals.length)return;
+      const avg=data.vals.reduce((a,b)=>a+b,0)/data.vals.length;
+      const tAvg=data.targets.length?data.targets.reduce((a,b)=>a+b,0)/data.targets.length:null;
+      const good=tAvg!=null?(data.lb?avg<=tAvg:avg>=tAvg):null;
+      html+='<div class="comp-kpi-row"><div class="comp-kpi-name">'+name+'</div><div class="comp-kpi-val" style="color:'+(good===null?'var(--charcoal)':good?'var(--green)':'var(--accent)')+'">'+f(avg)+'</div></div>';
+    });
+    // Machine list
+    html+='<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">';
+    ms.forEach(m=>{
+      const o=calcOEE(m,pi,'monthly');
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px"><span style="color:var(--muted)">'+m.name+'</span><span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;color:'+(o?oeeColor(o.oee):'var(--muted)')+'">'+(o?o.oee+'% OEE':'--')+'</span></div>';
+    });
+    html+='</div></div></div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+// ── ALERT CONFIG VIEW ──
+function renderAlertConfig(){
+  const el=document.getElementById('alertContent');el.style.display='';
+  document.getElementById('dashContent').style.display='none';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('compContent').style.display='none';
+  let html='<div style="max-width:660px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Alert Thresholds</div><div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Configure automatic Email / Teams notifications when KPIs breach thresholds during a shift.</div>';
+  // Existing rules
+  html+='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Active Rules</div>';
+  if(alertRules.length===0)html+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:3px;margin-bottom:14px;">No alert rules configured yet.</div>';
+  else alertRules.forEach((r,i)=>{
+    html+='<div class="alert-rule"><button class="alert-toggle '+(r.active?'on':'')+'" onclick="toggleAlert('+i+')"></button><div class="alert-rule-text">If <strong>'+r.kpiName+'</strong> '+r.operator+' <strong>'+r.value+'</strong> '+r.unit+'</div><span class="alert-badge '+(r.channel==='teams'?'teams':'email')+'">'+(r.channel==='teams'?'&#128241; Teams':'&#128231; Email')+'</span><button class="kdel" onclick="deleteAlert('+i+')">x</button></div>';
+  });
+  // Add new rule
+  html+='<div style="margin-top:18px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:4px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Add New Rule</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-size:12px;color:var(--muted)">If</span><input class="finp" id="alertKpi" placeholder="KPI name (e.g. Downtime)" style="width:140px;padding:6px 10px;font-size:12px"><select class="finp" id="alertOp" style="width:100px;padding:6px 10px;font-size:12px"><option value="exceeds">exceeds</option><option value="falls below">falls below</option></select><input class="finp" id="alertVal" type="number" step="any" placeholder="5" style="width:70px;padding:6px 10px;font-size:12px"><input class="finp" id="alertUnit" placeholder="hrs" style="width:60px;padding:6px 10px;font-size:12px"><span style="font-size:12px;color:var(--muted)">→ via</span><select class="finp" id="alertChan" style="width:100px;padding:6px 10px;font-size:12px"><option value="teams">Teams</option><option value="email">Email</option></select><button class="btn btn-accent" style="font-size:11px;padding:6px 12px" onclick="addAlertRule()">+ Add</button></div></div>';
+  // Integration note
+  html+='<div style="margin-top:16px;padding:12px 16px;background:var(--amber-bg);border:1px solid #f3d07e;border-radius:3px;font-size:12px;line-height:1.6;color:var(--amber)"><strong>&#9889; Integration Note:</strong> To activate live notifications, connect this dashboard to your Microsoft Teams Incoming Webhook URL or SMTP relay. Alert rules defined here will trigger when real-time production data feeds are connected via your SCADA/MES integration layer.</div>';
+  html+='</div>';
+  el.innerHTML=html;
+}
+function toggleAlert(i){alertRules[i].active=!alertRules[i].active;saveAlerts();renderAlertConfig();}
+function deleteAlert(i){alertRules.splice(i,1);saveAlerts();renderAlertConfig();}
+function addAlertRule(){
+  const kpi=document.getElementById('alertKpi').value.trim();
+  const op=document.getElementById('alertOp').value;
+  const val=parseFloat(document.getElementById('alertVal').value);
+  const unit=document.getElementById('alertUnit').value.trim();
+  const chan=document.getElementById('alertChan').value;
+  if(!kpi||isNaN(val)){toast('Fill in KPI name and threshold value','error');return;}
+  alertRules.push({kpiName:kpi,operator:op,value:val,unit:unit,channel:chan,active:true});
+  saveAlerts();renderAlertConfig();toast('Alert rule added');
+}
+
+// ── GOAL-SETTING MODAL ──
+function openGoalModal(mid){
+  const m=state.machines.find(x=>x.id===mid);if(!m)return;
+  if(!m.goals)m.goals={};
+  document.getElementById('goalModalSub').textContent=m.name+' · Set green/amber thresholds per KPI';
+  let html='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Green = on target, Amber = caution zone, Red = below threshold. Leave amber blank to use simple target pass/fail.</div>';
+  html+='<div style="border:1px solid var(--border);border-radius:3px;overflow:hidden;">';
+  html+='<div style="display:grid;grid-template-columns:1fr 100px 100px 100px;gap:5px;padding:8px 12px;background:#f5f4f2;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)"><div>KPI</div><div style="text-align:center">&#128994; Green</div><div style="text-align:center">&#128992; Amber</div><div style="text-align:center">Direction</div></div>';
+  m.kpis.forEach(k=>{
+    const g=m.goals[k.code]||{};
+    const tgt=(m.data[window._viewMode]?.cyTarget?.[k.code]||[])[window._activePeriod];
+    html+='<div style="display:grid;grid-template-columns:1fr 100px 100px 100px;gap:5px;padding:6px 12px;border-top:1px solid var(--border);align-items:center"><div style="font-size:13px;font-weight:500">'+k.name+'<div style="font-size:10px;color:var(--muted)">'+k.code+' · Current target: '+f(tgt)+'</div></div><input class="kfi goal-inp" data-code="'+k.code+'" data-field="green" value="'+(g.green!=null?g.green:(tgt!=null?tgt:''))+'" type="number" step="any" placeholder="'+f(tgt)+'" style="text-align:center"><input class="kfi goal-inp" data-code="'+k.code+'" data-field="amber" value="'+(g.amber!=null?g.amber:'')+'" type="number" step="any" placeholder="--" style="text-align:center"><div style="font-size:11px;color:var(--muted);text-align:center">'+(k.lowerBetter?'↓ Lower better':'↑ Higher better')+'</div></div>';
+  });
+  html+='</div>';
+  document.getElementById('goalModalBody').innerHTML=html;
+  document.getElementById('goalModal').classList.add('open');
+}
+function saveGoals(){
+  const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;
+  if(!m.goals)m.goals={};
+  document.querySelectorAll('.goal-inp').forEach(inp=>{
+    const code=inp.dataset.code,field=inp.dataset.field;
+    if(!m.goals[code])m.goals[code]={};
+    const v=inp.value.trim();
+    m.goals[code][field]=v===''?null:parseFloat(v);
+  });
+  closeModal('goalModal');saveState();renderDashboard();toast('Targets saved');
+}
+
+// ── PRINT / PDF EXPORT ──
+function printReport(){window.print();}
+
+// ── MACHINE CRUD (unchanged logic) ──
 let kpiRows=[];
 function openAddMachineModal(){state.editingMachine=null;document.getElementById('machModalTitle').textContent='Add New Machine';['mName','mCode','mLabel'].forEach(id=>document.getElementById(id).value='');document.getElementById('mColor').value=PLANT_COLORS[state.plant]||'#c8102e';kpiRows=[{code:'',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Hrs',target:'',lowerBetter:true},{code:'',name:'Downtime',criteria:'% of scheduled time machine is down',unit:'%',target:'',lowerBetter:true},{code:'',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Qty/Hr',target:'',lowerBetter:false},{code:'',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Qty/Hr',target:'',lowerBetter:false}];renderKFL();document.getElementById('addMachModal').classList.add('open');}
 function openEditMachine(id){const m=state.machines.find(x=>x.id===id);if(!m)return;state.editingMachine=id;document.getElementById('machModalTitle').textContent='Edit Machine';document.getElementById('mName').value=m.name;document.getElementById('mCode').value=m.code;document.getElementById('mLabel').value=m.label;document.getElementById('mColor').value=m.color;kpiRows=m.kpis.map(k=>({...k}));renderKFL();document.getElementById('addMachModal').classList.add('open');}
@@ -617,10 +1042,12 @@ function saveMachine(){
   }else{
     const id=state.plant+'_'+name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();
     const data={};LENS.forEach(([len,mode])=>{data[mode]={cyActual:{},cyTarget:{},pyActual:{}};kpis.forEach(k=>{data[mode].cyActual[k.code]=new Array(len).fill(null);data[mode].cyTarget[k.code]=new Array(len).fill(k.target||null);data[mode].pyActual[k.code]=new Array(len).fill(null);});});
-    state.machines.push({id,plant:state.plant,name,code,label:label||code+' '+name.toUpperCase(),color,kpis,data});toast('Machine added');
+    state.machines.push({id,plant:state.plant,name,code,label:label||code+' '+name.toUpperCase(),color,kpis,goals:{},data});toast('Machine added');
   }
   saveState();closeModal('addMachModal');renderSidebar();if(!state.activeMachine){const ms=state.machines.filter(m=>m.plant===state.plant);if(ms.length)selectMachine(ms[ms.length-1].id);}else renderDashboard();
 }
+
+// ── DATA ENTRY ──
 let dataMachId=null;
 function openDataModal(mid){dataMachId=mid;const m=state.machines.find(x=>x.id===mid);if(!m)return;document.getElementById('dataModalTitle').textContent='Enter Data - '+m.name;document.getElementById('dataModalBody').innerHTML='<div style="margin-bottom:16px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Period</div><div class="vtabs"><button class="vtab" id="dataTabDaily" onclick="switchDataTab(\'daily\')">Daily</button><button class="vtab" id="dataTabWeekly" onclick="switchDataTab(\'weekly\')">Weekly</button><button class="vtab active" id="dataTabMonthly" onclick="switchDataTab(\'monthly\')">Monthly</button><button class="vtab" id="dataTabQuarterly" onclick="switchDataTab(\'quarterly\')">Quarterly</button><button class="vtab" id="dataTabYearly" onclick="switchDataTab(\'yearly\')">Yearly</button></div></div><div id="dataTabContent"></div>';window._dataModalMode='monthly';renderDataTab(m,'monthly');document.getElementById('dataModal').classList.add('open');}
 function switchDataTab(mode){window._dataModalMode=mode;document.querySelectorAll('[id^="dataTab"]').forEach(t=>t.classList.remove('active'));document.getElementById('dataTab'+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add('active');const m=state.machines.find(x=>x.id===dataMachId);if(m)renderDataTab(m,mode);}
@@ -644,6 +1071,8 @@ function renderDailyDataTab(m,el){
   }).join('');
 }
 function saveDataEntry(){const m=state.machines.find(x=>x.id===dataMachId);if(!m)return;document.querySelectorAll('[data-kpi][data-mode]').forEach(inp=>{const kpi=inp.dataset.kpi,type=inp.dataset.type,mode=inp.dataset.mode,idx=parseInt(inp.dataset.idx);if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!m.data[mode][type])m.data[mode][type]={};const len={daily:365,weekly:52,monthly:12,quarterly:4,yearly:1}[mode]||12;if(!m.data[mode][type][kpi])m.data[mode][type][kpi]=new Array(len).fill(null);const v=inp.value.trim();m.data[mode][type][kpi][idx]=v===''?null:parseFloat(v);});closeModal('dataModal');renderDashboard();saveState();toast('Data saved');}
+
+// ── IMPORT/EXPORT ──
 function openImportModal(){document.getElementById('importModal').classList.add('open');}
 const dz=document.getElementById('dropZone');
 dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag');});
@@ -651,12 +1080,7 @@ dz.addEventListener('dragleave',function(){dz.classList.remove('drag');});
 dz.addEventListener('drop',function(e){dz.classList.remove('drag');e.preventDefault();var f=e.dataTransfer.files[0];if(f)processFile(f);});
 function handleFileSelect(e){var f=e.target.files[0];if(f)processFile(f);}
 function processFile(file){var st=document.getElementById('importStatus');st.textContent='Reading...';var reader=new FileReader();reader.onload=function(e){try{var wb=XLSX.read(e.target.result,{type:'array'});parseXLSX(wb);closeModal('importModal');toast('Imported successfully');renderSidebar();renderDashboard();}catch(err){st.textContent='Error: '+err.message;st.style.color='var(--accent)';}};reader.readAsArrayBuffer(file);}
-function parseXLSX(wb){
-  var gs=function(n){var s=wb.Sheets[n];return s?XLSX.utils.sheet_to_json(s,{header:1,defval:null}):null;};
-  var first=gs(wb.SheetNames[0]);
-  if(first&&first[0]&&String(first[0][0]||'').includes('Production Efficiency')){parsePEFS(first);return;}
-  toast('KPI template import not configured for this plant','error');
-}
+function parseXLSX(wb){var gs=function(n){var s=wb.Sheets[n];return s?XLSX.utils.sheet_to_json(s,{header:1,defval:null}):null;};var first=gs(wb.SheetNames[0]);if(first&&first[0]&&String(first[0][0]||'').includes('Production Efficiency')){parsePEFS(first);return;}toast('KPI template import not configured for this plant','error');}
 function parsePEFS(data){
   var machineName='',machineCode='';
   for(var i=0;i<data.length;i++){var cell=String(data[i][0]||'').trim();if(cell&&/^\d{3}\s/.test(cell)){machineName=cell;machineCode=cell.split(' ')[0];break;}}
@@ -680,14 +1104,12 @@ function parsePEFS(data){
     var kpis=[{code:'001',name:'Setup Time',criteria:'Avg production hrs per changeover',unit:'Hrs',lowerBetter:true},{code:'002',name:'Downtime',criteria:'Utilization down %',unit:'%',lowerBetter:true},{code:'003',name:'Feeds/RunHr',criteria:'Rate Qty per actual run hour',unit:'Qty/Hr',lowerBetter:false},{code:'004',name:'Feeds/SchHr',criteria:'Production Qty per act hour',unit:'Qty/Hr',lowerBetter:false}];
     var codes=['001','002','003','004'];
     var d={daily:emptyMode(codes,365),weekly:emptyMode(codes,52),monthly:emptyMode(codes,12),quarterly:emptyMode(codes,4),yearly:emptyMode(codes,1)};
-    mach={id:'pefs_'+machineCode+'_'+Date.now(),plant:state.plant,name:machineName,code:machineCode,label:machineName,color:PLANT_COLORS[state.plant]||'#c8102e',kpis:kpis,data:d};
+    mach={id:'pefs_'+machineCode+'_'+Date.now(),plant:state.plant,name:machineName,code:machineCode,label:machineName,color:PLANT_COLORS[state.plant]||'#c8102e',kpis:kpis,goals:{},data:d};
     state.machines.push(mach);
   }
   var setVal=function(nameHint,val){var k=mach.kpis.find(function(x){return x.name.toLowerCase().includes(nameHint.toLowerCase());});if(!k||val==null)return;['weekly','daily'].forEach(function(mode){var len=mode==='daily'?365:52,idx=mode==='daily'?dayIdx:weekIdx;if(!mach.data[mode])mach.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!mach.data[mode].cyActual[k.code])mach.data[mode].cyActual[k.code]=new Array(len).fill(null);mach.data[mode].cyActual[k.code][idx]=val;});};
   setVal('Setup',setupTime);setVal('Downtime',downtime);setVal('RunHr',feedsRunHr);setVal('SchHr',feedsSchHr);
-  saveState();
-  toast(machineName+' - Week '+(weekIdx+1)+' - '+dayIdxLabel(dayIdx)+' imported');
-  state.activeMachine=mach.id;
+  saveState();toast(machineName+' - Week '+(weekIdx+1)+' - '+dayIdxLabel(dayIdx)+' imported');state.activeMachine=mach.id;
 }
 function exportData(){
   var m=state.machines.find(function(x){return x.id===state.activeMachine;});if(!m){toast('Select a machine first','error');return;}
@@ -699,246 +1121,56 @@ function exportData(){
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-bg').forEach(function(bg){bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('open');});});
-loadState();
+loadState();loadAlerts();
 renderSidebar();
 initSharePoint();
-// Auto-select if no machine remembered or remembered machine not found
 if(!state.activeMachine||!state.machines.find(function(m){return m.id===state.activeMachine;})){
   var firstPlant=state.machines.find(function(m){return m.plant===state.plant;});
   if(firstPlant)selectMachine(firstPlant.id);
-}else{
-  renderDashboard();
-}
+}else{renderDashboard();}
 
-// ── WAKE LOCK ─────────────────────────────────────────────────────────────────
+// ── WAKE LOCK ──
 let wakeLock=null;
-async function requestWakeLock(){
-  if(!('wakeLock' in navigator)){return;}
-  try{
-    wakeLock=await navigator.wakeLock.request('screen');
-    const btn=document.getElementById('wakeBtn');
-    if(btn){btn.classList.add('active');btn.title='Screen stay-awake: ON (tap to turn off)';}
-    wakeLock.addEventListener('release',()=>{
-      const btn=document.getElementById('wakeBtn');
-      if(btn){btn.classList.remove('active');btn.title='Screen stay-awake: OFF (tap to turn on)';}
-    });
-  }catch(e){console.log('Wake lock failed:',e);}
-}
-async function toggleWakeLock(){
-  if(wakeLock){wakeLock.release();wakeLock=null;}
-  else{await requestWakeLock();}
-}
-// Re-acquire wake lock when tab becomes visible again
-document.addEventListener('visibilitychange',async()=>{
-  if(document.visibilityState==='visible'&&wakeLock===null){
-    await requestWakeLock();
-  }
-});
-// Auto-enable wake lock on load
+async function requestWakeLock(){if(!('wakeLock' in navigator))return;try{wakeLock=await navigator.wakeLock.request('screen');const btn=document.getElementById('wakeBtn');if(btn){btn.classList.add('active');btn.title='Screen stay-awake: ON';}wakeLock.addEventListener('release',()=>{const btn=document.getElementById('wakeBtn');if(btn){btn.classList.remove('active');btn.title='Screen stay-awake: OFF';}});}catch(e){}}
+async function toggleWakeLock(){if(wakeLock){wakeLock.release();wakeLock=null;}else{await requestWakeLock();}}
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&wakeLock===null)await requestWakeLock();});
 requestWakeLock();
 
-// ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
-function toggleSidebar(){
-  const sb=document.querySelector('.sidebar');
-  const ov=document.getElementById('sidebarOverlay');
-  sb.classList.toggle('open');
-  ov.classList.toggle('open');
-}
-function closeSidebar(){
-  const sb=document.querySelector('.sidebar');
-  const ov=document.getElementById('sidebarOverlay');
-  sb.classList.remove('open');
-  ov.classList.remove('open');
-}
-// Close sidebar on machine select (mobile)
-const _origSelect=selectMachine;
-function selectMachine(id){state.activeMachine=id;renderSidebar();renderDashboard();saveState();closeSidebar();}
+// ── MOBILE SIDEBAR ──
+function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open');}
+function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');}
 
-// ── SHAREPOINT / MSAL ─────────────────────────────────────────────────────────
+// ── SHAREPOINT / MSAL ──
 const SP_CFG_KEY='supplyone_sp_cfg_v1';
 let msalApp=null,spCfg=null,spUser=null;
-
-function loadSpConfig(){
-  try{const raw=localStorage.getItem(SP_CFG_KEY);if(raw)spCfg=JSON.parse(raw);}catch(e){}
-}
-function saveSpConfig(cfg){
-  spCfg=cfg;
-  localStorage.setItem(SP_CFG_KEY,JSON.stringify(cfg));
-}
-function initMsal(tenantId,clientId){
-  if(msalApp)return;
-  msalApp=new msal.PublicClientApplication({
-    auth:{clientId,authority:'https://login.microsoftonline.com/'+tenantId,redirectUri:window.location.origin+window.location.pathname},
-    cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}
-  });
-}
+function loadSpConfig(){try{const raw=localStorage.getItem(SP_CFG_KEY);if(raw)spCfg=JSON.parse(raw);}catch(e){}}
+function saveSpConfig(cfg){spCfg=cfg;localStorage.setItem(SP_CFG_KEY,JSON.stringify(cfg));}
+function initMsal(tenantId,clientId){if(msalApp)return;msalApp=new msal.PublicClientApplication({auth:{clientId,authority:'https://login.microsoftonline.com/'+tenantId,redirectUri:window.location.origin+window.location.pathname},cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}});}
 function openSPModal(){
-  const body=document.getElementById('spConfigBody');
-  const signedIn=document.getElementById('spSignedInBody');
-  const btn=document.getElementById('spConnectBtn');
-  if(spCfg){
-    document.getElementById('spTenantId').value=spCfg.tenantId||'';
-    document.getElementById('spClientId').value=spCfg.clientId||'';
-    document.getElementById('spSiteUrl').value=spCfg.siteUrl||'';
-    document.getElementById('spFilePath').value=spCfg.filePath||'KPI-Dashboard/kpi-data.json';
-  }
-  if(spUser){
-    body.style.display='none';signedIn.style.display='';btn.style.display='none';
-    document.getElementById('spSignedInUser').textContent=spUser.username||spUser.name||'';
-  }else{
-    body.style.display='';signedIn.style.display='none';btn.style.display='';
-  }
+  const body=document.getElementById('spConfigBody'),signedIn=document.getElementById('spSignedInBody'),btn=document.getElementById('spConnectBtn');
+  if(spCfg){document.getElementById('spTenantId').value=spCfg.tenantId||'';document.getElementById('spClientId').value=spCfg.clientId||'';document.getElementById('spSiteUrl').value=spCfg.siteUrl||'';document.getElementById('spFilePath').value=spCfg.filePath||'KPI-Dashboard/kpi-data.json';}
+  if(spUser){body.style.display='none';signedIn.style.display='';btn.style.display='none';document.getElementById('spSignedInUser').textContent=spUser.username||spUser.name||'';}
+  else{body.style.display='';signedIn.style.display='none';btn.style.display='';}
   document.getElementById('spModal').classList.add('open');
 }
 async function spConnect(){
-  const tenantId=document.getElementById('spTenantId').value.trim();
-  const clientId=document.getElementById('spClientId').value.trim();
-  const siteUrl=document.getElementById('spSiteUrl').value.trim().replace(/\/$/,'');
-  const filePath=document.getElementById('spFilePath').value.trim()||'KPI-Dashboard/kpi-data.json';
+  const tenantId=document.getElementById('spTenantId').value.trim(),clientId=document.getElementById('spClientId').value.trim(),siteUrl=document.getElementById('spSiteUrl').value.trim().replace(/\/$/,''),filePath=document.getElementById('spFilePath').value.trim()||'KPI-Dashboard/kpi-data.json';
   if(!tenantId||!clientId||!siteUrl){toast('All fields are required','error');return;}
-  saveSpConfig({tenantId,clientId,siteUrl,filePath});
-  initMsal(tenantId,clientId);
-  try{
-    const btn=document.getElementById('spConnectBtn');
-    btn.textContent='Signing in...';btn.disabled=true;
-    const result=await msalApp.loginPopup({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All']});
-    spUser=result.account;
-    updateSpStatus(true,'syncing');
-    await spSyncNow();
-    closeModal('spModal');
-    openSPModal();
-    toast('Connected to SharePoint as '+spUser.username);
-  }catch(e){
-    toast('Sign-in failed: '+e.message,'error');
-    document.getElementById('spConnectBtn').textContent='Sign in with Microsoft';
-    document.getElementById('spConnectBtn').disabled=false;
-  }
+  saveSpConfig({tenantId,clientId,siteUrl,filePath});initMsal(tenantId,clientId);
+  try{const btn=document.getElementById('spConnectBtn');btn.textContent='Signing in...';btn.disabled=true;const result=await msalApp.loginPopup({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All']});spUser=result.account;updateSpStatus(true,'syncing');await spSyncNow();closeModal('spModal');openSPModal();toast('Connected to SharePoint as '+spUser.username);}
+  catch(e){toast('Sign-in failed: '+e.message,'error');document.getElementById('spConnectBtn').textContent='Sign in with Microsoft';document.getElementById('spConnectBtn').disabled=false;}
 }
-async function getSpToken(){
-  if(!msalApp||!spUser)return null;
-  try{
-    const r=await msalApp.acquireTokenSilent({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All'],account:spUser});
-    return r.accessToken;
-  }catch(e){
-    try{const r=await msalApp.acquireTokenPopup({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All']});return r.accessToken;}
-    catch(e2){return null;}
-  }
-}
-async function getSpSiteId(token,siteUrl){
-  // Extract hostname and path from siteUrl
-  const url=new URL(siteUrl);
-  const hostname=url.hostname;
-  const sitePath=url.pathname;
-  const resp=await fetch(`https://graph.microsoft.com/v1.0/sites/${hostname}:${sitePath}`,{headers:{'Authorization':'Bearer '+token}});
-  if(!resp.ok)throw new Error('Could not find SharePoint site. Check URL.');
-  const data=await resp.json();
-  return data.id;
-}
-async function spSaveToSharePoint(){
-  if(!spCfg||!spUser)return;
-  const token=await getSpToken();if(!token)return;
-  updateSpStatus(true,'syncing');
-  try{
-    const siteId=await getSpSiteId(token,spCfg.siteUrl);
-    const payload=JSON.stringify({machines:state.machines,plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString(),version:'v1'});
-    const resp=await fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:/${spCfg.filePath}:/content`,{
-      method:'PUT',
-      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
-      body:payload
-    });
-    if(!resp.ok)throw new Error('Save failed: '+resp.status);
-    updateSpStatus(true,'connected');
-    const syncEl=document.getElementById('spSyncStatus');
-    if(syncEl)syncEl.textContent='Last synced: '+new Date().toLocaleTimeString();
-  }catch(e){
-    console.warn('SP save error:',e);
-    updateSpStatus(true,'error');
-    toast('SharePoint save failed: '+e.message,'error');
-  }
-}
-async function spLoadFromSharePoint(){
-  if(!spCfg||!spUser)return false;
-  const token=await getSpToken();if(!token)return false;
-  updateSpStatus(true,'syncing');
-  try{
-    const siteId=await getSpSiteId(token,spCfg.siteUrl);
-    const resp=await fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drive/root:/${spCfg.filePath}:/content`,{
-      headers:{'Authorization':'Bearer '+token}
-    });
-    if(resp.status===404){updateSpStatus(true,'connected');return false;}
-    if(!resp.ok)throw new Error('Load failed: '+resp.status);
-    const data=await resp.json();
-    if(data.machines&&data.machines.length){
-      state.machines=data.machines;
-      state.plant=data.plant||'okc';
-      state.activeMachine=data.activeMachine||null;
-      document.body.setAttribute('data-plant',state.plant);
-      document.getElementById('hdrPlantName').textContent=PLANT_NAMES[state.plant]||'Oklahoma City';
-      document.querySelectorAll('.plant-btn').forEach(b=>{
-        const map={OKC:'okc',DAL:'dallas',ABQ:'abq',TUS:'tus'};
-        b.classList.toggle('active',map[b.textContent.trim()]===state.plant);
-      });
-    }
-    updateSpStatus(true,'connected');
-    return true;
-  }catch(e){
-    console.warn('SP load error:',e);
-    updateSpStatus(true,'error');
-    return false;
-  }
-}
-async function spSyncNow(){
-  const loaded=await spLoadFromSharePoint();
-  await spSaveToSharePoint();
-  if(loaded){renderSidebar();if(!state.activeMachine||!state.machines.find(m=>m.id===state.activeMachine)){const first=state.machines.find(m=>m.plant===state.plant);if(first)selectMachine(first.id);}else renderDashboard();}
-  toast('SharePoint sync complete','success');
-}
-function spSignOut(){
-  if(!msalApp||!spUser)return;
-  msalApp.logoutPopup({account:spUser}).then(()=>{spUser=null;updateSpStatus(false,'disconnected');closeModal('spModal');toast('Signed out of Microsoft');});
-}
-function spDisconnect(){
-  if(!confirm('Disconnect SharePoint? Data stays in localStorage.'))return;
-  localStorage.removeItem(SP_CFG_KEY);
-  spCfg=null;spUser=null;msalApp=null;
-  updateSpStatus(false,'disconnected');
-  closeModal('spModal');
-  toast('SharePoint disconnected');
-}
-function updateSpStatus(configured,status){
-  const dot=document.getElementById('spDot');
-  const lbl=document.getElementById('spLabel');
-  if(!dot||!lbl)return;
-  dot.className='sp-dot '+status;
-  if(status==='connected'){lbl.textContent='SharePoint';lbl.style.color='#4ec98a';}
-  else if(status==='syncing'){lbl.textContent='Syncing...';lbl.style.color='#f59e0b';}
-  else if(status==='error'){lbl.textContent='Sync Error';lbl.style.color='var(--accent)';}
-  else{lbl.textContent='SharePoint';lbl.style.color='#555';}
-}
-
-// Override saveState to also push to SharePoint
+async function getSpToken(){if(!msalApp||!spUser)return null;try{const r=await msalApp.acquireTokenSilent({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All'],account:spUser});return r.accessToken;}catch(e){try{const r=await msalApp.acquireTokenPopup({scopes:['Sites.ReadWrite.All','Files.ReadWrite.All']});return r.accessToken;}catch(e2){return null;}}}
+async function getSpSiteId(token,siteUrl){const url=new URL(siteUrl);const resp=await fetch('https://graph.microsoft.com/v1.0/sites/'+url.hostname+':'+url.pathname,{headers:{'Authorization':'Bearer '+token}});if(!resp.ok)throw new Error('Could not find SharePoint site.');const data=await resp.json();return data.id;}
+async function spSaveToSharePoint(){if(!spCfg||!spUser)return;const token=await getSpToken();if(!token)return;updateSpStatus(true,'syncing');try{const siteId=await getSpSiteId(token,spCfg.siteUrl);const payload=JSON.stringify({machines:state.machines,plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString(),version:'v1'});const resp=await fetch('https://graph.microsoft.com/v1.0/sites/'+siteId+'/drive/root:/'+spCfg.filePath+':/content',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:payload});if(!resp.ok)throw new Error('Save failed: '+resp.status);updateSpStatus(true,'connected');const syncEl=document.getElementById('spSyncStatus');if(syncEl)syncEl.textContent='Last synced: '+new Date().toLocaleTimeString();}catch(e){updateSpStatus(true,'error');toast('SharePoint save failed: '+e.message,'error');}}
+async function spLoadFromSharePoint(){if(!spCfg||!spUser)return false;const token=await getSpToken();if(!token)return false;updateSpStatus(true,'syncing');try{const siteId=await getSpSiteId(token,spCfg.siteUrl);const resp=await fetch('https://graph.microsoft.com/v1.0/sites/'+siteId+'/drive/root:/'+spCfg.filePath+':/content',{headers:{'Authorization':'Bearer '+token}});if(resp.status===404){updateSpStatus(true,'connected');return false;}if(!resp.ok)throw new Error('Load failed: '+resp.status);const data=await resp.json();if(data.machines&&data.machines.length){state.machines=data.machines;state.machines.forEach(m=>{if(!m.goals)m.goals={};});state.plant=data.plant||'okc';state.activeMachine=data.activeMachine||null;document.body.setAttribute('data-plant',state.plant);document.getElementById('hdrPlantName').textContent=PLANT_NAMES[state.plant]||'Oklahoma City';document.querySelectorAll('.plant-btn').forEach(b=>{const map={OKC:'okc',DAL:'dallas',ABQ:'abq',TUS:'tus'};b.classList.toggle('active',map[b.textContent.trim()]===state.plant);});}updateSpStatus(true,'connected');return true;}catch(e){updateSpStatus(true,'error');return false;}}
+async function spSyncNow(){const loaded=await spLoadFromSharePoint();await spSaveToSharePoint();if(loaded){renderSidebar();if(!state.activeMachine||!state.machines.find(m=>m.id===state.activeMachine)){const first=state.machines.find(m=>m.plant===state.plant);if(first)selectMachine(first.id);}else renderDashboard();}toast('SharePoint sync complete');}
+function spSignOut(){if(!msalApp||!spUser)return;msalApp.logoutPopup({account:spUser}).then(()=>{spUser=null;updateSpStatus(false,'disconnected');closeModal('spModal');toast('Signed out');});}
+function spDisconnect(){if(!confirm('Disconnect SharePoint?'))return;localStorage.removeItem(SP_CFG_KEY);spCfg=null;spUser=null;msalApp=null;updateSpStatus(false,'disconnected');closeModal('spModal');toast('SharePoint disconnected');}
+function updateSpStatus(configured,status){const dot=document.getElementById('spDot'),lbl=document.getElementById('spLabel');if(!dot||!lbl)return;dot.className='sp-dot '+status;if(status==='connected'){lbl.textContent='SharePoint';lbl.style.color='#4ec98a';}else if(status==='syncing'){lbl.textContent='Syncing...';lbl.style.color='#f59e0b';}else if(status==='error'){lbl.textContent='Sync Error';lbl.style.color='var(--accent)';}else{lbl.textContent='SharePoint';lbl.style.color='#555';}}
 const _origSaveState=saveState;
-function saveState(){
-  _origSaveState();
-  if(spCfg&&spUser){spSaveToSharePoint();}
-}
-
-// Init SharePoint on load if previously configured
-async function initSharePoint(){
-  loadSpConfig();
-  if(!spCfg)return;
-  initMsal(spCfg.tenantId,spCfg.clientId);
-  try{
-    const accounts=msalApp.getAllAccounts();
-    if(accounts.length){
-      spUser=accounts[0];
-      updateSpStatus(true,'syncing');
-      const loaded=await spLoadFromSharePoint();
-      if(loaded){renderSidebar();if(!state.activeMachine||!state.machines.find(m=>m.id===state.activeMachine)){const first=state.machines.find(m=>m.plant===state.plant);if(first)selectMachine(first.id);}else renderDashboard();}
-    }else{updateSpStatus(true,'disconnected');}
-  }catch(e){console.warn('SP init error:',e);}
-}
-
+function saveState(){_origSaveState();if(spCfg&&spUser)spSaveToSharePoint();}
+async function initSharePoint(){loadSpConfig();if(!spCfg)return;initMsal(spCfg.tenantId,spCfg.clientId);try{const accounts=msalApp.getAllAccounts();if(accounts.length){spUser=accounts[0];updateSpStatus(true,'syncing');const loaded=await spLoadFromSharePoint();if(loaded){renderSidebar();if(!state.activeMachine||!state.machines.find(m=>m.id===state.activeMachine)){const first=state.machines.find(m=>m.plant===state.plant);if(first)selectMachine(first.id);}else renderDashboard();}}else{updateSpStatus(true,'disconnected');}}catch(e){}}
 </script>
 </body>
 </html>
