@@ -775,7 +775,114 @@ dz.addEventListener('drop',function(e){dz.classList.remove('drag');e.preventDefa
 function handleFileSelect(e){var f=e.target.files[0];if(f)processFile(f);}
 function processFile(file){var st=document.getElementById('importStatus');st.textContent='Reading...';var reader=new FileReader();reader.onload=function(e){try{var wb=XLSX.read(e.target.result,{type:'array'});parseXLSX(wb);closeModal('importModal');toast('Imported successfully');renderSidebar();renderDashboard();}catch(err){st.textContent='Error: '+err.message;st.style.color='var(--accent)';}};reader.readAsArrayBuffer(file);}
 function parseXLSX(wb){var gs=function(n){var s=wb.Sheets[n];return s?XLSX.utils.sheet_to_json(s,{header:1,defval:null}):null;};var first=gs(wb.SheetNames[0]);if(first&&first[0]&&String(first[0][0]||'').includes('Production Efficiency')){parsePEFS(first);return;}toast('KPI template import not configured for this plant','error');}
-function parsePEFS(data){var machineName='',machineCode='';for(var i=0;i<data.length;i++){var cell=String(data[i][0]||'').trim();if(cell&&/^\d{3}\s/.test(cell)){machineName=cell;machineCode=cell.split(' ')[0];break;}}if(!machineName){toast('Machine name not found','error');return;}var dateStr=String(data[1]?data[1][10]||'':'');var dm=dateStr.match(/(\d+)\/(\d+)\/(\d+)\s+to\s+(\d+)\/(\d+)\/(\d+)/);var weekIdx=5,dayIdx=38;if(dm){var em=parseInt(dm[4]),ed=parseInt(dm[5]);dayIdx=Math.min(MONTH_DAY_OFFSET[em-1]+(ed-1),364);weekIdx=Math.min(Math.floor(dayIdx/7),51);}var dr=null;for(var i=0;i<data.length;i++){if(String(data[i][0]||'').trim().toLowerCase()==='total'){dr=data[i];break;}}if(!dr){for(var i=0;i<data.length;i++){var c=String(data[i][0]||'').trim();if(c&&!isNaN(c.replace(/\s/g,''))&&parseInt(c)>=1&&parseInt(c)<=3){dr=data[i];break;}}}if(!dr){toast('No data rows found','error');return;}var pf=function(v){return parseFloat(v)||null;};var prodQty=pf(dr[3]),setups=pf(dr[5])||1,rateQtyHr=pf(dr[6]),prodHrsSetup=pf(dr[11]),actHrsTotal=pf(dr[15]),utilDown=pf(dr[16]);var setupTime=prodHrsSetup!=null&&setups>0?prodHrsSetup/setups:null;var downtime=utilDown!=null?utilDown*100:null;var feedsRunHr=rateQtyHr;var feedsSchHr=prodQty!=null&&actHrsTotal!=null&&actHrsTotal>0?prodQty/actHrsTotal:null;var mach=state.machines.find(function(m){return m.plant===state.plant&&(m.name===machineName||m.code===machineCode);});if(!mach){var kpis=[{code:'001',name:'Setup Time',criteria:'Avg production hrs per changeover',unit:'Hrs',lowerBetter:true},{code:'002',name:'Downtime',criteria:'Utilization down %',unit:'%',lowerBetter:true},{code:'003',name:'Feeds/RunHr',criteria:'Rate Qty per actual run hour',unit:'Qty/Hr',lowerBetter:false},{code:'004',name:'Feeds/SchHr',criteria:'Production Qty per act hour',unit:'Qty/Hr',lowerBetter:false}];var codes=['001','002','003','004'];var d={daily:emptyMode(codes,365),weekly:emptyMode(codes,52),monthly:emptyMode(codes,12),quarterly:emptyMode(codes,4),yearly:emptyMode(codes,1)};mach={id:'pefs_'+machineCode+'_'+Date.now(),plant:state.plant,name:machineName,code:machineCode,label:machineName,color:PLANT_COLORS[state.plant]||'#c8102e',kpis:kpis,goals:{},data:d};state.machines.push(mach);}var monthIdx=dayIdxToMonthDay(dayIdx).month;var quarterIdx=Math.floor(monthIdx/3);var setVal=function(nameHint,val){var k=mach.kpis.find(function(x){return x.name.toLowerCase().includes(nameHint.toLowerCase());});if(!k||val==null)return;[['daily',365,dayIdx],['weekly',52,weekIdx],['monthly',12,monthIdx],['quarterly',4,quarterIdx],['yearly',1,0]].forEach(function(cfg){var mode=cfg[0],len=cfg[1],idx=cfg[2];if(!mach.data[mode])mach.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!mach.data[mode].cyActual[k.code])mach.data[mode].cyActual[k.code]=new Array(len).fill(null);mach.data[mode].cyActual[k.code][idx]=val;});};setVal('Setup',setupTime);setVal('Downtime',downtime);setVal('RunHr',feedsRunHr);setVal('SchHr',feedsSchHr);saveState();toast(machineName+' - '+MONTHS[monthIdx]+' (Week '+(weekIdx+1)+') imported');state.activeMachine=mach.id;window._viewMode='monthly';window._activePeriod=monthIdx;}
+function parsePEFS(data){
+  // ── Parse date range ──
+  var dateStr=String(data[1]?data[1][10]||'':'');
+  var dm=dateStr.match(/(\d+)\/(\d+)\/(\d+)\s+to\s+(\d+)\/(\d+)\/(\d+)/);
+  var dayIdx=todayDayIdx(),weekIdx=Math.min(Math.floor(dayIdx/7),51);
+  if(dm){var em=parseInt(dm[1]),ed=parseInt(dm[2]);dayIdx=Math.min(MONTH_DAY_OFFSET[em-1]+(ed-1),364);weekIdx=Math.min(Math.floor(dayIdx/7),51);}
+  var monthIdx=dayIdxToMonthDay(dayIdx).month;
+  var quarterIdx=Math.floor(monthIdx/3);
+  var pf=function(v){return(v!=null&&v!==''&&!isNaN(v))?parseFloat(v):null;};
+
+  // ── Find header row first ──
+  var startRow=0;
+  for(var i=0;i<Math.min(12,data.length);i++){
+    var joined=data[i].map(function(v){return String(v||'');}).join(' ');
+    if(/P\/Date|Shft/.test(joined)&&/Qty/.test(joined)){startRow=i+1;break;}
+  }
+  if(startRow===0)startRow=8; // fallback
+
+  // ── Find all machine sections ──
+  var machineBlocks=[];
+  var currentMachine=null;
+  for(var i=startRow;i<data.length;i++){
+    var a=String(data[i][0]||'').trim();
+    if(!a)continue;
+    if(/Department|Totals|Grand/i.test(a))continue;
+    // Machine name row: has text in col A but NO numeric data in col D (index 3)
+    if(a && a!=='Total' && !/^\d+$/.test(a.replace(/\s/g,'')) && data[i][3]==null){
+      currentMachine={name:a,code:a.split(' ')[0],totalRow:null};
+      machineBlocks.push(currentMachine);
+      continue;
+    }
+    // Total row for current machine
+    if(a.toLowerCase()==='total' && currentMachine && data[i][3]!=null){
+      currentMachine.totalRow=data[i];
+    }
+  }
+
+  if(!machineBlocks.length){toast('No machines found in PEFS file','error');return;}
+  var importCount=0;
+  var lastMachId=null;
+
+  machineBlocks.forEach(function(block){
+    if(!block.totalRow)return;
+    var dr=block.totalRow;
+    var machineName=block.name,machineCode=block.code;
+
+    // ── Extract KPIs ──
+    var prodQty=pf(dr[3]),setups=pf(dr[5])||1,rateQtyHr=pf(dr[6]);
+    var prodHrsSetup=pf(dr[11]),actHrsTotal=pf(dr[15]),utilDown=pf(dr[16]);
+    // Check for Monthly Metrics columns (25-28) if present
+    var hasMonthlyMetrics=(dr.length>24 && pf(dr[24])!=null);
+    var setupTime=hasMonthlyMetrics?pf(dr[24]):(prodHrsSetup!=null&&setups>0?(prodHrsSetup/setups*60):null);
+    var feedsRunHr=hasMonthlyMetrics?pf(dr[25]):rateQtyHr;
+    var feedsSchHr=hasMonthlyMetrics?pf(dr[26]):(prodQty!=null&&actHrsTotal!=null&&actHrsTotal>0?prodQty/actHrsTotal:null);
+    var downtime=hasMonthlyMetrics?pf(dr[27]):(utilDown!=null?utilDown:null);
+    // Convert downtime to percentage if it's a decimal
+    if(downtime!=null&&downtime<1)downtime=downtime*100;
+
+    // ── Find or create machine ──
+    var mach=state.machines.find(function(m){return m.plant===state.plant&&(m.name===machineName||m.code===machineCode);});
+    if(!mach){
+      var kpis=[
+        {code:'001',name:'Setup Time',criteria:'Avg minutes per setup/changeover',unit:'Min',lowerBetter:true},
+        {code:'002',name:'Downtime',criteria:'Utilization down %',unit:'%',lowerBetter:true},
+        {code:'003',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Qty/Hr',lowerBetter:false},
+        {code:'004',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Qty/Hr',lowerBetter:false}
+      ];
+      var codes=['001','002','003','004'];
+      var d={daily:emptyMode(codes,365),weekly:emptyMode(codes,52),monthly:emptyMode(codes,12),quarterly:emptyMode(codes,4),yearly:emptyMode(codes,1)};
+      mach={id:'pefs_'+machineCode+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),plant:state.plant,name:machineName,code:machineCode,label:machineName,color:PLANT_COLORS[state.plant]||'#c8102e',kpis:kpis,goals:{},data:d};
+      state.machines.push(mach);
+    }
+
+    // ── Write values to all time views ──
+    var vals={'Setup':setupTime,'Downtime':downtime,'RunHr':feedsRunHr,'SchHr':feedsSchHr};
+    Object.keys(vals).forEach(function(nameHint){
+      var val=vals[nameHint];
+      var k=mach.kpis.find(function(x){return x.name.toLowerCase().includes(nameHint.toLowerCase());});
+      if(!k||val==null)return;
+      [['daily',365,dayIdx],['weekly',52,weekIdx],['monthly',12,monthIdx],['quarterly',4,quarterIdx],['yearly',1,0]].forEach(function(cfg){
+        var mode=cfg[0],len=cfg[1],idx=cfg[2];
+        if(!mach.data[mode])mach.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};
+        if(!mach.data[mode].cyActual[k.code])mach.data[mode].cyActual[k.code]=new Array(len).fill(null);
+        var existing=mach.data[mode].cyActual[k.code][idx];
+        if(mode==='daily'){
+          // Daily: overwrite (one value per day)
+          mach.data[mode].cyActual[k.code][idx]=val;
+        }else{
+          // Weekly/Monthly/Quarterly/Yearly: running average
+          if(existing!=null){
+            mach.data[mode].cyActual[k.code][idx]=(existing+val)/2;
+          }else{
+            mach.data[mode].cyActual[k.code][idx]=val;
+          }
+        }
+      });
+    });
+
+    lastMachId=mach.id;
+    importCount++;
+  });
+
+  saveState();
+  toast(importCount+' machine'+(importCount!==1?'s':'')+' imported — '+MONTHS[monthIdx]+' (Week '+(weekIdx+1)+')');
+  if(lastMachId)state.activeMachine=lastMachId;
+  window._viewMode='monthly';
+  window._activePeriod=monthIdx;
+}
 function exportData(){var m=state.machines.find(function(x){return x.id===state.activeMachine;});if(!m){toast('Select a machine first','error');return;}var mode=window._viewMode;var periods=mode==='daily'?DAYS.map(function(_,i){return dayIdxLabel(i);}):mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;var wb=XLSX.utils.book_new();['cyActual','cyTarget','pyActual'].forEach(function(type,ti){var label=['CY Actual','CY Target','PY Actual'][ti];var hdr=['KPI Code','KPI Name','Criteria','Unit'].concat(periods);var rows=[hdr].concat(m.kpis.map(function(kpi){return[kpi.code,kpi.name,kpi.criteria,kpi.unit].concat(m.data[mode][type][kpi.code]||new Array(periods.length).fill(null));}));XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),(label+' '+(mode==='daily'?'Daily':mode.charAt(0).toUpperCase()+mode.slice(1))).slice(0,31));});XLSX.writeFile(wb,'KPI_'+m.name+'_'+mode+'_'+new Date().toISOString().slice(0,10)+'.xlsx');toast('Exported');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-bg').forEach(function(bg){bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('open');});});
