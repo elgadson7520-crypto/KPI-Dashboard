@@ -362,6 +362,10 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
 }
 .print-hdr{display:none;}
 .print-footer{display:none;}
+.editor-bar{display:none;padding:4px 18px;background:#1a3a1a;border-bottom:1px solid #2a5c2a;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#4ec98a;text-transform:uppercase;letter-spacing:.1em;font-weight:700;align-items:center;gap:12px;}
+.editor-bar.active{display:flex;}
+.editor-bar a{color:#6ee6a8;cursor:pointer;text-decoration:underline;font-size:10px;letter-spacing:.06em;}
+.editor-bar a:hover{color:#fff;}
 </style>
 </head>
 <body data-plant="okc">
@@ -383,15 +387,18 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
       <button class="plant-btn" onclick="switchPlant('abq',this)">ABQ</button>
       <button class="plant-btn" onclick="switchPlant('tus',this)">TUS</button>
     </div>
-    <button class="btn btn-ghost" onclick="openImportModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import</button>
+    <button class="btn btn-ghost editor-only" onclick="openImportModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import</button>
     <button class="btn btn-ghost" onclick="exportData()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
     <button class="btn btn-ghost" onclick="printReport()" title="Print/PDF executive report"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
     <button class="btn btn-ghost" onclick="openScorecard()" title="Generate one-page plant scorecard for VP review" style="color:#e0a030;border-color:#4a3a1a;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Scorecard</button>
-    <button class="btn btn-ghost" onclick="clearState()" title="Reset all data to factory defaults" style="color:#555;border-color:#2a2a2a;font-size:11px;padding:6px 10px;">
+    <button class="btn btn-ghost editor-only" onclick="clearState()" title="Reset all data to factory defaults" style="color:#555;border-color:#2a2a2a;font-size:11px;padding:6px 10px;">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       Reset
     </button>
-    <button class="btn btn-accent" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Add Machine</span></button>
+    <button class="btn btn-accent editor-only" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Add Machine</span></button>
+    <button class="btn btn-ghost" id="editorToggleBtn" onclick="promptEditorLogin()" title="Toggle editor / view-only mode" style="color:#888;border-color:#383838;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>View Only</span>
+    </button>
     <div class="sp-status" id="spStatus" onclick="openGDriveModal()" title="Google Drive backup settings">
       <div class="sp-dot disconnected" id="spDot"></div>
       <span id="spLabel" style="color:#555;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Google Drive</span>
@@ -399,6 +406,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <span class="wake-indicator" id="wakeBtn" onclick="toggleWakeLock()" title="Screen wake lock">&#128261;</span>
   </div>
 </header>
+<div class="editor-bar" id="editorBar">&#128274; Editor Mode Active <a onclick="changeEditorPwd()">Change Password</a> <a onclick="logoutEditor()">Lock &amp; Switch to View Only</a></div>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="main">
   <aside class="sidebar">
@@ -421,7 +429,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <div class="empty" id="emptyState">
       <div class="empty-ico">&#9881;</div><div class="empty-title">No Machine Selected</div>
       <div class="empty-sub">Select a machine from the sidebar or add a new one</div>
-      <button class="btn btn-accent" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add First Machine</button>
+      <button class="btn btn-accent editor-only" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add First Machine</button>
     </div>
     <div id="dashContent" style="display:none"></div>
     <div id="compContent" style="display:none"></div>
@@ -539,6 +547,69 @@ const COLORS=['#c8102e','#2d2d2d','#b45309','#1a5276','#6b2fa0','#145a32','#7f1d
 let state={machines:[],activeMachine:null,editingMachine:null,plant:'okc'};
 window._activePeriod=4;window._viewMode='monthly';window._dailyMonth=0;window._activeView='dashboard';window._drillPeriod=null;window._dateRange='ytd';window._dateStart=0;window._dateEnd=11;
 
+// ── EDITOR MODE (password-gated) ──
+const EDITOR_KEY='supplyone_editor_v1';
+const EDITOR_PWD_KEY='supplyone_editor_pwd_v1';
+function getEditorHash(){try{return localStorage.getItem(EDITOR_PWD_KEY)||null;}catch(e){return null;}}
+function setEditorHash(pwd){try{localStorage.setItem(EDITOR_PWD_KEY,btoa(pwd));}catch(e){}}
+function isEditor(){try{return sessionStorage.getItem(EDITOR_KEY)==='1';}catch(e){return false;}}
+function setEditor(v){try{sessionStorage.setItem(EDITOR_KEY,v?'1':'0');}catch(e){}}
+function promptEditorLogin(){
+  const stored=getEditorHash();
+  if(!stored){
+    // First-time setup: set the editor password
+    const pwd=prompt('No editor password has been set yet.\\nCreate an editor password now:');
+    if(!pwd||!pwd.trim()){toast('Password setup cancelled','error');return;}
+    const confirm2=prompt('Confirm the password:');
+    if(pwd!==confirm2){toast('Passwords did not match','error');return;}
+    setEditorHash(pwd.trim());
+    setEditor(true);
+    applyEditorUI();
+    toast('Editor password set & logged in');
+    return;
+  }
+  const pwd=prompt('Enter editor password:');
+  if(!pwd)return;
+  if(btoa(pwd.trim())===stored){
+    setEditor(true);
+    applyEditorUI();
+    toast('Editor mode activated');
+  }else{
+    toast('Incorrect password','error');
+  }
+}
+function logoutEditor(){
+  setEditor(false);
+  applyEditorUI();
+  toast('Switched to view-only mode');
+}
+function changeEditorPwd(){
+  const stored=getEditorHash();
+  const old=prompt('Enter current password:');
+  if(!old||btoa(old.trim())!==stored){toast('Incorrect password','error');return;}
+  const np=prompt('Enter new password:');
+  if(!np||!np.trim()){toast('Cancelled','error');return;}
+  const np2=prompt('Confirm new password:');
+  if(np!==np2){toast('Passwords did not match','error');return;}
+  setEditorHash(np.trim());
+  toast('Password updated');
+}
+function applyEditorUI(){
+  const ed=isEditor();
+  document.querySelectorAll('.editor-only').forEach(el=>{el.style.display=ed?'':'none';});
+  document.querySelectorAll('.viewer-hide').forEach(el=>{el.style.display=ed?'none':'';});
+  const bar=document.getElementById('editorBar');
+  if(bar)bar.classList.toggle('active',ed);
+  const lockBtn=document.getElementById('editorToggleBtn');
+  if(lockBtn){
+    lockBtn.innerHTML=ed?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Editor</span>':'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>View Only</span>';
+    lockBtn.style.color=ed?'#4ec98a':'#888';
+    lockBtn.style.borderColor=ed?'#2a5c3a':'#383838';
+    lockBtn.onclick=ed?logoutEditor:promptEditorLogin;
+  }
+  renderSidebar();
+}
+
 const ALERTS_KEY='supplyone_alerts_v1';
 let alertRules=[];
 function loadAlerts(){try{const r=localStorage.getItem(ALERTS_KEY);if(r)alertRules=JSON.parse(r);}catch(e){}}
@@ -590,15 +661,75 @@ const f=(v,d=3)=>{if(v===null||v===undefined||isNaN(v))return'--';return Number(
 function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.className='toast',3200);}
 function calcYTD(arr,pi){const vals=(arr||[]).slice(0,pi+1).filter(v=>v!=null);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;}
 
-// ── LOCALSTORAGE PERSISTENCE ──
+// ── LOCALSTORAGE PERSISTENCE (compressed) ──
 const LS_KEY='supplyone_kpi_v1';
+function compressMachines(machines){
+  return machines.map(m=>{
+    const cm={...m,data:{}};
+    Object.keys(m.data).forEach(mode=>{
+      cm.data[mode]={};
+      ['cyActual','cyTarget','pyActual'].forEach(type=>{
+        cm.data[mode][type]={};
+        const src=m.data[mode][type]||{};
+        Object.keys(src).forEach(code=>{
+          const arr=src[code];
+          if(!arr)return;
+          // Sparse encode: only store {index:value} for non-null entries
+          const sparse={};let hasData=false;
+          arr.forEach((v,i)=>{if(v!=null){sparse[i]=v;hasData=true;}});
+          if(hasData)cm.data[mode][type][code]=sparse;
+        });
+      });
+    });
+    return cm;
+  });
+}
+function decompressMachines(compressed){
+  const LENS={daily:365,weekly:52,monthly:12,quarterly:4,yearly:1};
+  return compressed.map(cm=>{
+    const m={...cm,data:{}};
+    Object.keys(cm.data).forEach(mode=>{
+      m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};
+      ['cyActual','cyTarget','pyActual'].forEach(type=>{
+        const src=cm.data[mode][type]||{};
+        Object.keys(src).forEach(code=>{
+          const val=src[code];
+          const len=LENS[mode]||12;
+          if(Array.isArray(val)){
+            // Legacy uncompressed format
+            m.data[mode][type][code]=val;
+          }else if(typeof val==='object'){
+            // Sparse format: {index:value}
+            const arr=new Array(len).fill(null);
+            Object.keys(val).forEach(k=>{arr[parseInt(k)]=val[k];});
+            m.data[mode][type][code]=arr;
+          }
+        });
+      });
+    });
+    // Ensure all KPI codes have arrays for all modes
+    if(m.kpis){m.kpis.forEach(k=>{Object.keys(LENS).forEach(mode=>{if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};['cyActual','cyTarget','pyActual'].forEach(type=>{if(!m.data[mode][type][k.code])m.data[mode][type][k.code]=new Array(LENS[mode]).fill(null);});});});}
+    return m;
+  });
+}
 function saveState(){
   try{
-    const payload={machines:state.machines,plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString()};
-    localStorage.setItem(LS_KEY,JSON.stringify(payload));
+    const compressed=compressMachines(state.machines);
+    const payload={machines:compressed,plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString(),_compressed:true};
+    const json=JSON.stringify(payload);
+    try{
+      localStorage.setItem(LS_KEY,json);
+    }catch(storageErr){
+      console.error('localStorage full ('+Math.round(json.length/1024)+'KB), attempting cleanup...');
+      // Try clearing old keys and retrying
+      try{localStorage.removeItem('supplyone_kpi_v0');localStorage.removeItem('supplyone_kpi_old');}catch(e2){}
+      try{localStorage.setItem(LS_KEY,json);}catch(e3){
+        toast('Storage full — connect Google Drive to save data','error');
+      }
+    }
     const ind=document.getElementById('saveIndicator');
     if(ind){const now=new Date();ind.textContent='Saved '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ind.style.color='#3a5c3a';}
-  }catch(e){console.warn('localStorage save failed:',e);}
+  }catch(e){console.warn('Save failed:',e);toast('Save error: '+e.message,'error');}
   // Auto-sync to Google Drive if connected
   if(gdriveToken&&gdriveCfg)gdriveSaveToCloud();
 }
@@ -608,7 +739,8 @@ function loadState(){
     if(!raw){seedData();return;}
     const payload=JSON.parse(raw);
     if(!payload.machines||!payload.machines.length){seedData();return;}
-    state.machines=payload.machines;
+    // Decompress if needed
+    state.machines=payload._compressed?decompressMachines(payload.machines):payload.machines;
     state.machines.forEach(m=>{if(!m.goals)m.goals={};});
     state.plant=payload.plant||'okc';
     state.activeMachine=payload.activeMachine||null;
@@ -623,7 +755,7 @@ function loadState(){
     });
   }catch(e){console.warn('localStorage load failed, using defaults:',e);seedData();}
 }
-function clearState(){
+function clearState(){if(!isEditor()){toast('Editor access required','error');return;}
   if(!confirm('Reset ALL data to factory defaults? This cannot be undone.'))return;
   localStorage.removeItem(LS_KEY);localStorage.removeItem(ALERTS_KEY);localStorage.removeItem(SHIFT_KEY);
   state.plant='okc';state.activeMachine=null;
@@ -668,13 +800,15 @@ function switchView(view){
  * ═══════════════════════════════════════════════════════════════════════ */
 
 function renderSidebar(){
-  const plant=state.plant;
+  const plant=state.plant;const ed=isEditor();
   const ms=state.machines.filter(m=>m.plant===plant);
   document.getElementById('machCount').textContent=ms.length+' machine'+(ms.length!==1?'s':'');
-  document.getElementById('machList').innerHTML=ms.map(m=>'<div class="mach-item '+(m.id===state.activeMachine?'active':'')+'" onclick="selectMachine(\''+m.id+'\')"><div class="mach-left"><div class="mach-pip" style="background:'+m.color+'"></div><div><div class="mach-name">'+m.name+'</div><div class="mach-code">'+m.code+'</div></div></div><button class="mach-del" onclick="event.stopPropagation();deleteMachine(\''+m.id+'\')">x</button></div>').join('');
+  document.getElementById('machList').innerHTML=ms.map(m=>'<div class="mach-item '+(m.id===state.activeMachine?'active':'')+'" onclick="selectMachine(\''+m.id+'\')"><div class="mach-left"><div class="mach-pip" style="background:'+m.color+'"></div><div><div class="mach-name">'+m.name+'</div><div class="mach-code">'+m.code+'</div></div></div>'+(ed?'<button class="mach-del" onclick="event.stopPropagation();deleteMachine(\''+m.id+'\')">x</button>':'')+'</div>').join('');
+  const sbAdd=document.querySelector('.sb-add');
+  if(sbAdd)sbAdd.style.display=ed?'':'none';
 }
 function selectMachine(id){state.activeMachine=id;window._activeView='dashboard';document.querySelectorAll('.sb-nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('navDash').classList.add('active');document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';window._drillPeriod=null;renderSidebar();renderDashboard();saveState();closeSidebar();}
-function deleteMachine(id){if(!confirm('Delete this machine?'))return;state.machines=state.machines.filter(m=>m.id!==id);if(state.activeMachine===id)state.activeMachine=null;renderSidebar();renderDashboard();saveState();toast('Machine deleted');}
+function deleteMachine(id){if(!isEditor()){toast('Editor access required','error');return;}if(!confirm('Delete this machine?'))return;state.machines=state.machines.filter(m=>m.id!==id);if(state.activeMachine===id)state.activeMachine=null;renderSidebar();renderDashboard();saveState();toast('Machine deleted');}
 function calcDelta(curr,prev,lowerBetter){
   if(curr==null||prev==null||prev===0)return{html:'<span class="kpi-delta flat">—</span>',cls:'flat'};
   const pct=((curr-prev)/Math.abs(prev)*100);
@@ -745,29 +879,29 @@ function renderComparison(){const el=document.getElementById('compContent');el.s
 function renderAlertConfig(){const el=document.getElementById('alertContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('compContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';let html='<div style="max-width:660px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Alert Thresholds</div><div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Configure automatic Email / Teams notifications when KPIs breach thresholds during a shift.</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Active Rules</div>';if(alertRules.length===0)html+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:3px;margin-bottom:14px;">No alert rules configured yet.</div>';else alertRules.forEach((r,i)=>{html+='<div class="alert-rule"><button class="alert-toggle '+(r.active?'on':'')+'" onclick="toggleAlert('+i+')"></button><div class="alert-rule-text">If <strong>'+r.kpiName+'</strong> '+r.operator+' <strong>'+r.value+'</strong> '+r.unit+'</div><span class="alert-badge '+(r.channel==='teams'?'teams':'email')+'">'+(r.channel==='teams'?'&#128241; Teams':'&#128231; Email')+'</span><button class="kdel" onclick="deleteAlert('+i+')">x</button></div>';});html+='<div style="margin-top:18px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:4px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Add New Rule</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-size:12px;color:var(--muted)">If</span><input class="finp" id="alertKpi" placeholder="KPI name" style="width:140px;padding:6px 10px;font-size:12px"><select class="finp" id="alertOp" style="width:100px;padding:6px 10px;font-size:12px"><option value="exceeds">exceeds</option><option value="falls below">falls below</option></select><input class="finp" id="alertVal" type="number" step="any" placeholder="5" style="width:70px;padding:6px 10px;font-size:12px"><input class="finp" id="alertUnit" placeholder="hrs" style="width:60px;padding:6px 10px;font-size:12px"><span style="font-size:12px;color:var(--muted)">→ via</span><select class="finp" id="alertChan" style="width:100px;padding:6px 10px;font-size:12px"><option value="teams">Teams</option><option value="email">Email</option></select><button class="btn btn-accent" style="font-size:11px;padding:6px 12px" onclick="addAlertRule()">+ Add</button></div></div></div>';el.innerHTML=html;}
 function toggleAlert(i){alertRules[i].active=!alertRules[i].active;saveAlerts();renderAlertConfig();}
 function deleteAlert(i){alertRules.splice(i,1);saveAlerts();renderAlertConfig();}
-function addAlertRule(){const kpi=document.getElementById('alertKpi').value.trim();const op=document.getElementById('alertOp').value;const val=parseFloat(document.getElementById('alertVal').value);const unit=document.getElementById('alertUnit').value.trim();const chan=document.getElementById('alertChan').value;if(!kpi||isNaN(val)){toast('Fill in KPI name and threshold value','error');return;}alertRules.push({kpiName:kpi,operator:op,value:val,unit:unit,channel:chan,active:true});saveAlerts();renderAlertConfig();toast('Alert rule added');}
-function openGoalModal(mid){const m=state.machines.find(x=>x.id===mid);if(!m)return;if(!m.goals)m.goals={};document.getElementById('goalModalSub').textContent=m.name+' · Set green/amber thresholds per KPI';let html='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Green = on target, Amber = caution zone, Red = below threshold. Leave amber blank for simple pass/fail.</div><div style="border:1px solid var(--border);border-radius:3px;overflow:hidden;"><div style="display:grid;grid-template-columns:1fr 100px 100px 100px;gap:5px;padding:8px 12px;background:#f5f4f2;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)"><div>KPI</div><div style="text-align:center">&#128994; Green</div><div style="text-align:center">&#128992; Amber</div><div style="text-align:center">Direction</div></div>';m.kpis.forEach(k=>{const g=m.goals[k.code]||{};const tgt=(m.data[window._viewMode]?.cyTarget?.[k.code]||[])[window._activePeriod];html+='<div style="display:grid;grid-template-columns:1fr 100px 100px 100px;gap:5px;padding:6px 12px;border-top:1px solid var(--border);align-items:center"><div style="font-size:13px;font-weight:500">'+k.name+'<div style="font-size:10px;color:var(--muted)">'+k.code+' · Current target: '+f(tgt)+'</div></div><input class="kfi goal-inp" data-code="'+k.code+'" data-field="green" value="'+(g.green!=null?g.green:(tgt!=null?tgt:''))+'" type="number" step="any" placeholder="'+f(tgt)+'" style="text-align:center"><input class="kfi goal-inp" data-code="'+k.code+'" data-field="amber" value="'+(g.amber!=null?g.amber:'')+'" type="number" step="any" placeholder="--" style="text-align:center"><div style="font-size:11px;color:var(--muted);text-align:center">'+(k.lowerBetter?'↓ Lower better':'↑ Higher better')+'</div></div>';});html+='</div>';document.getElementById('goalModalBody').innerHTML=html;document.getElementById('goalModal').classList.add('open');}
-function saveGoals(){const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;if(!m.goals)m.goals={};document.querySelectorAll('.goal-inp').forEach(inp=>{const code=inp.dataset.code,field=inp.dataset.field;if(!m.goals[code])m.goals[code]={};const v=inp.value.trim();m.goals[code][field]=v===''?null:parseFloat(v);});closeModal('goalModal');saveState();renderDashboard();toast('Targets saved');}
+function addAlertRule(){if(!isEditor()){toast('Editor access required','error');return;}const kpi=document.getElementById('alertKpi').value.trim();const op=document.getElementById('alertOp').value;const val=parseFloat(document.getElementById('alertVal').value);const unit=document.getElementById('alertUnit').value.trim();const chan=document.getElementById('alertChan').value;if(!kpi||isNaN(val)){toast('Fill in KPI name and threshold value','error');return;}alertRules.push({kpiName:kpi,operator:op,value:val,unit:unit,channel:chan,active:true});saveAlerts();renderAlertConfig();toast('Alert rule added');}
+function openGoalModal(mid){if(!isEditor()){toast('Editor access required','error');return;}const m=state.machines.find(x=>x.id===mid);if(!m)return;if(!m.goals)m.goals={};document.getElementById('goalModalSub').textContent=m.name+' · Set green/amber thresholds per KPI';let html='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Green = on target, Amber = caution zone, Red = below threshold. Leave amber blank for simple pass/fail.</div><div style="border:1px solid var(--border);border-radius:3px;overflow:hidden;"><div style="display:grid;grid-template-columns:1fr 100px 100px 100px;gap:5px;padding:8px 12px;background:#f5f4f2;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)"><div>KPI</div><div style="text-align:center">&#128994; Green</div><div style="text-align:center">&#128992; Amber</div><div style="text-align:center">Direction</div></div>';m.kpis.forEach(k=>{const g=m.goals[k.code]||{};const tgt=(m.data[window._viewMode]?.cyTarget?.[k.code]||[])[window._activePeriod];html+='<div style="display:grid;grid-template-columns:1fr 100px 100px 100px;gap:5px;padding:6px 12px;border-top:1px solid var(--border);align-items:center"><div style="font-size:13px;font-weight:500">'+k.name+'<div style="font-size:10px;color:var(--muted)">'+k.code+' · Current target: '+f(tgt)+'</div></div><input class="kfi goal-inp" data-code="'+k.code+'" data-field="green" value="'+(g.green!=null?g.green:(tgt!=null?tgt:''))+'" type="number" step="any" placeholder="'+f(tgt)+'" style="text-align:center"><input class="kfi goal-inp" data-code="'+k.code+'" data-field="amber" value="'+(g.amber!=null?g.amber:'')+'" type="number" step="any" placeholder="--" style="text-align:center"><div style="font-size:11px;color:var(--muted);text-align:center">'+(k.lowerBetter?'↓ Lower better':'↑ Higher better')+'</div></div>';});html+='</div>';document.getElementById('goalModalBody').innerHTML=html;document.getElementById('goalModal').classList.add('open');}
+function saveGoals(){if(!isEditor()){toast('Editor access required','error');return;}const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;if(!m.goals)m.goals={};document.querySelectorAll('.goal-inp').forEach(inp=>{const code=inp.dataset.code,field=inp.dataset.field;if(!m.goals[code])m.goals[code]={};const v=inp.value.trim();m.goals[code][field]=v===''?null:parseFloat(v);});closeModal('goalModal');saveState();renderDashboard();toast('Targets saved');}
 function printReport(){window.print();}
 
 // ── MACHINE CRUD ──
 let kpiRows=[];
-function openAddMachineModal(){state.editingMachine=null;document.getElementById('machModalTitle').textContent='Add New Machine';['mName','mCode','mLabel'].forEach(id=>document.getElementById(id).value='');document.getElementById('mColor').value=PLANT_COLORS[state.plant]||'#c8102e';kpiRows=[{code:'',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Hrs',target:'',lowerBetter:true},{code:'',name:'Downtime',criteria:'% of scheduled time machine is down',unit:'%',target:'',lowerBetter:true},{code:'',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Qty/Hr',target:'',lowerBetter:false},{code:'',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Qty/Hr',target:'',lowerBetter:false}];renderKFL();document.getElementById('addMachModal').classList.add('open');}
-function openEditMachine(id){const m=state.machines.find(x=>x.id===id);if(!m)return;state.editingMachine=id;document.getElementById('machModalTitle').textContent='Edit Machine';document.getElementById('mName').value=m.name;document.getElementById('mCode').value=m.code;document.getElementById('mLabel').value=m.label;document.getElementById('mColor').value=m.color;kpiRows=m.kpis.map(k=>({...k}));renderKFL();document.getElementById('addMachModal').classList.add('open');}
+function openAddMachineModal(){if(!isEditor()){toast('Editor access required — click the lock icon to sign in','error');return;}state.editingMachine=null;document.getElementById('machModalTitle').textContent='Add New Machine';['mName','mCode','mLabel'].forEach(id=>document.getElementById(id).value='');document.getElementById('mColor').value=PLANT_COLORS[state.plant]||'#c8102e';kpiRows=[{code:'',name:'Setup Time',criteria:'Avg setup time per job/changeover',unit:'Hrs',target:'',lowerBetter:true},{code:'',name:'Downtime',criteria:'% of scheduled time machine is down',unit:'%',target:'',lowerBetter:true},{code:'',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Qty/Hr',target:'',lowerBetter:false},{code:'',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Qty/Hr',target:'',lowerBetter:false}];renderKFL();document.getElementById('addMachModal').classList.add('open');}
+function openEditMachine(id){if(!isEditor()){toast('Editor access required','error');return;}const m=state.machines.find(x=>x.id===id);if(!m)return;state.editingMachine=id;document.getElementById('machModalTitle').textContent='Edit Machine';document.getElementById('mName').value=m.name;document.getElementById('mCode').value=m.code;document.getElementById('mLabel').value=m.label;document.getElementById('mColor').value=m.color;kpiRows=m.kpis.map(k=>({...k}));renderKFL();document.getElementById('addMachModal').classList.add('open');}
 function renderKFL(){document.getElementById('kpiFL').innerHTML='<div class="kpi-fr kh"><div>Code</div><div>Name</div><div>Criteria</div><div>Unit</div><div>Target</div><div>Direction</div><div></div></div>'+kpiRows.map((r,i)=>'<div class="kpi-fr"><input class="kfi" value="'+r.code+'" placeholder="101" oninput="kpiRows['+i+'].code=this.value"><input class="kfi" value="'+r.name+'" placeholder="KPI Name" oninput="kpiRows['+i+'].name=this.value"><input class="kfi" value="'+r.criteria+'" placeholder="Description" oninput="kpiRows['+i+'].criteria=this.value"><input class="kfi" value="'+r.unit+'" placeholder="Avg" style="text-align:center" oninput="kpiRows['+i+'].unit=this.value"><input class="kfi" value="'+(r.target||'')+'" placeholder="0.87" type="number" step="any" oninput="kpiRows['+i+'].target=parseFloat(this.value)||null"><select class="kfi" onchange="kpiRows['+i+'].lowerBetter=this.value===\'true\'"><option value="true" '+(r.lowerBetter?'selected':'')+'>Down Lower Better</option><option value="false" '+(!r.lowerBetter?'selected':'')+'>Up Higher Better</option></select><button class="kdel" onclick="kpiRows.splice('+i+',1);renderKFL()">x</button></div>').join('');}
 function addKpiRow(){kpiRows.push({code:'',name:'New KPI',criteria:'',unit:'Avg',target:null,lowerBetter:false});renderKFL();}
-function saveMachine(){const name=document.getElementById('mName').value.trim(),code=document.getElementById('mCode').value.trim(),label=document.getElementById('mLabel').value.trim(),color=document.getElementById('mColor').value;if(!name){toast('Machine name is required','error');return;}const kpis=kpiRows.filter(r=>r.name).map(r=>({code:r.code||String(Math.floor(Math.random()*900)+100),name:r.name,criteria:r.criteria,unit:r.unit,lowerBetter:r.lowerBetter}));const LENS=[[365,'daily'],[52,'weekly'],[12,'monthly'],[4,'quarterly'],[1,'yearly']];if(state.editingMachine){const m=state.machines.find(x=>x.id===state.editingMachine);m.name=name;m.code=code;m.label=label||code+' '+name.toUpperCase();m.color=color;m.kpis=kpis;kpis.forEach(k=>LENS.forEach(([len,mode])=>{if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};['cyActual','cyTarget','pyActual'].forEach(t=>{if(!m.data[mode][t][k.code])m.data[mode][t][k.code]=new Array(len).fill(null);});}));toast('Machine updated');}else{const id=state.plant+'_'+name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();const data={};LENS.forEach(([len,mode])=>{data[mode]={cyActual:{},cyTarget:{},pyActual:{}};kpis.forEach(k=>{data[mode].cyActual[k.code]=new Array(len).fill(null);data[mode].cyTarget[k.code]=new Array(len).fill(k.target||null);data[mode].pyActual[k.code]=new Array(len).fill(null);});});state.machines.push({id,plant:state.plant,name,code,label:label||code+' '+name.toUpperCase(),color,kpis,goals:{},data});toast('Machine added');}saveState();closeModal('addMachModal');renderSidebar();if(!state.activeMachine){const ms=state.machines.filter(m=>m.plant===state.plant);if(ms.length)selectMachine(ms[ms.length-1].id);}else renderDashboard();}
+function saveMachine(){if(!isEditor()){toast('Editor access required','error');return;}const name=document.getElementById('mName').value.trim(),code=document.getElementById('mCode').value.trim(),label=document.getElementById('mLabel').value.trim(),color=document.getElementById('mColor').value;if(!name){toast('Machine name is required','error');return;}const kpis=kpiRows.filter(r=>r.name).map(r=>({code:r.code||String(Math.floor(Math.random()*900)+100),name:r.name,criteria:r.criteria,unit:r.unit,lowerBetter:r.lowerBetter}));const LENS=[[365,'daily'],[52,'weekly'],[12,'monthly'],[4,'quarterly'],[1,'yearly']];if(state.editingMachine){const m=state.machines.find(x=>x.id===state.editingMachine);m.name=name;m.code=code;m.label=label||code+' '+name.toUpperCase();m.color=color;m.kpis=kpis;kpis.forEach(k=>LENS.forEach(([len,mode])=>{if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};['cyActual','cyTarget','pyActual'].forEach(t=>{if(!m.data[mode][t][k.code])m.data[mode][t][k.code]=new Array(len).fill(null);});}));toast('Machine updated');}else{const id=state.plant+'_'+name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();const data={};LENS.forEach(([len,mode])=>{data[mode]={cyActual:{},cyTarget:{},pyActual:{}};kpis.forEach(k=>{data[mode].cyActual[k.code]=new Array(len).fill(null);data[mode].cyTarget[k.code]=new Array(len).fill(k.target||null);data[mode].pyActual[k.code]=new Array(len).fill(null);});});state.machines.push({id,plant:state.plant,name,code,label:label||code+' '+name.toUpperCase(),color,kpis,goals:{},data});toast('Machine added');}saveState();closeModal('addMachModal');renderSidebar();if(!state.activeMachine){const ms=state.machines.filter(m=>m.plant===state.plant);if(ms.length)selectMachine(ms[ms.length-1].id);}else renderDashboard();}
 
 // ── DATA ENTRY ──
 let dataMachId=null;
-function openDataModal(mid){dataMachId=mid;const m=state.machines.find(x=>x.id===mid);if(!m)return;document.getElementById('dataModalTitle').textContent='Enter Data - '+m.name;document.getElementById('dataModalBody').innerHTML='<div style="margin-bottom:16px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Period</div><div class="vtabs"><button class="vtab" id="dataTabDaily" onclick="switchDataTab(\'daily\')">Daily</button><button class="vtab" id="dataTabWeekly" onclick="switchDataTab(\'weekly\')">Weekly</button><button class="vtab active" id="dataTabMonthly" onclick="switchDataTab(\'monthly\')">Monthly</button><button class="vtab" id="dataTabQuarterly" onclick="switchDataTab(\'quarterly\')">Quarterly</button><button class="vtab" id="dataTabYearly" onclick="switchDataTab(\'yearly\')">Yearly</button></div></div><div id="dataTabContent"></div>';window._dataModalMode='monthly';renderDataTab(m,'monthly');document.getElementById('dataModal').classList.add('open');}
+function openDataModal(mid){if(!isEditor()){toast('Editor access required — click the lock icon to sign in','error');return;}dataMachId=mid;const m=state.machines.find(x=>x.id===mid);if(!m)return;document.getElementById('dataModalTitle').textContent='Enter Data - '+m.name;document.getElementById('dataModalBody').innerHTML='<div style="margin-bottom:16px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Period</div><div class="vtabs"><button class="vtab" id="dataTabDaily" onclick="switchDataTab(\'daily\')">Daily</button><button class="vtab" id="dataTabWeekly" onclick="switchDataTab(\'weekly\')">Weekly</button><button class="vtab active" id="dataTabMonthly" onclick="switchDataTab(\'monthly\')">Monthly</button><button class="vtab" id="dataTabQuarterly" onclick="switchDataTab(\'quarterly\')">Quarterly</button><button class="vtab" id="dataTabYearly" onclick="switchDataTab(\'yearly\')">Yearly</button></div></div><div id="dataTabContent"></div>';window._dataModalMode='monthly';renderDataTab(m,'monthly');document.getElementById('dataModal').classList.add('open');}
 function switchDataTab(mode){window._dataModalMode=mode;document.querySelectorAll('[id^="dataTab"]').forEach(t=>t.classList.remove('active'));document.getElementById('dataTab'+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add('active');const m=state.machines.find(x=>x.id===dataMachId);if(m)renderDataTab(m,mode);}
 function renderDataTab(m,mode){const el=document.getElementById('dataTabContent');if(mode==='daily'){renderDailyDataTab(m,el);return;}const periods=mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;el.innerHTML=m.kpis.map(kpi=>{const cyA=m.data[mode].cyActual[kpi.code]||new Array(periods.length).fill(null),cyT=m.data[mode].cyTarget[kpi.code]||new Array(periods.length).fill(null),pyA=m.data[mode].pyActual[kpi.code]||new Array(periods.length).fill(null);const gc=mode==='weekly'?'repeat(13,1fr)':mode==='yearly'?'1fr':'repeat(12,1fr)';const row=(arr,type,off)=>{off=off||0;return arr.map((v,i)=>'<input class="mci" data-kpi="'+kpi.code+'" data-type="'+type+'" data-mode="'+mode+'" data-idx="'+(off+i)+'" value="'+(v??'')+'" type="number" step="any" placeholder="--">').join('');};const mh=arr=>arr.map(p=>'<div class="mhc">'+p+'</div>').join('');if(mode==='weekly'){return'<div style="margin-bottom:16px;padding:13px 15px;background:var(--bg);border-radius:3px;border:1px solid var(--border);"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">'+kpi.code+' - '+kpi.name+'</div>'+[[0,13,'Weeks 1-13'],[13,26,'Weeks 14-26'],[26,39,'Weeks 27-39'],[39,52,'Weeks 40-52']].map(function(seg){var s=seg[0],e=seg[1],lbl=seg[2];return'<div style="margin-bottom:4px;font-size:10px;color:var(--muted);">'+lbl+'</div><div class="mhrow" style="grid-template-columns:repeat('+(e-s)+',1fr)">'+mh(periods.slice(s,e))+'</div><div class="dsec">CY Actual</div><div class="mgrid" style="grid-template-columns:repeat('+(e-s)+',1fr);margin-bottom:5px">'+row(cyA.slice(s,e),'cyActual',s)+'</div><div class="dsec">CY Target</div><div class="mgrid" style="grid-template-columns:repeat('+(e-s)+',1fr);margin-bottom:5px">'+row(cyT.slice(s,e),'cyTarget',s)+'</div><div class="dsec">PY Actual</div><div class="mgrid" style="grid-template-columns:repeat('+(e-s)+',1fr);margin-bottom:10px">'+row(pyA.slice(s,e),'pyActual',s)+'</div>';}).join('')+'</div>';}return'<div style="margin-bottom:16px;padding:13px 15px;background:var(--bg);border-radius:3px;border:1px solid var(--border);"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">'+kpi.code+' - '+kpi.name+'</div><div class="mhrow" style="grid-template-columns:'+gc+'">'+mh(periods)+'</div><div class="dsec">CY Actual</div><div class="mgrid" style="grid-template-columns:'+gc+';margin-bottom:5px">'+row(cyA,'cyActual')+'</div><div class="dsec">CY Target</div><div class="mgrid" style="grid-template-columns:'+gc+';margin-bottom:5px">'+row(cyT,'cyTarget')+'</div><div class="dsec">PY Actual</div><div class="mgrid" style="grid-template-columns:'+gc+'">'+row(pyA,'pyActual')+'</div></div>';}).join('');}
 function renderDailyDataTab(m,el){el.innerHTML=m.kpis.map(kpi=>{const cyA=m.data.daily.cyActual[kpi.code]||new Array(365).fill(null),cyT=m.data.daily.cyTarget[kpi.code]||new Array(365).fill(null),pyA=m.data.daily.pyActual[kpi.code]||new Array(365).fill(null);var secs=MONTHS.map(function(mn,mi){var off=MONTH_DAY_OFFSET[mi],cnt=DAYS_IN_MONTH[mi],cols='repeat('+cnt+',1fr)';var dh=Array.from({length:cnt},function(_,d){return'<div class="mhc">'+(d+1)+'</div>';}).join('');var mkrow=function(arr,type){return Array.from({length:cnt},function(_,i){return'<input class="mci" data-kpi="'+kpi.code+'" data-type="'+type+'" data-mode="daily" data-idx="'+(off+i)+'" value="'+(arr[off+i]??'')+'" type="number" step="any" placeholder="--">';}).join('');};return'<div style="margin-bottom:10px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:4px;padding:3px 8px;background:#eeecea;border-radius:2px;">'+mn+'</div><div class="mhrow" style="grid-template-columns:'+cols+'">'+dh+'</div><div class="dsec">CY Actual</div><div class="mgrid" style="grid-template-columns:'+cols+';margin-bottom:4px">'+mkrow(cyA,'cyActual')+'</div><div class="dsec">CY Target</div><div class="mgrid" style="grid-template-columns:'+cols+';margin-bottom:4px">'+mkrow(cyT,'cyTarget')+'</div><div class="dsec">PY Actual</div><div class="mgrid" style="grid-template-columns:'+cols+'">'+mkrow(pyA,'pyActual')+'</div></div>';}).join('');return'<div style="margin-bottom:16px;padding:13px 15px;background:var(--bg);border-radius:3px;border:1px solid var(--border);"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">'+kpi.code+' - '+kpi.name+'</div>'+secs+'</div>';}).join('');}
-function saveDataEntry(){const m=state.machines.find(x=>x.id===dataMachId);if(!m)return;document.querySelectorAll('[data-kpi][data-mode]').forEach(inp=>{const kpi=inp.dataset.kpi,type=inp.dataset.type,mode=inp.dataset.mode,idx=parseInt(inp.dataset.idx);if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!m.data[mode][type])m.data[mode][type]={};const len={daily:365,weekly:52,monthly:12,quarterly:4,yearly:1}[mode]||12;if(!m.data[mode][type][kpi])m.data[mode][type][kpi]=new Array(len).fill(null);const v=inp.value.trim();m.data[mode][type][kpi][idx]=v===''?null:parseFloat(v);});closeModal('dataModal');renderDashboard();saveState();toast('Data saved');}
+function saveDataEntry(){if(!isEditor()){toast('Editor access required','error');return;}const m=state.machines.find(x=>x.id===dataMachId);if(!m)return;document.querySelectorAll('[data-kpi][data-mode]').forEach(inp=>{const kpi=inp.dataset.kpi,type=inp.dataset.type,mode=inp.dataset.mode,idx=parseInt(inp.dataset.idx);if(!m.data[mode])m.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};if(!m.data[mode][type])m.data[mode][type]={};const len={daily:365,weekly:52,monthly:12,quarterly:4,yearly:1}[mode]||12;if(!m.data[mode][type][kpi])m.data[mode][type][kpi]=new Array(len).fill(null);const v=inp.value.trim();m.data[mode][type][kpi][idx]=v===''?null:parseFloat(v);});closeModal('dataModal');renderDashboard();saveState();toast('Data saved');}
 
 // ── IMPORT/EXPORT ──
-function openImportModal(){document.getElementById('importModal').classList.add('open');}
+function openImportModal(){if(!isEditor()){toast('Editor access required — click the lock icon to sign in','error');return;}document.getElementById('importModal').classList.add('open');}
 const dz=document.getElementById('dropZone');
 dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag');});
 dz.addEventListener('dragleave',function(){dz.classList.remove('drag');});
@@ -899,7 +1033,7 @@ let shiftCharts={};
 window._shiftMonth=4;
 function renderShiftAnalysis(){const el=document.getElementById('shiftContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('analyticsContent').style.display='none';Object.values(shiftCharts).forEach(c=>c.destroy());shiftCharts={};const m=state.machines.find(x=>x.id===state.activeMachine);if(!m){el.innerHTML='<div class="empty"><div class="empty-ico">&#9201;</div><div class="empty-title">Select a Machine</div><div class="empty-sub">Choose a machine from the sidebar to view shift-level breakdowns</div></div>';return;}const pi=window._shiftMonth;const sd=genDemoShiftData(m,pi);let html='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;">Shift Analysis — '+m.name+'</div><div style="font-size:12px;color:var(--muted);">Performance breakdown by shift · '+MONTHS[pi]+' 2026</div></div><button class="btn btn-outline" onclick="openShiftDataEntry()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Shift Data</button></div><div class="month-bar" style="margin-bottom:16px"><span class="month-lbl">Month:</span>'+MONTHS.map((lbl,i)=>'<div class="mpill '+(i===pi?'active':'')+'" onclick="window._shiftMonth='+i+';renderShiftAnalysis()">'+lbl+'</div>').join('')+'</div><div class="shift-grid">';SHIFTS.forEach(sh=>{const data=sd[sh.id]||{};html+='<div class="shift-card" style="border-top:3px solid '+sh.color+'"><div class="shift-card-hdr"><div><div class="shift-name" style="color:'+sh.color+'">'+sh.name+'</div></div><div class="shift-time">'+sh.time+'</div></div><div class="shift-body">';m.kpis.forEach(k=>{const v=data[k.code];const t=(m.data.monthly.cyTarget[k.code]||[])[pi];const good=v!=null&&t!=null?(k.lowerBetter?v<=t:v>=t):null;html+='<div class="shift-kpi-row"><div class="shift-kpi-nm">'+k.name+'</div><div class="shift-kpi-val" style="color:'+(good===null?'var(--muted)':good?'var(--green)':'var(--accent)')+'">'+f(v)+'</div></div>';});html+='</div></div>';});html+='</div><div class="shift-compare-chart"><div class="chart-title">Shift Comparison — All KPIs</div><div class="chart-sub">Side-by-side performance across shifts for '+MONTHS[pi]+' 2026</div><div style="height:240px"><canvas id="shiftCompareChart"></canvas></div></div>';html+='<div class="tbl-wrap"><div class="tbl-bar"><div class="tbl-bar-title">Shift Performance Summary</div><div style="font-size:11px;color:var(--muted);font-family:\'JetBrains Mono\',monospace">'+MONTHS[pi]+' 2026</div></div><table class="sc-kpi-tbl"><thead><tr><th>KPI</th><th class="r">1st Shift</th><th class="r">2nd Shift</th><th class="r">3rd Shift</th><th class="r">Best</th><th class="r">Gap</th></tr></thead><tbody>';m.kpis.forEach(k=>{const vals=SHIFTS.map(s=>(sd[s.id]||{})[k.code]||null);const valid=vals.filter(v=>v!=null);let bestIdx=-1,bestVal=null;if(valid.length){bestVal=k.lowerBetter?Math.min(...valid):Math.max(...valid);bestIdx=vals.indexOf(bestVal);}const worstVal=valid.length?(k.lowerBetter?Math.max(...valid):Math.min(...valid)):null;const gap=bestVal!=null&&worstVal!=null&&bestVal!==0?Math.abs(((worstVal-bestVal)/bestVal)*100).toFixed(1):'--';html+='<tr><td style="font-weight:500">'+k.name+'</td>';vals.forEach((v,i)=>{html+='<td class="r" style="'+(i===bestIdx?'font-weight:700;color:var(--green)':'')+'">'+f(v)+'</td>';});html+='<td class="r" style="font-weight:600">'+(bestIdx>=0?SHIFTS[bestIdx].name:'--')+'</td><td class="r" style="color:var(--accent);font-weight:600">'+gap+'%</td></tr>';});html+='</tbody></table></div>';el.innerHTML=html;const ctx=document.getElementById('shiftCompareChart');if(ctx){const kpiLabels=m.kpis.map(k=>k.name);const datasets=SHIFTS.map(sh=>({label:sh.name,data:m.kpis.map(k=>(sd[sh.id]||{})[k.code]||0),backgroundColor:sh.color+'cc',borderColor:sh.color,borderWidth:1,borderRadius:3}));shiftCharts.compare=new Chart(ctx,{type:'bar',data:{labels:kpiLabels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'Barlow Condensed',size:11}}},y:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'JetBrains Mono',size:10}}}}}});}}
 function openShiftDataEntry(){const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const pi=window._shiftMonth;const sd=getShiftData(m.id,pi);let body='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Enter KPI values per shift for <strong>'+m.name+'</strong> · '+MONTHS[pi]+' 2026</div><div style="overflow-x:auto"><table class="sc-kpi-tbl"><thead><tr><th>KPI</th>';SHIFTS.forEach(s=>{body+='<th class="r" style="color:'+s.color+'">'+s.name+'</th>';});body+='</tr></thead><tbody>';m.kpis.forEach(k=>{body+='<tr><td style="font-weight:500">'+k.name+'</td>';SHIFTS.forEach(s=>{const v=(sd[s.id]||{})[k.code];body+='<td class="r"><input class="kfi shift-inp" data-shift="'+s.id+'" data-kpi="'+k.code+'" value="'+(v!=null?v:'')+'" type="number" step="any" style="width:80px;text-align:center"></td>';});body+='</tr>';});body+='</tbody></table></div>';document.getElementById('dataModalTitle').textContent='Shift Data — '+m.name+' · '+MONTHS[pi];document.getElementById('dataModalBody').innerHTML=body;const footer=document.querySelector('#dataModal .mod-foot');footer.innerHTML='<button class="btn btn-light" onclick="closeModal(\'dataModal\')">Cancel</button><button class="btn btn-accent" onclick="saveShiftEntry()">Save Shift Data</button>';document.getElementById('dataModal').classList.add('open');}
-function saveShiftEntry(){const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const pi=window._shiftMonth;const sd=getShiftData(m.id,pi);document.querySelectorAll('.shift-inp').forEach(inp=>{const sh=inp.dataset.shift,kpi=inp.dataset.kpi;if(!sd[sh])sd[sh]={};const v=inp.value.trim();sd[sh][kpi]=v===''?null:parseFloat(v);});saveShiftData();closeModal('dataModal');renderShiftAnalysis();toast('Shift data saved');}
+function saveShiftEntry(){if(!isEditor()){toast('Editor access required','error');return;}const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const pi=window._shiftMonth;const sd=getShiftData(m.id,pi);document.querySelectorAll('.shift-inp').forEach(inp=>{const sh=inp.dataset.shift,kpi=inp.dataset.kpi;if(!sd[sh])sd[sh]={};const v=inp.value.trim();sd[sh][kpi]=v===''?null:parseFloat(v);});saveShiftData();closeModal('dataModal');renderShiftAnalysis();toast('Shift data saved');}
 
 // ── ANALYTICS ──
 let analyticsCharts={};
@@ -998,7 +1132,7 @@ async function gdriveSaveToCloud(){
   if(!gdriveToken||!gdriveCfg)return;
   updateGDriveStatus('syncing');
   try{
-    const payload=JSON.stringify({machines:state.machines,plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString(),version:'v1'});
+    const payload=JSON.stringify({machines:compressMachines(state.machines),plant:state.plant,activeMachine:state.activeMachine,savedAt:new Date().toISOString(),version:'v1',_compressed:true});
     const fileName='supplyone-kpi-data.json';
     // Search for existing file
     if(!gdriveFileId){
@@ -1059,15 +1193,15 @@ async function gdriveLoadFromCloud(){
         updateGDriveStatus('connected');
         return false;
       }
-      state.machines=data.machines;
+      state.machines=data._compressed?decompressMachines(data.machines):data.machines;
       state.machines.forEach(m=>{if(!m.goals)m.goals={};});
       state.plant=data.plant||'okc';
       state.activeMachine=data.activeMachine||null;
       document.body.setAttribute('data-plant',state.plant);
       document.getElementById('hdrPlantName').textContent=PLANT_NAMES[state.plant]||'Oklahoma City';
       document.querySelectorAll('.plant-btn').forEach(b=>{const map={OKC:'okc',DAL:'dallas',ABQ:'abq',TUS:'tus'};b.classList.toggle('active',map[b.textContent.trim()]===state.plant);});
-      // Save to localStorage too
-      localStorage.setItem(LS_KEY,JSON.stringify({machines:state.machines,plant:state.plant,activeMachine:state.activeMachine,savedAt:data.savedAt}));
+      // Save to localStorage too (compressed)
+      try{localStorage.setItem(LS_KEY,JSON.stringify({machines:compressMachines(state.machines),plant:state.plant,activeMachine:state.activeMachine,savedAt:data.savedAt,_compressed:true}));}catch(e){console.warn('localStorage save after GDrive load failed:',e);}
     }
     updateGDriveStatus('connected');
     return true;
@@ -1099,6 +1233,7 @@ async function initGDrive(){
 // ── INIT ──
 loadState();loadAlerts();loadShiftData();
 renderSidebar();
+applyEditorUI();
 initGDrive();
 if(!state.activeMachine||!state.machines.find(function(m){return m.id===state.activeMachine;})){
   var firstPlant=state.machines.find(function(m){return m.plant===state.plant;});
