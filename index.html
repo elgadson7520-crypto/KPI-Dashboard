@@ -710,6 +710,44 @@ function applyEditorUI(){
 
 const ALERTS_KEY='supplyone_alerts_v1';
 let alertRules=[];
+
+// ═══════════════════════════════════════════════════════════════
+// RAW DATA ACCUMULATOR — Stores production totals for proper
+// monthly KPI computation (mirrors OKC Metrics Row 72 SUM logic)
+// ═══════════════════════════════════════════════════════════════
+const RAW_KEY='supplyone_raw_v1';
+let rawAccum={};
+function loadRawData(){try{const r=localStorage.getItem(RAW_KEY);if(r)rawAccum=JSON.parse(r);}catch(e){rawAccum={};}}
+function saveRawData(){try{localStorage.setItem(RAW_KEY,JSON.stringify(rawAccum));}catch(e){console.warn('Raw data save failed:',e);}}
+function ensureRawBucket(machId,monthIdx,shiftId){
+  if(!rawAccum[machId])rawAccum[machId]={};
+  if(!rawAccum[machId][monthIdx])rawAccum[machId][monthIdx]={combined:{qty:0,setups:0,setupHrs:0,runHrs:0,downOnStd:0,downOffStd:0,actHrs:0,days:0},shifts:{}};
+  if(shiftId&&!rawAccum[machId][monthIdx].shifts[shiftId])
+    rawAccum[machId][monthIdx].shifts[shiftId]={qty:0,setups:0,setupHrs:0,runHrs:0,downOnStd:0,downOffStd:0,actHrs:0,days:0};
+  return rawAccum[machId][monthIdx];
+}
+function accumulateRaw(machId,monthIdx,shiftId,raw){
+  const bucket=ensureRawBucket(machId,monthIdx,shiftId);
+  if(shiftId&&bucket.shifts[shiftId]){
+    const sb=bucket.shifts[shiftId];
+    sb.qty+=raw.qty||0;sb.setups+=raw.setups||0;sb.setupHrs+=raw.setupHrs||0;
+    sb.runHrs+=raw.runHrs||0;sb.downOnStd+=raw.downOnStd||0;sb.downOffStd+=raw.downOffStd||0;
+    sb.actHrs+=raw.actHrs||0;sb.days+=1;
+  }
+  const cb=bucket.combined;
+  cb.qty+=raw.qty||0;cb.setups+=raw.setups||0;cb.setupHrs+=raw.setupHrs||0;
+  cb.runHrs+=raw.runHrs||0;cb.downOnStd+=raw.downOnStd||0;cb.downOffStd+=raw.downOffStd||0;
+  cb.actHrs+=raw.actHrs||0;cb.days+=1;
+}
+function computeKPIsFromRaw(raw){
+  return{
+    minSetup:(raw.setups>0&&raw.setupHrs>0)?(raw.setupHrs*60)/raw.setups:null,
+    feedsRunHr:(raw.runHrs>0)?raw.qty/raw.runHrs:null,
+    feedsSchHr:(raw.actHrs>0)?raw.qty/raw.actHrs:null,
+    downtimePct:(raw.actHrs>0)?(raw.downOnStd+raw.downOffStd)/raw.actHrs:null
+  };
+}
+
 function loadAlerts(){try{const r=localStorage.getItem(ALERTS_KEY);if(r)alertRules=JSON.parse(r);}catch(e){}}
 function saveAlerts(){try{localStorage.setItem(ALERTS_KEY,JSON.stringify(alertRules));}catch(e){}}
 
@@ -856,6 +894,7 @@ function loadState(){
 function clearState(){if(!isEditor()){toast('Editor access required','error');return;}
   if(!confirm('Reset ALL data to factory defaults? This cannot be undone.'))return;
   localStorage.removeItem(LS_KEY);localStorage.removeItem(ALERTS_KEY);localStorage.removeItem(SHIFT_KEY);
+  localStorage.removeItem(RAW_KEY);rawAccum={};
   state.plant='okc';state.activeMachine=null;
   document.body.setAttribute('data-plant','okc');
   document.getElementById('hdrPlantName').textContent='Oklahoma City';
@@ -1011,113 +1050,205 @@ function handleFileSelect(e){var f=e.target.files[0];if(f)processFile(f);}
 function processFile(file){var st=document.getElementById('importStatus');st.textContent='Reading...';var reader=new FileReader();reader.onload=function(e){try{var wb=XLSX.read(e.target.result,{type:'array'});parseXLSX(wb);closeModal('importModal');toast('Imported successfully');renderSidebar();renderDashboard();}catch(err){st.textContent='Error: '+err.message;st.style.color='var(--accent)';}};reader.readAsArrayBuffer(file);}
 function parseXLSX(wb){var gs=function(n){var s=wb.Sheets[n];return s?XLSX.utils.sheet_to_json(s,{header:1,defval:null}):null;};var first=gs(wb.SheetNames[0]);if(first&&first[0]&&String(first[0][0]||'').includes('Production Efficiency')){parsePEFS(first);return;}toast('KPI template import not configured for this plant','error');}
 function parsePEFS(data){
-  // ── Parse date range ──
-  var dateStr=String(data[1]?data[1][10]||'':'');
-  var dm=dateStr.match(/(\d+)\/(\d+)\/(\d+)\s+to\s+(\d+)\/(\d+)\/(\d+)/);
-  var dayIdx=todayDayIdx(),weekIdx=Math.min(Math.floor(dayIdx/7),51);
-  if(dm){var em=parseInt(dm[1]),ed=parseInt(dm[2]);dayIdx=Math.min(MONTH_DAY_OFFSET[em-1]+(ed-1),364);weekIdx=Math.min(Math.floor(dayIdx/7),51);}
-  var monthIdx=dayIdxToMonthDay(dayIdx).month;
-  var quarterIdx=Math.floor(monthIdx/3);
   var pf=function(v){return(v!=null&&v!==''&&!isNaN(v))?parseFloat(v):null;};
 
-  // ── Find header row first ──
+  // ── 1. Parse date range ──
+  var dateStr='';
+  for(var i=0;i<Math.min(5,data.length);i++){
+    for(var c=0;c<Math.min(20,(data[i]||[]).length);c++){
+      var cv=String(data[i][c]||'');
+      if(cv.match(/\d+\/\d+\/\d+\s+(to|thru|-)\s+\d+\/\d+\/\d+/i)){dateStr=cv;break;}
+    }
+    if(dateStr)break;
+  }
+  var startDate=null,endDate=null;
+  var dm=dateStr.match(/(\d+)\/(\d+)\/(\d+)\s+(?:to|thru|-)\s+(\d+)\/(\d+)\/(\d+)/i);
+  if(dm){
+    startDate={m:parseInt(dm[1]),d:parseInt(dm[2]),y:parseInt(dm[3])};
+    endDate={m:parseInt(dm[4]),d:parseInt(dm[5]),y:parseInt(dm[6])};
+  }else{
+    for(var i=0;i<5;i++){
+      var dv=String(data[i]?data[i][0]||'':'');
+      var sm=dv.match(/(\w+),\s+(\w+)\s+(\d+),\s+(\d+)/);
+      if(sm){var dt=new Date(dv);if(!isNaN(dt)){startDate={m:dt.getMonth()+1,d:dt.getDate(),y:dt.getFullYear()};endDate=startDate;break;}}
+    }
+  }
+  var isSingleDay=startDate&&endDate&&startDate.m===endDate.m&&startDate.d===endDate.d;
+  var monthIdx=startDate?(startDate.m-1):new Date().getMonth();
+  var dayIdx=startDate?Math.min(MONTH_DAY_OFFSET[startDate.m-1]+(startDate.d-1),364):todayDayIdx();
+  var weekIdx=Math.min(Math.floor(dayIdx/7),51);
+  var quarterIdx=Math.floor(monthIdx/3);
+
+  // ── 2. Find header row ──
   var startRow=0;
   for(var i=0;i<Math.min(12,data.length);i++){
-    var joined=data[i].map(function(v){return String(v||'');}).join(' ');
+    var joined=(data[i]||[]).map(function(v){return String(v||'');}).join(' ');
     if(/P\/Date|Shft/.test(joined)&&/Qty/.test(joined)){startRow=i+1;break;}
   }
-  if(startRow===0)startRow=8; // fallback
+  if(startRow===0)startRow=8;
 
-  // ── Find all machine sections ──
-  var machineBlocks=[];
-  var currentMachine=null;
+  // ── 3. Parse machine blocks with shift-level detail ──
+  var machineBlocks=[];var currentMachine=null;
   for(var i=startRow;i<data.length;i++){
-    var a=String(data[i][0]||'').trim();
-    if(!a)continue;
-    if(/Department|Totals|Grand/i.test(a))continue;
-    // Machine name row: has text in col A but NO numeric data in col D (index 3)
-    if(a && a!=='Total' && !/^\d+$/.test(a.replace(/\s/g,'')) && data[i][3]==null){
-      currentMachine={name:a,code:a.split(' ')[0],totalRow:null};
-      machineBlocks.push(currentMachine);
-      continue;
+    var row=data[i]||[];
+    var col1=String(row[0]||'').trim();
+    if(!col1)continue;
+    if(/Department|Grand|Primary Machine Totals/i.test(col1))continue;
+    var hasQty=pf(row[3])!=null;
+    var isTotal=/^total$/i.test(col1);
+    var isShiftNum=/^\s*\d\s*$/.test(col1);
+    if(!hasQty&&!isTotal&&!isShiftNum){
+      currentMachine={name:col1,code:col1.split(/[-\s]/)[0],shifts:[],totalRow:null};
+      machineBlocks.push(currentMachine);continue;
     }
-    // Total row for current machine
-    if(a.toLowerCase()==='total' && currentMachine && data[i][3]!=null){
-      currentMachine.totalRow=data[i];
+    if(!currentMachine)continue;
+    if(isTotal&&hasQty){currentMachine.totalRow=row;currentMachine=null;continue;}
+    if(hasQty){
+      var shiftId='combined';
+      if(isShiftNum){var sn=parseInt(col1.trim());shiftId=sn===1?'1st':sn===2?'2nd':sn===3?'3rd':sn+'th';}
+      currentMachine.shifts.push({shiftId:shiftId,row:row,
+        raw:{qty:pf(row[3])||0,setups:pf(row[5])||0,setupHrs:pf(row[11])||0,
+             runHrs:pf(row[12])||0,downOnStd:pf(row[13])||0,downOffStd:pf(row[14])||0,actHrs:pf(row[15])||0}
+      });
     }
   }
-
   if(!machineBlocks.length){toast('No machines found in PEFS file','error');return;}
-  var importCount=0;
-  var lastMachId=null;
 
+  // ── 4. Process each machine ──
+  var importCount=0,lastMachId=null;
+  loadRawData();
   machineBlocks.forEach(function(block){
-    if(!block.totalRow)return;
-    var dr=block.totalRow;
+    if(!block.shifts.length&&!block.totalRow)return;
     var machineName=block.name,machineCode=block.code;
-
-    // ── Extract KPIs ──
-    var prodQty=pf(dr[3]),setups=pf(dr[5])||1,rateQtyHr=pf(dr[6]);
-    var prodHrsSetup=pf(dr[11]),actHrsTotal=pf(dr[15]),utilDown=pf(dr[16]);
-    // Check for Monthly Metrics columns (25-28) if present
-    var hasMonthlyMetrics=(dr.length>24 && pf(dr[24])!=null);
-    var setupTime=hasMonthlyMetrics?pf(dr[24]):(prodHrsSetup!=null&&setups>0?(prodHrsSetup/setups*60):null);
-    var feedsRunHr=hasMonthlyMetrics?pf(dr[25]):rateQtyHr;
-    var feedsSchHr=hasMonthlyMetrics?pf(dr[26]):(prodQty!=null&&actHrsTotal!=null&&actHrsTotal>0?prodQty/actHrsTotal:null);
-    var downtime=hasMonthlyMetrics?pf(dr[27]):(utilDown!=null?utilDown:null);
-    // Convert downtime to percentage if it's a decimal
-    if(downtime!=null&&downtime<1)downtime=downtime*100;
-
-    // ── Find or create machine ──
-    var mach=state.machines.find(function(m){return m.plant===state.plant&&(m.name===machineName||m.code===machineCode);});
+    var mach=state.machines.find(function(m){
+      return m.plant===state.plant&&(m.name===machineName||m.code===machineCode||
+        m.label===machineName||machineName.toLowerCase().indexOf(m.name.toLowerCase())>=0||
+        m.name.toLowerCase().indexOf(machineCode.toLowerCase())>=0);
+    });
     if(!mach){
       var kpis=[
-        {code:'001',name:'Setup Time',criteria:'Avg minutes per setup/changeover',unit:'Min',lowerBetter:true},
-        {code:'002',name:'Downtime',criteria:'Utilization down %',unit:'%',lowerBetter:true},
-        {code:'003',name:'Feeds/RunHr',criteria:'Avg feeds per actual run hour',unit:'Qty/Hr',lowerBetter:false},
-        {code:'004',name:'Feeds/SchHr',criteria:'Avg feeds per scheduled hour',unit:'Qty/Hr',lowerBetter:false}
+        {code:'001',name:'Min/Setup',criteria:'Avg minutes per setup/changeover',unit:'Min',lowerBetter:true},
+        {code:'002',name:'Feeds/Run Hr',criteria:'Avg feeds per actual run hour',unit:'Qty/Hr',lowerBetter:false},
+        {code:'003',name:'Feeds/Sch Hr',criteria:'Avg feeds per scheduled hour',unit:'Qty/Hr',lowerBetter:false},
+        {code:'004',name:'Downtime %',criteria:'Down hours as % of scheduled hours',unit:'%',lowerBetter:true}
       ];
       var codes=['001','002','003','004'];
       var d={daily:emptyMode(codes,365),weekly:emptyMode(codes,52),monthly:emptyMode(codes,12),quarterly:emptyMode(codes,4),yearly:emptyMode(codes,1)};
-      mach={id:'pefs_'+machineCode+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),plant:state.plant,name:machineName,code:machineCode,label:machineName,color:PLANT_COLORS[state.plant]||'#c8102e',kpis:kpis,goals:{},data:d};
+      mach={id:'pefs_'+machineCode+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        plant:state.plant,name:machineName,code:machineCode,label:machineName,
+        color:PLANT_COLORS[state.plant]||'#c8102e',kpis:kpis,goals:{},data:d};
       state.machines.push(mach);
     }
-
-    // ── Write values to all time views ──
-    var vals={'Setup':setupTime,'Downtime':downtime,'RunHr':feedsRunHr,'SchHr':feedsSchHr};
-    Object.keys(vals).forEach(function(nameHint){
-      var val=vals[nameHint];
-      var k=mach.kpis.find(function(x){return x.name.toLowerCase().includes(nameHint.toLowerCase());});
-      if(!k||val==null)return;
-      [['daily',365,dayIdx],['weekly',52,weekIdx],['monthly',12,monthIdx],['quarterly',4,quarterIdx],['yearly',1,0]].forEach(function(cfg){
-        var mode=cfg[0],len=cfg[1],idx=cfg[2];
-        if(!mach.data[mode])mach.data[mode]={cyActual:{},cyTarget:{},pyActual:{}};
-        if(!mach.data[mode].cyActual[k.code])mach.data[mode].cyActual[k.code]=new Array(len).fill(null);
-        var existing=mach.data[mode].cyActual[k.code][idx];
-        if(mode==='daily'){
-          // Daily: overwrite (one value per day)
-          mach.data[mode].cyActual[k.code][idx]=val;
-        }else{
-          // Weekly/Monthly/Quarterly/Yearly: running average
-          if(existing!=null){
-            mach.data[mode].cyActual[k.code][idx]=(existing+val)/2;
-          }else{
-            mach.data[mode].cyActual[k.code][idx]=val;
-          }
-        }
-      });
+    // Map KPI codes by name
+    var kpiMap={};
+    mach.kpis.forEach(function(k){
+      var nm=k.name.toLowerCase();
+      if(nm.includes('setup')&&(nm.includes('min')||nm.includes('time')))kpiMap.minSetup=k.code;
+      else if((nm.includes('run')&&nm.includes('hr'))||(nm.includes('feed')&&nm.includes('run')))kpiMap.feedsRunHr=k.code;
+      else if((nm.includes('sch')&&nm.includes('hr'))||(nm.includes('feed')&&nm.includes('sch')))kpiMap.feedsSchHr=k.code;
+      else if(nm.includes('down'))kpiMap.downtimePct=k.code;
     });
+    if(!kpiMap.minSetup&&mach.kpis[0])kpiMap.minSetup=mach.kpis[0].code;
+    if(!kpiMap.feedsRunHr&&mach.kpis[1])kpiMap.feedsRunHr=mach.kpis[1].code;
+    if(!kpiMap.feedsSchHr&&mach.kpis[2])kpiMap.feedsSchHr=mach.kpis[2].code;
+    if(!kpiMap.downtimePct&&mach.kpis[3])kpiMap.downtimePct=mach.kpis[3].code;
 
-    lastMachId=mach.id;
-    importCount++;
+    // Accumulate raw data per shift
+    var combinedRaw={qty:0,setups:0,setupHrs:0,runHrs:0,downOnStd:0,downOffStd:0,actHrs:0};
+    block.shifts.forEach(function(sh){
+      accumulateRaw(mach.id,monthIdx,sh.shiftId,sh.raw);
+      combinedRaw.qty+=sh.raw.qty;combinedRaw.setups+=sh.raw.setups;
+      combinedRaw.setupHrs+=sh.raw.setupHrs;combinedRaw.runHrs+=sh.raw.runHrs;
+      combinedRaw.downOnStd+=sh.raw.downOnStd;combinedRaw.downOffStd+=sh.raw.downOffStd;
+      combinedRaw.actHrs+=sh.raw.actHrs;
+      // Store shift-level KPIs
+      var shKPIs=computeKPIsFromRaw(sh.raw);
+      var sd=getShiftData(mach.id,monthIdx);
+      if(!sd[sh.shiftId])sd[sh.shiftId]={};
+      if(kpiMap.minSetup&&shKPIs.minSetup!=null)sd[sh.shiftId][kpiMap.minSetup]=shKPIs.minSetup;
+      if(kpiMap.feedsRunHr&&shKPIs.feedsRunHr!=null)sd[sh.shiftId][kpiMap.feedsRunHr]=shKPIs.feedsRunHr;
+      if(kpiMap.feedsSchHr&&shKPIs.feedsSchHr!=null)sd[sh.shiftId][kpiMap.feedsSchHr]=shKPIs.feedsSchHr;
+      if(kpiMap.downtimePct&&shKPIs.downtimePct!=null)sd[sh.shiftId][kpiMap.downtimePct]=shKPIs.downtimePct;
+    });
+    // Use Total row if available
+    if(block.totalRow){
+      var tr=block.totalRow;
+      combinedRaw={qty:pf(tr[3])||combinedRaw.qty,setups:pf(tr[5])||combinedRaw.setups,
+        setupHrs:pf(tr[11])||combinedRaw.setupHrs,runHrs:pf(tr[12])||combinedRaw.runHrs,
+        downOnStd:pf(tr[13])||combinedRaw.downOnStd,downOffStd:pf(tr[14])||combinedRaw.downOffStd,
+        actHrs:pf(tr[15])||combinedRaw.actHrs};
+    }
+    // Compute combined KPIs
+    var kpis=computeKPIsFromRaw(combinedRaw);
+    var kpiVals={};
+    if(kpiMap.minSetup)kpiVals[kpiMap.minSetup]=kpis.minSetup;
+    if(kpiMap.feedsRunHr)kpiVals[kpiMap.feedsRunHr]=kpis.feedsRunHr;
+    if(kpiMap.feedsSchHr)kpiVals[kpiMap.feedsSchHr]=kpis.feedsSchHr;
+    if(kpiMap.downtimePct)kpiVals[kpiMap.downtimePct]=kpis.downtimePct;
+
+    // Write DAILY
+    if(isSingleDay){Object.keys(kpiVals).forEach(function(code){
+      if(kpiVals[code]==null)return;
+      if(!mach.data.daily)mach.data.daily=emptyMode(mach.kpis.map(function(k){return k.code;}),365);
+      if(!mach.data.daily.cyActual[code])mach.data.daily.cyActual[code]=new Array(365).fill(null);
+      mach.data.daily.cyActual[code][dayIdx]=kpiVals[code];
+    });}
+    // Write WEEKLY
+    Object.keys(kpiVals).forEach(function(code){
+      if(kpiVals[code]==null)return;
+      if(!mach.data.weekly)mach.data.weekly=emptyMode(mach.kpis.map(function(k){return k.code;}),52);
+      if(!mach.data.weekly.cyActual[code])mach.data.weekly.cyActual[code]=new Array(52).fill(null);
+      var ex=mach.data.weekly.cyActual[code][weekIdx];
+      mach.data.weekly.cyActual[code][weekIdx]=ex!=null?(ex+kpiVals[code])/2:kpiVals[code];
+    });
+    // MONTHLY: Recompute from accumulated raw (mirrors Row 72)
+    var mb=ensureRawBucket(mach.id,monthIdx,null);
+    var mKPIs=computeKPIsFromRaw(mb.combined);
+    [{k:'minSetup',c:kpiMap.minSetup},{k:'feedsRunHr',c:kpiMap.feedsRunHr},
+     {k:'feedsSchHr',c:kpiMap.feedsSchHr},{k:'downtimePct',c:kpiMap.downtimePct}].forEach(function(e){
+      if(!e.c||mKPIs[e.k]==null)return;
+      if(!mach.data.monthly)mach.data.monthly=emptyMode(mach.kpis.map(function(k){return k.code;}),12);
+      if(!mach.data.monthly.cyActual[e.c])mach.data.monthly.cyActual[e.c]=new Array(12).fill(null);
+      mach.data.monthly.cyActual[e.c][monthIdx]=mKPIs[e.k];
+    });
+    // QUARTERLY
+    var qRaw={qty:0,setups:0,setupHrs:0,runHrs:0,downOnStd:0,downOffStd:0,actHrs:0};
+    for(var qi=quarterIdx*3;qi<quarterIdx*3+3;qi++){
+      if(rawAccum[mach.id]&&rawAccum[mach.id][qi]){var qb=rawAccum[mach.id][qi].combined;
+        qRaw.qty+=qb.qty;qRaw.setups+=qb.setups;qRaw.setupHrs+=qb.setupHrs;
+        qRaw.runHrs+=qb.runHrs;qRaw.downOnStd+=qb.downOnStd;qRaw.downOffStd+=qb.downOffStd;qRaw.actHrs+=qb.actHrs;}}
+    var qK=computeKPIsFromRaw(qRaw);
+    [{k:'minSetup',c:kpiMap.minSetup},{k:'feedsRunHr',c:kpiMap.feedsRunHr},
+     {k:'feedsSchHr',c:kpiMap.feedsSchHr},{k:'downtimePct',c:kpiMap.downtimePct}].forEach(function(e){
+      if(!e.c||qK[e.k]==null)return;
+      if(!mach.data.quarterly)mach.data.quarterly=emptyMode(mach.kpis.map(function(k){return k.code;}),4);
+      if(!mach.data.quarterly.cyActual[e.c])mach.data.quarterly.cyActual[e.c]=new Array(4).fill(null);
+      mach.data.quarterly.cyActual[e.c][quarterIdx]=qK[e.k];
+    });
+    // YEARLY
+    var yRaw={qty:0,setups:0,setupHrs:0,runHrs:0,downOnStd:0,downOffStd:0,actHrs:0};
+    for(var yi=0;yi<12;yi++){
+      if(rawAccum[mach.id]&&rawAccum[mach.id][yi]){var yb=rawAccum[mach.id][yi].combined;
+        yRaw.qty+=yb.qty;yRaw.setups+=yb.setups;yRaw.setupHrs+=yb.setupHrs;
+        yRaw.runHrs+=yb.runHrs;yRaw.downOnStd+=yb.downOnStd;yRaw.downOffStd+=yb.downOffStd;yRaw.actHrs+=yb.actHrs;}}
+    var yK=computeKPIsFromRaw(yRaw);
+    [{k:'minSetup',c:kpiMap.minSetup},{k:'feedsRunHr',c:kpiMap.feedsRunHr},
+     {k:'feedsSchHr',c:kpiMap.feedsSchHr},{k:'downtimePct',c:kpiMap.downtimePct}].forEach(function(e){
+      if(!e.c||yK[e.k]==null)return;
+      if(!mach.data.yearly)mach.data.yearly=emptyMode(mach.kpis.map(function(k){return k.code;}),1);
+      if(!mach.data.yearly.cyActual[e.c])mach.data.yearly.cyActual[e.c]=new Array(1).fill(null);
+      mach.data.yearly.cyActual[e.c][0]=yK[e.k];
+    });
+    lastMachId=mach.id;importCount++;
   });
-
-  saveState();
-  toast(importCount+' machine'+(importCount!==1?'s':'')+' imported — '+MONTHS[monthIdx]+' (Week '+(weekIdx+1)+')');
+  saveRawData();saveShiftData();saveState();
+  var dateLabel=startDate?MONTHS[startDate.m-1]+' '+startDate.d:'Today';
+  if(!isSingleDay&&endDate)dateLabel=MONTHS[startDate.m-1]+' '+startDate.d+' - '+MONTHS[endDate.m-1]+' '+endDate.d;
+  toast(importCount+' machine'+(importCount!==1?'s':'')+' imported \u2014 '+dateLabel+' ('+MONTHS[monthIdx]+')');
   if(lastMachId)state.activeMachine=lastMachId;
-  window._viewMode='monthly';
-  window._activePeriod=monthIdx;
+  window._viewMode='monthly';window._activePeriod=monthIdx;
 }
+
 function exportData(){var m=state.machines.find(function(x){return x.id===state.activeMachine;});if(!m){toast('Select a machine first','error');return;}var mode=window._viewMode;var periods=mode==='daily'?DAYS.map(function(_,i){return dayIdxLabel(i);}):mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;var wb=XLSX.utils.book_new();['cyActual','cyTarget','pyActual'].forEach(function(type,ti){var label=['CY Actual','CY Target','PY Actual'][ti];var hdr=['KPI Code','KPI Name','Criteria','Unit'].concat(periods);var rows=[hdr].concat(m.kpis.map(function(kpi){return[kpi.code,kpi.name,kpi.criteria,kpi.unit].concat(m.data[mode][type][kpi.code]||new Array(periods.length).fill(null));}));XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),(label+' '+(mode==='daily'?'Daily':mode.charAt(0).toUpperCase()+mode.slice(1))).slice(0,31));});XLSX.writeFile(wb,'KPI_'+m.name+'_'+mode+'_'+new Date().toISOString().slice(0,10)+'.xlsx');toast('Exported');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-bg').forEach(function(bg){bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('open');});});
@@ -1129,7 +1260,16 @@ let shiftData={};
 function loadShiftData(){try{const r=localStorage.getItem(SHIFT_KEY);if(r)shiftData=JSON.parse(r);}catch(e){}}
 function saveShiftData(){try{localStorage.setItem(SHIFT_KEY,JSON.stringify(shiftData));}catch(e){}}
 function getShiftData(machId,month){if(!shiftData[machId])shiftData[machId]={};if(!shiftData[machId][month]){shiftData[machId][month]={};SHIFTS.forEach(s=>{shiftData[machId][month][s.id]={};});}return shiftData[machId][month];}
-function genDemoShiftData(m,pi){const sd=getShiftData(m.id,pi);const rng=(seed)=>{let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};};m.kpis.forEach(k=>{const base=(m.data.monthly.cyActual[k.code]||[])[pi];if(base==null)return;SHIFTS.forEach((sh,si)=>{const r=rng(pi*100+si*17+parseInt(k.code)*3);const variance=0.85+r()*0.3;sd[sh.id][k.code]=+(base*variance).toFixed(4);});});return sd;}
+function genDemoShiftData(m,pi){const sd=getShiftData(m.id,pi);
+  var hasReal=false;
+  SHIFTS.forEach(function(s){if(sd[s.id]&&Object.keys(sd[s.id]).length>0)
+    m.kpis.forEach(function(k){if(sd[s.id][k.code]!=null)hasReal=true;});});
+  if(hasReal)return sd;
+  const rng=(seed)=>{let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};};
+  m.kpis.forEach(k=>{const base=(m.data.monthly.cyActual[k.code]||[])[pi];if(base==null)return;
+    SHIFTS.forEach((sh,si)=>{const r=rng(pi*100+si*17+parseInt(k.code)*3);const variance=0.85+r()*0.3;
+      sd[sh.id][k.code]=+(base*variance).toFixed(4);});});return sd;}
+
 let shiftCharts={};
 window._shiftMonth=4;
 function renderShiftAnalysis(){const el=document.getElementById('shiftContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('analyticsContent').style.display='none';document.getElementById('heatmapContent').style.display='none';Object.values(shiftCharts).forEach(c=>c.destroy());shiftCharts={};const m=state.machines.find(x=>x.id===state.activeMachine);if(!m){el.innerHTML='<div class="empty"><div class="empty-ico">&#9201;</div><div class="empty-title">Select a Machine</div><div class="empty-sub">Choose a machine from the sidebar to view shift-level breakdowns</div></div>';return;}const pi=window._shiftMonth;const sd=genDemoShiftData(m,pi);let html='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;">Shift Analysis — '+m.name+'</div><div style="font-size:12px;color:var(--muted);">Performance breakdown by shift · '+MONTHS[pi]+' 2026</div></div><button class="btn btn-outline" onclick="openShiftDataEntry()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Shift Data</button></div><div class="month-bar" style="margin-bottom:16px"><span class="month-lbl">Month:</span>'+MONTHS.map((lbl,i)=>'<div class="mpill '+(i===pi?'active':'')+'" onclick="window._shiftMonth='+i+';renderShiftAnalysis()">'+lbl+'</div>').join('')+'</div><div class="shift-grid">';SHIFTS.forEach(sh=>{const data=sd[sh.id]||{};html+='<div class="shift-card" style="border-top:3px solid '+sh.color+'"><div class="shift-card-hdr"><div><div class="shift-name" style="color:'+sh.color+'">'+sh.name+'</div></div><div class="shift-time">'+sh.time+'</div></div><div class="shift-body">';m.kpis.forEach(k=>{const v=data[k.code];const t=(m.data.monthly.cyTarget[k.code]||[])[pi];const good=v!=null&&t!=null?(k.lowerBetter?v<=t:v>=t):null;html+='<div class="shift-kpi-row"><div class="shift-kpi-nm">'+k.name+'</div><div class="shift-kpi-val" style="color:'+(good===null?'var(--muted)':good?'var(--green)':'var(--accent)')+'">'+f(v)+'</div></div>';});html+='</div></div>';});html+='</div><div class="shift-compare-chart"><div class="chart-title">Shift Comparison — All KPIs</div><div class="chart-sub">Side-by-side performance across shifts for '+MONTHS[pi]+' 2026</div><div style="height:240px"><canvas id="shiftCompareChart"></canvas></div></div>';html+='<div class="tbl-wrap"><div class="tbl-bar"><div class="tbl-bar-title">Shift Performance Summary</div><div style="font-size:11px;color:var(--muted);font-family:\'JetBrains Mono\',monospace">'+MONTHS[pi]+' 2026</div></div><table class="sc-kpi-tbl"><thead><tr><th>KPI</th><th class="r">1st Shift</th><th class="r">2nd Shift</th><th class="r">3rd Shift</th><th class="r">Best</th><th class="r">Gap</th></tr></thead><tbody>';m.kpis.forEach(k=>{const vals=SHIFTS.map(s=>(sd[s.id]||{})[k.code]||null);const valid=vals.filter(v=>v!=null);let bestIdx=-1,bestVal=null;if(valid.length){bestVal=k.lowerBetter?Math.min(...valid):Math.max(...valid);bestIdx=vals.indexOf(bestVal);}const worstVal=valid.length?(k.lowerBetter?Math.max(...valid):Math.min(...valid)):null;const gap=bestVal!=null&&worstVal!=null&&bestVal!==0?Math.abs(((worstVal-bestVal)/bestVal)*100).toFixed(1):'--';html+='<tr><td style="font-weight:500">'+k.name+'</td>';vals.forEach((v,i)=>{html+='<td class="r" style="'+(i===bestIdx?'font-weight:700;color:var(--green)':'')+'">'+f(v)+'</td>';});html+='<td class="r" style="font-weight:600">'+(bestIdx>=0?SHIFTS[bestIdx].name:'--')+'</td><td class="r" style="color:var(--accent);font-weight:600">'+gap+'%</td></tr>';});html+='</tbody></table></div>';el.innerHTML=html;const ctx=document.getElementById('shiftCompareChart');if(ctx){const kpiLabels=m.kpis.map(k=>k.name);const datasets=SHIFTS.map(sh=>({label:sh.name,data:m.kpis.map(k=>(sd[sh.id]||{})[k.code]||0),backgroundColor:sh.color+'cc',borderColor:sh.color,borderWidth:1,borderRadius:3}));shiftCharts.compare=new Chart(ctx,{type:'bar',data:{labels:kpiLabels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'Barlow Condensed',size:11}}},y:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'JetBrains Mono',size:10}}}}}});}}
@@ -1567,7 +1707,7 @@ async function refreshDashboard(){
 }
 
 // ── INIT ──
-loadState();loadAlerts();loadShiftData();initDarkMode();
+loadState();loadAlerts();loadShiftData();loadRawData();initDarkMode();
 renderSidebar();
 applyEditorUI();
 initGDrive();
