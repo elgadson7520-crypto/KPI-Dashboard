@@ -373,6 +373,83 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
 .editor-bar.active{display:flex;}
 .editor-bar a{color:#6ee6a8;cursor:pointer;text-decoration:underline;font-size:10px;letter-spacing:.06em;}
 .editor-bar a:hover{color:#fff;}
+
+/* ── DARK MODE ── */
+body.dark-mode{--bg:#111110;--surface:#1a1a19;--card:#1e1e1d;--border:#2a2a28;--border-dk:#3a3a38;--text:#e8e6df;--charcoal:#e8e6df;--muted:#8a8880;--grey:#9a9890;--grey-lt:#6a6a60;--accent-lt:rgba(200,16,46,.12);--green-bg:rgba(26,122,70,.12);--amber-bg:rgba(180,83,9,.12);--shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow:0 2px 10px rgba(0,0,0,.4);--shadow-lg:0 6px 24px rgba(0,0,0,.5);}
+body.dark-mode .header{background:#0a0a09;}
+body.dark-mode thead tr{background:#1a1a19;}
+body.dark-mode th{border-color:#2a2a28;}
+body.dark-mode td{border-color:#222220;}
+body.dark-mode tr:hover td{background:#222220;}
+body.dark-mode .tbl-bar{background:#161615;}
+body.dark-mode .import-zone{background:#161615;border-color:#3a3a38;}
+body.dark-mode .import-zone:hover{background:var(--accent-lt);border-color:var(--accent);}
+body.dark-mode .finp{background:#161615;color:var(--text);}
+body.dark-mode .finp:focus{background:#1a1a19;border-color:#555;}
+body.dark-mode .kfi{background:#1a1a19;color:var(--text);border-color:#2a2a28;}
+body.dark-mode .mci{background:#161615;color:var(--text);border-color:#2a2a28;}
+body.dark-mode select.finp,body.dark-mode select.kfi{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239a9890' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");}
+
+/* ── ALERT BANNER ── */
+.alert-banner-strip{display:none;padding:0;background:#1a1a1a;border-bottom:1px solid #2a2a2a;overflow-x:auto;white-space:nowrap;}
+.alert-banner-strip.has-alerts{display:flex;}
+.alert-item{display:inline-flex;align-items:center;gap:8px;padding:7px 18px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-right:1px solid #2a2a2a;flex-shrink:0;}
+.alert-item.red{color:#ff6b82;background:rgba(200,16,46,.08);}
+.alert-item.amber{color:#f59e0b;background:rgba(245,158,11,.06);}
+.alert-item.green{color:#4ec98a;background:rgba(78,201,138,.06);}
+.alert-item-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.alert-item.red .alert-item-dot{background:#ff6b82;box-shadow:0 0 6px rgba(255,107,130,.4);}
+.alert-item.amber .alert-item-dot{background:#f59e0b;box-shadow:0 0 6px rgba(245,158,11,.3);}
+
+/* ── ANIMATED GAUGES ── */
+@keyframes countUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes needleSweep{from{stroke-dashoffset:var(--needle-full);}to{stroke-dashoffset:var(--needle-target);}}
+.kpi-val-anim{animation:countUp .5s ease-out both;}
+.kpi-card:nth-child(1) .kpi-val-anim{animation-delay:.05s;}
+.kpi-card:nth-child(2) .kpi-val-anim{animation-delay:.1s;}
+.kpi-card:nth-child(3) .kpi-val-anim{animation-delay:.15s;}
+.kpi-card:nth-child(4) .kpi-val-anim{animation-delay:.2s;}
+.oee-ring-sweep{animation:needleSweep 1.2s cubic-bezier(.34,1.56,.64,1) forwards;}
+
+/* ── HEATMAP VIEW ── */
+.heatmap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:22px;}
+.heatmap-plant{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s;}
+.heatmap-plant:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.heatmap-plant-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.heatmap-plant-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;text-transform:uppercase;letter-spacing:.04em;}
+.heatmap-oee-big{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:32px;line-height:1;}
+.heatmap-oee-lbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+.heatmap-machines{padding:14px 18px;}
+.heatmap-mach-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.heatmap-mach-row:last-child{border-bottom:none;}
+.heatmap-mach-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;color:var(--grey);}
+.heatmap-mach-oee{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;}
+.heatmap-kpi-dots{display:flex;gap:4px;}
+.heatmap-dot{width:10px;height:10px;border-radius:2px;}
+.heatmap-dot.g{background:var(--green);}
+.heatmap-dot.a{background:var(--amber);}
+.heatmap-dot.r{background:var(--accent);}
+.heatmap-dot.n{background:var(--border-dk);}
+.heatmap-summary{background:var(--charcoal);color:#fff;border-radius:4px;padding:16px 20px;margin-bottom:16px;border:1px solid #2a2a2a;}
+body.dark-mode .heatmap-summary{background:#0a0a09;}
+
+/* ── AI SUMMARY ── */
+.ai-summary-block{background:var(--surface);border:1px solid var(--border);border-left:4px solid #7c3aed;border-radius:0 4px 4px 0;padding:16px 20px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
+.ai-summary-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ai-summary-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#7c3aed;background:rgba(124,58,237,.1);padding:2px 8px;border-radius:2px;}
+.ai-summary-text{font-size:14px;line-height:1.7;color:var(--text);}
+.ai-summary-loading{color:var(--muted);font-style:italic;}
+
+/* ── DARK MODE TOGGLE ── */
+.dm-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;border-radius:2px;transition:background .14s;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#666;border:1px solid #383838;background:transparent;}
+.dm-toggle:hover{background:rgba(255,255,255,.06);color:#ccc;}
+
+/* ── MOBILE QUICK VIEW ── */
+@media(max-width:768px){
+  .heatmap-grid{grid-template-columns:1fr;}
+  .alert-banner-strip{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+}
+
 </style>
 </head>
 <body data-plant="okc">
@@ -396,13 +473,16 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     </div>
     <button class="btn btn-ghost editor-only" onclick="openImportModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import</button>
     <button class="btn btn-ghost" onclick="exportData()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
-    <button class="btn btn-ghost" onclick="printReport()" title="Print/PDF executive report"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</button>
+    <button class="btn btn-ghost" onclick="generatePDF()" title="Generate one-click PDF executive report"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF Report</button>
     <button class="btn btn-ghost" onclick="openScorecard()" title="Generate one-page plant scorecard for VP review" style="color:#e0a030;border-color:#4a3a1a;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Scorecard</button>
-    <button class="btn btn-ghost editor-only" onclick="clearState()" title="Reset all data to factory defaults" style="color:#555;border-color:#2a2a2a;font-size:11px;padding:6px 10px;">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-      Reset
+    <button class="btn btn-ghost" onclick="refreshDashboard()" title="Pull latest data from Google Drive and re-render">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
     </button>
     <button class="btn btn-accent editor-only" onclick="openAddMachineModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Add Machine</span></button>
+    <button class="dm-toggle" id="dmToggle" onclick="toggleDarkMode()" title="Toggle dark mode for floor displays">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
     <div style="width:1px;height:26px;background:#303030;margin:0 2px;"></div>
     <button class="btn editor-lock-btn" id="editorToggleBtn" onclick="promptEditorLogin()" title="Toggle editor / view-only mode">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Sign In</span>
@@ -414,6 +494,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <span class="wake-indicator" id="wakeBtn" onclick="toggleWakeLock()" title="Screen wake lock">&#128261;</span>
   </div>
 </header>
+<div class="alert-banner-strip" id="alertBannerStrip"></div>
 <div class="editor-bar" id="editorBar">&#128274; Editor Mode Active <a onclick="changeEditorPwd()">Change Password</a> <a onclick="logoutEditor()">Lock &amp; Switch to View Only</a></div>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <div class="main">
@@ -423,6 +504,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
       <button class="sb-nav-btn" id="navComp" onclick="switchView('comparison')"><span class="sb-nav-ico">&#9878;</span>Plant Comparison</button>
       <button class="sb-nav-btn" id="navAlerts" onclick="switchView('alerts')"><span class="sb-nav-ico">&#9888;</span>Alert Thresholds</button>
       <button class="sb-nav-btn" id="navShift" onclick="switchView('shift')"><span class="sb-nav-ico">&#9201;</span>Shift Analysis</button>
+      <button class="sb-nav-btn" id="navHeatmap" onclick="switchView('heatmap')"><span class="sb-nav-ico">&#127760;</span>Plant Health</button>
       <button class="sb-nav-btn" id="navAnalytics" onclick="switchView('analytics')"><span class="sb-nav-ico">&#128200;</span>Analytics</button>
     </div>
     <div class="sb-head"><div class="sb-head-lbl">Fleet</div><div class="sb-head-val" id="machCount">0 machines</div></div>
@@ -443,6 +525,7 @@ select.finp,select.kfi{appearance:none;background-image:url("data:image/svg+xml,
     <div id="compContent" style="display:none"></div>
     <div id="alertContent" style="display:none"></div>
     <div id="shiftContent" style="display:none"></div>
+    <div id="heatmapContent" style="display:none"></div>
     <div id="analyticsContent" style="display:none"></div>
     <div class="print-footer"><span>SupplyOne Packaging — Southwest Region Operations</span><span>Confidential — For Internal Use Only</span></div>
   </main>
@@ -793,17 +876,19 @@ function switchPlant(plant,btn){
 function switchView(view){
   window._activeView=view;
   document.querySelectorAll('.sb-nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(view==='comparison'?'navComp':view==='alerts'?'navAlerts':view==='shift'?'navShift':view==='analytics'?'navAnalytics':'navDash').classList.add('active');
+  document.getElementById(view==='comparison'?'navComp':view==='alerts'?'navAlerts':view==='shift'?'navShift':view==='analytics'?'navAnalytics':view==='heatmap'?'navHeatmap':'navDash').classList.add('active');
   document.getElementById('emptyState').style.display='none';
   document.getElementById('dashContent').style.display=view==='dashboard'?'':'none';
   document.getElementById('compContent').style.display=view==='comparison'?'':'none';
   document.getElementById('alertContent').style.display=view==='alerts'?'':'none';
   document.getElementById('shiftContent').style.display=view==='shift'?'':'none';
+  document.getElementById('heatmapContent').style.display=view==='heatmap'?'':'none';
   document.getElementById('analyticsContent').style.display=view==='analytics'?'':'none';
   if(view==='dashboard')renderDashboard();
   else if(view==='comparison')renderComparison();
   else if(view==='alerts')renderAlertConfig();
   else if(view==='shift')renderShiftAnalysis();
+  else if(view==='heatmap')renderHeatmap();
   else if(view==='analytics')renderAnalytics();
   closeSidebar();
 }
@@ -869,7 +954,7 @@ function goalStripeColor(status){return status==='good'?'var(--green)':status===
 function renderYTDStrip(m,pi,mode){const el=document.getElementById('ytdStrip');if(!el)return;const thru=mode==='yearly'?'Year 2026':mode==='daily'?dayIdxLabel(pi)+' 2026':mode==='weekly'?'W'+(pi+1)+' 2026':mode==='quarterly'?QUARTERS[pi]+' 2026':MONTHS[pi]+' 2026';const cells=m.kpis.map(kpi=>{const ytdA=calcYTD(m.data[mode].cyActual[kpi.code],pi);const ytdT=calcYTD(m.data[mode].cyTarget[kpi.code],pi);const vsT=(ytdA!=null&&ytdT!=null&&ytdT!==0)?ytdA/ytdT*100:null;const good=vsT!=null?(kpi.lowerBetter?vsT<=100:vsT>=100):null;const badge=vsT!=null?'<span class="ytd-badge '+(good?'ytd-g':'ytd-r')+'">'+(good?'&#9650;':'&#9660;')+' '+vsT.toFixed(1)+'%</span>':'<span class="ytd-badge ytd-m">No Data</span>';return'<div class="ytd-cell"><div class="ytd-kpi-name">'+kpi.name+'</div><div class="ytd-val '+(ytdA==null?'nd':'')+'">'+f(ytdA)+'</div><div class="ytd-row">'+badge+'<span class="ytd-tgt">'+(ytdT!=null?'Tgt '+f(ytdT):'')+'</span></div></div>';}).join('');el.innerHTML='<div class="ytd-hdr"><span class="ytd-hdr-lbl">YTD Running Average</span><span class="ytd-hdr-period">Jan - '+thru+'</span></div><div class="ytd-cells">'+cells+'</div>';}
 
 let charts={};
-function renderDashboard(){const emp=document.getElementById('emptyState'),dash=document.getElementById('dashContent');document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';if(!state.activeMachine){emp.style.display='';dash.style.display='none';return;}emp.style.display='none';dash.style.display='';const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;Object.values(charts).forEach(c=>c.destroy());charts={};const mode=window._viewMode,pi=window._activePeriod;const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;let drBar='';if(mode==='monthly'){const dr=window._dateRange;drBar='<div class="dr-bar"><span class="month-lbl">Range:</span>';[{k:'ytd',l:'Full Year'},{k:'last3',l:'Last 3 Mo'},{k:'last6',l:'Last 6 Mo'},{k:'custom',l:'Custom'}].forEach(r=>{drBar+='<div class="dr-pill '+(dr===r.k?'active':'')+'" onclick="setDateRange(\''+r.k+'\')">'+r.l+'</div>';});if(dr==='custom'){drBar+='<span class="dr-custom">from <select class="dr-sel" onchange="window._dateStart=+this.value;renderDashboard()">'+MONTHS.map((m,i)=>'<option value="'+i+'" '+(i===window._dateStart?'selected':'')+'>'+m+'</option>').join('')+'</select> to <select class="dr-sel" onchange="window._dateEnd=+this.value;renderDashboard()">'+MONTHS.map((m,i)=>'<option value="'+i+'" '+(i===window._dateEnd?'selected':'')+'>'+m+'</option>').join('')+'</select></span>';}drBar+='</div>';}let pSel='';if(mode==='daily'){const mPills=MONTHS.map((lbl,mi)=>{const has=m.kpis.some(k=>{const a=m.data.daily.cyActual[k.code]||[];return a.slice(MONTH_DAY_OFFSET[mi],MONTH_DAY_OFFSET[mi]+DAYS_IN_MONTH[mi]).some(v=>v!=null);});return'<div class="mpill '+(mi===window._dailyMonth?'active':'')+(has?' filled':'')+'" onclick="switchDailyMonth('+mi+')">'+lbl+'</div>';}).join('');const dm=window._dailyMonth,mo=MONTH_DAY_OFFSET[dm];const dPills=Array.from({length:DAYS_IN_MONTH[dm]},(_,di)=>{const gi=mo+di,h=m.kpis.some(k=>(m.data.daily.cyActual[k.code]||[])[gi]!=null);return'<div class="mpill day '+(gi===pi?'active':'')+(h?' filled':'')+'" onclick="switchPeriod('+gi+')">'+(di+1)+'</div>';}).join('');pSel='<div class="month-bar" style="margin-bottom:6px"><span class="month-lbl">Month:</span>'+mPills+'</div><div class="month-bar" style="margin-bottom:14px"><span class="month-lbl">Day:</span>'+dPills+'</div>';}else if(mode!=='yearly'){const lbl=mode==='weekly'?'Week':mode==='quarterly'?'Quarter':'Month';pSel='<div class="month-bar" style="margin-bottom:14px"><span class="month-lbl">'+lbl+':</span>'+pl.map((l,i)=>{const has=m.kpis.some(k=>(m.data[mode].cyActual[k.code]||[])[i]!=null);return'<div class="mpill '+(i===pi?'active':'')+(has?' filled':'')+'" onclick="switchPeriod('+i+')">'+l+'</div>';}).join('')+'</div>';}const pd=mode==='yearly'?'Year 2026':mode==='daily'?dayIdxLabel(pi)+' 2026':pl[pi]+' 2026';const vl={daily:'Daily',weekly:'Weekly',monthly:'Monthly',quarterly:'Quarterly',yearly:'Yearly'}[mode];const oeeData=calcOEE(m,pi,mode);const prevOee=pi>0?calcOEE(m,pi-1,mode):null;const oeeHtml=oeeData?renderOEEStrip(oeeData,prevOee):'';const narr=generateNarrative(m,pi,mode);const drillHtml=window._drillPeriod!=null?'<div class="drill-banner"><span class="drill-banner-text">&#128269; Filtered to: '+pl[window._drillPeriod]+'</span><button class="drill-clear" onclick="clearDrill()">&#10005; Clear Filter</button></div>':'';dash.innerHTML='<div class="mach-hdr"><div class="mach-hdr-l"><div class="mach-accent-bar" style="background:'+m.color+'"></div><div><div class="mach-big-title">'+m.label+'</div><div class="mach-big-sub">CODE: '+m.code+' &nbsp;·&nbsp; '+m.kpis.length+' KPIs &nbsp;·&nbsp; FY 2026</div></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn btn-outline" onclick="openDataModal(\''+m.id+'\')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Data</button><button class="btn btn-light" onclick="openGoalModal(\''+m.id+'\')">&#9881; Targets</button><button class="btn btn-light" onclick="openEditMachine(\''+m.id+'\')">Edit</button></div></div>'+'<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">View:</div><div class="vtabs"><button class="vtab '+(mode==='daily'?'active':'')+'" onclick="switchViewMode(\'daily\')">Daily</button><button class="vtab '+(mode==='weekly'?'active':'')+'" onclick="switchViewMode(\'weekly\')">Weekly</button><button class="vtab '+(mode==='monthly'?'active':'')+'" onclick="switchViewMode(\'monthly\')">Monthly</button><button class="vtab '+(mode==='quarterly'?'active':'')+'" onclick="switchViewMode(\'quarterly\')">Quarterly</button><button class="vtab '+(mode==='yearly'?'active':'')+'" onclick="switchViewMode(\'yearly\')">Yearly</button></div></div>'+drBar+pSel+'<div class="narrative-block"><div class="narrative-hdr"><span class="narrative-hdr-lbl">Executive Summary</span><span class="narrative-hdr-tag">Auto-generated · '+pd+'</span></div><div class="narrative-text">'+narr+'</div></div>'+oeeHtml+'<div class="ytd-strip" id="ytdStrip"></div><div id="statStrip" class="stat-strip"></div><div class="kpi-grid" id="kpiCards"></div><div class="sec-hdr"><div class="sec-title">'+vl+' Trends <span class="sec-tag">CY Actual · Target · PY</span></div><div class="vtabs"><button class="vtab active" onclick="switchChartView(\'actual\',this)">Actual</button><button class="vtab" onclick="switchChartView(\'cumulative\',this)">Cumulative</button></div></div>'+drillHtml+'<div class="charts-grid" id="chartsGrid"></div><div class="sec-hdr"><div class="sec-title">Performance Table <span class="sec-tag">'+pd+'</span></div></div><div class="tbl-wrap"><div class="tbl-bar"><div class="tbl-bar-title">'+m.name+' · All KPIs</div><div style="font-size:11px;color:var(--muted);font-family:\'JetBrains Mono\',monospace">Period: '+pd+'</div></div><div id="tblBody"></div></div>';renderYTDStrip(m,pi,mode);renderStrip(m,pi,mode);renderCards(m,pi,mode);renderCharts(m,mode);renderTable(m,pi,mode);window._activeMachine=m;document.getElementById('printMeta').innerHTML=PLANT_NAMES[state.plant]+' · '+m.label+'<br>'+pd+' · Generated '+new Date().toLocaleDateString();}
+function renderDashboard(){const emp=document.getElementById('emptyState'),dash=document.getElementById('dashContent');document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';document.getElementById('heatmapContent').style.display='none';if(!state.activeMachine){emp.style.display='';dash.style.display='none';return;}emp.style.display='none';dash.style.display='';const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;Object.values(charts).forEach(c=>c.destroy());charts={};const mode=window._viewMode,pi=window._activePeriod;const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;let drBar='';if(mode==='monthly'){const dr=window._dateRange;drBar='<div class="dr-bar"><span class="month-lbl">Range:</span>';[{k:'ytd',l:'Full Year'},{k:'last3',l:'Last 3 Mo'},{k:'last6',l:'Last 6 Mo'},{k:'custom',l:'Custom'}].forEach(r=>{drBar+='<div class="dr-pill '+(dr===r.k?'active':'')+'" onclick="setDateRange(\''+r.k+'\')">'+r.l+'</div>';});if(dr==='custom'){drBar+='<span class="dr-custom">from <select class="dr-sel" onchange="window._dateStart=+this.value;renderDashboard()">'+MONTHS.map((m,i)=>'<option value="'+i+'" '+(i===window._dateStart?'selected':'')+'>'+m+'</option>').join('')+'</select> to <select class="dr-sel" onchange="window._dateEnd=+this.value;renderDashboard()">'+MONTHS.map((m,i)=>'<option value="'+i+'" '+(i===window._dateEnd?'selected':'')+'>'+m+'</option>').join('')+'</select></span>';}drBar+='</div>';}let pSel='';if(mode==='daily'){const mPills=MONTHS.map((lbl,mi)=>{const has=m.kpis.some(k=>{const a=m.data.daily.cyActual[k.code]||[];return a.slice(MONTH_DAY_OFFSET[mi],MONTH_DAY_OFFSET[mi]+DAYS_IN_MONTH[mi]).some(v=>v!=null);});return'<div class="mpill '+(mi===window._dailyMonth?'active':'')+(has?' filled':'')+'" onclick="switchDailyMonth('+mi+')">'+lbl+'</div>';}).join('');const dm=window._dailyMonth,mo=MONTH_DAY_OFFSET[dm];const dPills=Array.from({length:DAYS_IN_MONTH[dm]},(_,di)=>{const gi=mo+di,h=m.kpis.some(k=>(m.data.daily.cyActual[k.code]||[])[gi]!=null);return'<div class="mpill day '+(gi===pi?'active':'')+(h?' filled':'')+'" onclick="switchPeriod('+gi+')">'+(di+1)+'</div>';}).join('');pSel='<div class="month-bar" style="margin-bottom:6px"><span class="month-lbl">Month:</span>'+mPills+'</div><div class="month-bar" style="margin-bottom:14px"><span class="month-lbl">Day:</span>'+dPills+'</div>';}else if(mode!=='yearly'){const lbl=mode==='weekly'?'Week':mode==='quarterly'?'Quarter':'Month';pSel='<div class="month-bar" style="margin-bottom:14px"><span class="month-lbl">'+lbl+':</span>'+pl.map((l,i)=>{const has=m.kpis.some(k=>(m.data[mode].cyActual[k.code]||[])[i]!=null);return'<div class="mpill '+(i===pi?'active':'')+(has?' filled':'')+'" onclick="switchPeriod('+i+')">'+l+'</div>';}).join('')+'</div>';}const pd=mode==='yearly'?'Year 2026':mode==='daily'?dayIdxLabel(pi)+' 2026':pl[pi]+' 2026';const vl={daily:'Daily',weekly:'Weekly',monthly:'Monthly',quarterly:'Quarterly',yearly:'Yearly'}[mode];const oeeData=calcOEE(m,pi,mode);const prevOee=pi>0?calcOEE(m,pi-1,mode):null;const oeeHtml=oeeData?renderOEEStrip(oeeData,prevOee):'';const narr=generateNarrative(m,pi,mode);const drillHtml=window._drillPeriod!=null?'<div class="drill-banner"><span class="drill-banner-text">&#128269; Filtered to: '+pl[window._drillPeriod]+'</span><button class="drill-clear" onclick="clearDrill()">&#10005; Clear Filter</button></div>':'';dash.innerHTML='<div class="mach-hdr"><div class="mach-hdr-l"><div class="mach-accent-bar" style="background:'+m.color+'"></div><div><div class="mach-big-title">'+m.label+'</div><div class="mach-big-sub">CODE: '+m.code+' &nbsp;·&nbsp; '+m.kpis.length+' KPIs &nbsp;·&nbsp; FY 2026</div></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn btn-outline" onclick="openDataModal(\''+m.id+'\')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Data</button><button class="btn btn-light" onclick="openGoalModal(\''+m.id+'\')">&#9881; Targets</button><button class="btn btn-light" onclick="openEditMachine(\''+m.id+'\')">Edit</button></div></div>'+'<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">View:</div><div class="vtabs"><button class="vtab '+(mode==='daily'?'active':'')+'" onclick="switchViewMode(\'daily\')">Daily</button><button class="vtab '+(mode==='weekly'?'active':'')+'" onclick="switchViewMode(\'weekly\')">Weekly</button><button class="vtab '+(mode==='monthly'?'active':'')+'" onclick="switchViewMode(\'monthly\')">Monthly</button><button class="vtab '+(mode==='quarterly'?'active':'')+'" onclick="switchViewMode(\'quarterly\')">Quarterly</button><button class="vtab '+(mode==='yearly'?'active':'')+'" onclick="switchViewMode(\'yearly\')">Yearly</button></div></div>'+drBar+pSel+'<div class="narrative-block"><div class="narrative-hdr"><span class="narrative-hdr-lbl">Executive Summary</span><span class="narrative-hdr-tag">Auto-generated · '+pd+'</span></div><div class="narrative-text">'+narr+'</div></div>'+oeeHtml+'<div class="ytd-strip" id="ytdStrip"></div><div id="statStrip" class="stat-strip"></div><div class="kpi-grid" id="kpiCards"></div><div class="sec-hdr"><div class="sec-title">'+vl+' Trends <span class="sec-tag">CY Actual · Target · PY</span></div><div class="vtabs"><button class="vtab active" onclick="switchChartView(\'actual\',this)">Actual</button><button class="vtab" onclick="switchChartView(\'cumulative\',this)">Cumulative</button></div></div>'+drillHtml+'<div class="charts-grid" id="chartsGrid"></div><div class="sec-hdr"><div class="sec-title">Performance Table <span class="sec-tag">'+pd+'</span></div></div><div class="tbl-wrap"><div class="tbl-bar"><div class="tbl-bar-title">'+m.name+' · All KPIs</div><div style="font-size:11px;color:var(--muted);font-family:\'JetBrains Mono\',monospace">Period: '+pd+'</div></div><div id="tblBody"></div></div>';renderYTDStrip(m,pi,mode);renderStrip(m,pi,mode);renderCards(m,pi,mode);renderCharts(m,mode);renderTable(m,pi,mode);animateKPICards();renderAlertBanner();window._activeMachine=m;document.getElementById('printMeta').innerHTML=PLANT_NAMES[state.plant]+' · '+m.label+'<br>'+pd+' · Generated '+new Date().toLocaleDateString();}
 
 function renderOEEStrip(oee,prevOee){const oc=oeeColor(oee.oee);const delta=prevOee?calcDelta(oee.oee,prevOee.oee,false):{html:''};const r=34,c=2*Math.PI*r,off=c*(1-(oee.oee/100));return'<div class="oee-strip"><div class="oee-main"><div class="oee-ring"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="'+r+'" fill="none" stroke="#2a2a2a" stroke-width="5"/><circle cx="40" cy="40" r="'+r+'" fill="none" stroke="'+oc+'" stroke-width="5" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" stroke-linecap="round"/></svg><div class="oee-ring-val" style="color:'+oc+'">'+oee.oee+'%</div></div><div class="oee-lbl">OEE Score '+delta.html+'</div></div><div class="oee-factors"><div class="oee-factor"><div class="oee-f-lbl">Availability</div><div class="oee-f-val" style="color:'+oeeColor(oee.avail)+'">'+oee.avail+'%</div><div class="oee-f-note">100% - Downtime</div></div><div class="oee-factor"><div class="oee-f-lbl">Performance</div><div class="oee-f-val" style="color:'+oeeColor(oee.perf)+'">'+oee.perf+'%</div><div class="oee-f-note">Actual / Target Rate</div></div><div class="oee-factor"><div class="oee-f-lbl">Quality</div><div class="oee-f-val" style="color:'+oeeColor(oee.qual)+'">'+oee.qual+'%</div><div class="oee-f-note">Good Units / Total</div></div><div class="oee-factor"><div class="oee-f-lbl">Classification</div><div class="oee-f-val" style="color:'+oc+';font-size:16px;">'+(oee.oee>=85?'World Class':oee.oee>=75?'Good':oee.oee>=65?'Average':oee.oee>=55?'Below Avg':'Needs Attention')+'</div><div class="oee-f-note">A × P × Q</div></div></div></div>';}
 
@@ -882,16 +967,17 @@ function setDateRange(r){window._dateRange=r;renderDashboard();}
 function drillToPeriod(idx){if(window._drillPeriod===idx)window._drillPeriod=null;else window._drillPeriod=idx;const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;renderTable(m,window._activePeriod,window._viewMode);const old=document.querySelector('.drill-banner');const pl=window._viewMode==='daily'?DAYS:window._viewMode==='weekly'?WEEKS:window._viewMode==='quarterly'?QUARTERS:window._viewMode==='yearly'?['2026']:MONTHS;if(window._drillPeriod!=null){const html='<div class="drill-banner"><span class="drill-banner-text">&#128269; Table filtered to: '+pl[window._drillPeriod]+'</span><button class="drill-clear" onclick="clearDrill()">&#10005; Clear Filter</button></div>';if(old)old.outerHTML=html;else{const cg=document.getElementById('chartsGrid');if(cg)cg.insertAdjacentHTML('beforebegin',html);}}else if(old)old.remove();}
 function clearDrill(){window._drillPeriod=null;const m=state.machines.find(x=>x.id===state.activeMachine);if(m)renderTable(m,window._activePeriod,window._viewMode);const b=document.querySelector('.drill-banner');if(b)b.remove();}
 
-function renderCharts(m,mode){const grid=document.getElementById('chartsGrid');if(!grid)return;const isD=mode==='daily',isC=isD||mode==='weekly';const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;grid.innerHTML=m.kpis.map(k=>'<div class="chart-card" id="cc_'+k.code+'"><div class="chart-title">'+k.code+' · '+k.name+'</div><div class="chart-sub">'+k.criteria+' <span style="font-size:10px;color:var(--accent);cursor:pointer" onclick="clearDrill()">'+(window._drillPeriod!=null?'(click to clear filter)':'(click a bar to drill down)')+'</span></div><div class="chart-wrap"><canvas id="ch_'+k.code+'"></canvas></div></div>').join('');m.kpis.forEach(kpi=>{const ctx=document.getElementById('ch_'+kpi.code);if(!ctx)return;const cy=m.data[mode].cyActual[kpi.code]||[],tgt=m.data[mode].cyTarget[kpi.code]||[],py=m.data[mode].pyActual[kpi.code]||[];charts[kpi.code]=new Chart(ctx,{type:'bar',data:{labels:pl,datasets:[{label:'CY Actual',data:cy,backgroundColor:cy.map((_,i)=>{if(window._drillPeriod!=null&&i!==window._drillPeriod)return m.color+'30';return m.color+'cc';}),borderColor:m.color,borderWidth:1,borderRadius:2,order:2},{label:'Target',data:tgt,type:'line',borderColor:'#bbb',borderDash:[5,4],fill:false,tension:.3,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#bbb',order:1},{label:'PY Actual',data:py,type:'line',borderColor:'#ddd',fill:false,tension:.4,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#ddd',order:1}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length){drillToPeriod(items[0].index);}},plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2,callbacks:{title(items){return isD?dayIdxLabel(items[0].dataIndex)+' 2026':items[0].label;}}}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'Barlow Condensed',size:isD?8:isC?8:11},maxRotation:isC?90:0,minRotation:isC?45:0,maxTicksLimit:isD?14:undefined,callback:isD?function(v,i){return i%30===0?MONTHS[dayIdxToMonthDay(i).month]+' '+dayIdxToMonthDay(i).day:'';}:undefined}},y:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'JetBrains Mono',size:10}}}}}});});}
-function switchChartView(cm,btn){document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const mode=window._viewMode;m.kpis.forEach(kpi=>{const c=charts[kpi.code];if(!c)return;c.data.datasets[0].data=cm==='actual'?m.data[mode].cyActual[kpi.code]||[]:cumAvg(m.data[mode].cyActual[kpi.code]||[]);c.data.datasets[2].data=cm==='actual'?m.data[mode].pyActual[kpi.code]||[]:cumAvg(m.data[mode].pyActual[kpi.code]||[]);c.update();});}
+function safeDataArr(m,mode,type,code){const LENS={daily:365,weekly:52,monthly:12,quarterly:4,yearly:1};const len=LENS[mode]||12;const src=(m.data[mode]&&m.data[mode][type])?m.data[mode][type][code]:null;if(!src||!Array.isArray(src))return new Array(len).fill(null);if(src.length<len){const padded=new Array(len).fill(null);src.forEach((v,i)=>{padded[i]=v;});return padded;}return src.slice();}
+function renderCharts(m,mode){const grid=document.getElementById('chartsGrid');if(!grid)return;const isD=mode==='daily',isC=isD||mode==='weekly';const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;grid.innerHTML=m.kpis.map(k=>'<div class="chart-card" id="cc_'+k.code+'"><div class="chart-title">'+k.code+' · '+k.name+'</div><div class="chart-sub">'+k.criteria+' <span style="font-size:10px;color:var(--accent);cursor:pointer" onclick="clearDrill()">'+(window._drillPeriod!=null?'(click to clear filter)':'(click a bar to drill down)')+'</span></div><div class="chart-wrap"><canvas id="ch_'+k.code+'"></canvas></div></div>').join('');m.kpis.forEach(kpi=>{const ctx=document.getElementById('ch_'+kpi.code);if(!ctx)return;const cy=safeDataArr(m,mode,'cyActual',kpi.code),tgt=safeDataArr(m,mode,'cyTarget',kpi.code),py=safeDataArr(m,mode,'pyActual',kpi.code);try{charts[kpi.code]=new Chart(ctx,{type:'bar',data:{labels:pl,datasets:[{label:'CY Actual',data:cy,backgroundColor:cy.map((_,i)=>{if(window._drillPeriod!=null&&i!==window._drillPeriod)return m.color+'30';return m.color+'cc';}),borderColor:m.color,borderWidth:1,borderRadius:2,order:2},{label:'Target',data:tgt,type:'line',borderColor:'#bbb',borderDash:[5,4],fill:false,tension:.3,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#bbb',order:1},{label:'PY Actual',data:py,type:'line',borderColor:'#ddd',fill:false,tension:.4,borderWidth:1.5,pointRadius:isD?0:isC?1:2,pointBackgroundColor:'#ddd',order:1}]},options:{responsive:true,maintainAspectRatio:false,onClick:(evt,items)=>{if(items.length){drillToPeriod(items[0].index);}},plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12,padding:14}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2,callbacks:{title(items){return isD?dayIdxLabel(items[0].dataIndex)+' 2026':items[0].label;}}}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'Barlow Condensed',size:isD?8:isC?8:11},maxRotation:isC?90:0,minRotation:isC?45:0,maxTicksLimit:isD?14:undefined,callback:isD?function(v,i){return i%30===0?MONTHS[dayIdxToMonthDay(i).month]+' '+dayIdxToMonthDay(i).day:'';}:undefined}},y:{grid:{color:'#eeece8'},ticks:{color:'#bbb',font:{family:'JetBrains Mono',size:10}}}}}});}catch(e){console.error('Chart render error for '+kpi.code+':',e);}});}
+function switchChartView(cm,btn){document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const mode=window._viewMode;m.kpis.forEach(kpi=>{const c=charts[kpi.code];if(!c)return;c.data.datasets[0].data=cm==='actual'?safeDataArr(m,mode,'cyActual',kpi.code):cumAvg(safeDataArr(m,mode,'cyActual',kpi.code));c.data.datasets[2].data=cm==='actual'?safeDataArr(m,mode,'pyActual',kpi.code):cumAvg(safeDataArr(m,mode,'pyActual',kpi.code));c.update();});}
 function cumAvg(arr){let s=0,c=0;return arr.map(v=>{if(v==null)return null;s+=v;c++;return s/c;});}
 function renderTable(m,pi,mode){const el=document.getElementById('tblBody');if(!el)return;const drilled=window._drillPeriod;const usePi=drilled!=null?drilled:pi;const rows=m.kpis.map(kpi=>{const a=(m.data[mode].cyActual[kpi.code]||[])[usePi]??null,t=(m.data[mode].cyTarget[kpi.code]||[])[usePi]??null,p=(m.data[mode].pyActual[kpi.code]||[])[usePi]??null;const vsT=(a!=null&&t!=null&&t!==0)?a/t*100:null,vsP=(a!=null&&p!=null&&p!==0)?a/p*100:null;const st=getGoalStatus(m,kpi,a);const bc=goalBadgeClass(st);return'<tr><td class="code">'+kpi.code+'</td><td style="font-weight:500">'+kpi.name+'</td><td style="color:var(--muted);font-size:12px">'+kpi.criteria+'</td><td class="r" style="color:var(--muted)">'+kpi.unit+'</td><td class="r" style="font-weight:600">'+f(a)+'</td><td class="r">'+f(t)+'</td><td class="r">'+f(p)+'</td><td class="r"><span class="badge '+bc+'">'+(vsT!=null?(st==='good'?'&#9650;':st==='amber'?'&#9679;':'&#9660;')+' '+vsT.toFixed(1)+'%':'--')+'</span></td><td class="r" style="color:var(--muted)">'+(vsP!=null?vsP.toFixed(1)+'%':'--')+'</td></tr>';}).join('');const pl=mode==='daily'?DAYS:mode==='weekly'?WEEKS:mode==='quarterly'?QUARTERS:mode==='yearly'?['2026']:MONTHS;el.innerHTML='<table><thead><tr><th>Code</th><th>KPI</th><th>Criteria</th><th class="r">Unit</th><th class="r">Actual'+(drilled!=null?' ('+pl[usePi]+')':'')+'</th><th class="r">Target</th><th class="r">PY Actual</th><th class="r">Act/Target</th><th class="r">Act/PY</th></tr></thead><tbody>'+rows+'</tbody></table>';}
 
 // ── COMPARISON VIEW ──
-function renderComparison(){const el=document.getElementById('compContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';const mode='monthly';const pi=window._activePeriod;let html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;">Plant Comparison</div><div style="font-size:12px;color:var(--muted);">Side-by-side overview across all facilities · Latest monthly data</div></div></div><div class="comp-grid">';Object.entries(PLANT_NAMES).forEach(([pk,pn])=>{const ms=state.machines.filter(m=>m.plant===pk);if(!ms.length)return;const allKpis={};ms.forEach(m=>{m.kpis.forEach(k=>{const a=(m.data.monthly.cyActual[k.code]||[])[pi];const t=(m.data.monthly.cyTarget[k.code]||[])[pi];if(!allKpis[k.name])allKpis[k.name]={vals:[],targets:[],lb:k.lowerBetter};if(a!=null)allKpis[k.name].vals.push(a);if(t!=null)allKpis[k.name].targets.push(t);});});let oees=[];ms.forEach(m=>{const o=calcOEE(m,pi,'monthly');if(o)oees.push(o.oee);});const avgOee=oees.length?(oees.reduce((a,b)=>a+b,0)/oees.length).toFixed(1):'--';const oeeCl=avgOee!=='--'?oeeColor(parseFloat(avgOee)):'var(--muted)';const oeeBg=avgOee!=='--'?(parseFloat(avgOee)>=75?'var(--green-bg)':parseFloat(avgOee)>=55?'var(--amber-bg)':'var(--accent-lt)'):'var(--bg)';html+='<div class="comp-card"><div class="comp-card-hdr" style="border-top:3px solid '+(PLANT_COLORS[pk]||'var(--accent)')+'"><div><div class="comp-plant-name">'+pn+'</div><div class="comp-plant-sub">'+ms.length+' machine'+(ms.length!==1?'s':'')+'</div></div><div class="comp-oee-badge" style="background:'+oeeBg+';color:'+oeeCl+'">'+avgOee+'%<div style="font-size:9px;font-weight:600;text-align:center;margin-top:2px;">OEE</div></div></div><div class="comp-body">';Object.entries(allKpis).forEach(([name,data])=>{if(!data.vals.length)return;const avg=data.vals.reduce((a,b)=>a+b,0)/data.vals.length;const tAvg=data.targets.length?data.targets.reduce((a,b)=>a+b,0)/data.targets.length:null;const good=tAvg!=null?(data.lb?avg<=tAvg:avg>=tAvg):null;html+='<div class="comp-kpi-row"><div class="comp-kpi-name">'+name+'</div><div class="comp-kpi-val" style="color:'+(good===null?'var(--charcoal)':good?'var(--green)':'var(--accent)')+'">'+f(avg)+'</div></div>';});html+='<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">';ms.forEach(m=>{const o=calcOEE(m,pi,'monthly');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px"><span style="color:var(--muted)">'+m.name+'</span><span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;color:'+(o?oeeColor(o.oee):'var(--muted)')+'">'+(o?o.oee+'% OEE':'--')+'</span></div>';});html+='</div></div></div>';});html+='</div>';el.innerHTML=html;}
+function renderComparison(){const el=document.getElementById('compContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';document.getElementById('heatmapContent').style.display='none';const mode='monthly';const pi=window._activePeriod;let html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;">Plant Comparison</div><div style="font-size:12px;color:var(--muted);">Side-by-side overview across all facilities · Latest monthly data</div></div></div><div class="comp-grid">';Object.entries(PLANT_NAMES).forEach(([pk,pn])=>{const ms=state.machines.filter(m=>m.plant===pk);if(!ms.length)return;const allKpis={};ms.forEach(m=>{m.kpis.forEach(k=>{const a=(m.data.monthly.cyActual[k.code]||[])[pi];const t=(m.data.monthly.cyTarget[k.code]||[])[pi];if(!allKpis[k.name])allKpis[k.name]={vals:[],targets:[],lb:k.lowerBetter};if(a!=null)allKpis[k.name].vals.push(a);if(t!=null)allKpis[k.name].targets.push(t);});});let oees=[];ms.forEach(m=>{const o=calcOEE(m,pi,'monthly');if(o)oees.push(o.oee);});const avgOee=oees.length?(oees.reduce((a,b)=>a+b,0)/oees.length).toFixed(1):'--';const oeeCl=avgOee!=='--'?oeeColor(parseFloat(avgOee)):'var(--muted)';const oeeBg=avgOee!=='--'?(parseFloat(avgOee)>=75?'var(--green-bg)':parseFloat(avgOee)>=55?'var(--amber-bg)':'var(--accent-lt)'):'var(--bg)';html+='<div class="comp-card"><div class="comp-card-hdr" style="border-top:3px solid '+(PLANT_COLORS[pk]||'var(--accent)')+'"><div><div class="comp-plant-name">'+pn+'</div><div class="comp-plant-sub">'+ms.length+' machine'+(ms.length!==1?'s':'')+'</div></div><div class="comp-oee-badge" style="background:'+oeeBg+';color:'+oeeCl+'">'+avgOee+'%<div style="font-size:9px;font-weight:600;text-align:center;margin-top:2px;">OEE</div></div></div><div class="comp-body">';Object.entries(allKpis).forEach(([name,data])=>{if(!data.vals.length)return;const avg=data.vals.reduce((a,b)=>a+b,0)/data.vals.length;const tAvg=data.targets.length?data.targets.reduce((a,b)=>a+b,0)/data.targets.length:null;const good=tAvg!=null?(data.lb?avg<=tAvg:avg>=tAvg):null;html+='<div class="comp-kpi-row"><div class="comp-kpi-name">'+name+'</div><div class="comp-kpi-val" style="color:'+(good===null?'var(--charcoal)':good?'var(--green)':'var(--accent)')+'">'+f(avg)+'</div></div>';});html+='<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">';ms.forEach(m=>{const o=calcOEE(m,pi,'monthly');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px"><span style="color:var(--muted)">'+m.name+'</span><span style="font-family:\'Barlow Condensed\',sans-serif;font-weight:700;color:'+(o?oeeColor(o.oee):'var(--muted)')+'">'+(o?o.oee+'% OEE':'--')+'</span></div>';});html+='</div></div></div>';});html+='</div>';el.innerHTML=html;}
 
 // ── ALERT CONFIG VIEW ──
-function renderAlertConfig(){const el=document.getElementById('alertContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('compContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';let html='<div style="max-width:660px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Alert Thresholds</div><div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Configure automatic Email / Teams notifications when KPIs breach thresholds during a shift.</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Active Rules</div>';if(alertRules.length===0)html+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:3px;margin-bottom:14px;">No alert rules configured yet.</div>';else alertRules.forEach((r,i)=>{html+='<div class="alert-rule"><button class="alert-toggle '+(r.active?'on':'')+'" onclick="toggleAlert('+i+')"></button><div class="alert-rule-text">If <strong>'+r.kpiName+'</strong> '+r.operator+' <strong>'+r.value+'</strong> '+r.unit+'</div><span class="alert-badge '+(r.channel==='teams'?'teams':'email')+'">'+(r.channel==='teams'?'&#128241; Teams':'&#128231; Email')+'</span><button class="kdel" onclick="deleteAlert('+i+')">x</button></div>';});html+='<div style="margin-top:18px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:4px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Add New Rule</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-size:12px;color:var(--muted)">If</span><input class="finp" id="alertKpi" placeholder="KPI name" style="width:140px;padding:6px 10px;font-size:12px"><select class="finp" id="alertOp" style="width:100px;padding:6px 10px;font-size:12px"><option value="exceeds">exceeds</option><option value="falls below">falls below</option></select><input class="finp" id="alertVal" type="number" step="any" placeholder="5" style="width:70px;padding:6px 10px;font-size:12px"><input class="finp" id="alertUnit" placeholder="hrs" style="width:60px;padding:6px 10px;font-size:12px"><span style="font-size:12px;color:var(--muted)">→ via</span><select class="finp" id="alertChan" style="width:100px;padding:6px 10px;font-size:12px"><option value="teams">Teams</option><option value="email">Email</option></select><button class="btn btn-accent" style="font-size:11px;padding:6px 12px" onclick="addAlertRule()">+ Add</button></div></div></div>';el.innerHTML=html;}
+function renderAlertConfig(){const el=document.getElementById('alertContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('compContent').style.display='none';document.getElementById('shiftContent').style.display='none';document.getElementById('analyticsContent').style.display='none';document.getElementById('heatmapContent').style.display='none';let html='<div style="max-width:660px"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Alert Thresholds</div><div style="font-size:12px;color:var(--muted);margin-bottom:20px;">Configure automatic Email / Teams notifications when KPIs breach thresholds during a shift.</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Active Rules</div>';if(alertRules.length===0)html+='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:3px;margin-bottom:14px;">No alert rules configured yet.</div>';else alertRules.forEach((r,i)=>{html+='<div class="alert-rule"><button class="alert-toggle '+(r.active?'on':'')+'" onclick="toggleAlert('+i+')"></button><div class="alert-rule-text">If <strong>'+r.kpiName+'</strong> '+r.operator+' <strong>'+r.value+'</strong> '+r.unit+'</div><span class="alert-badge '+(r.channel==='teams'?'teams':'email')+'">'+(r.channel==='teams'?'&#128241; Teams':'&#128231; Email')+'</span><button class="kdel" onclick="deleteAlert('+i+')">x</button></div>';});html+='<div style="margin-top:18px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:4px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--charcoal);margin-bottom:10px;">Add New Rule</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><span style="font-size:12px;color:var(--muted)">If</span><input class="finp" id="alertKpi" placeholder="KPI name" style="width:140px;padding:6px 10px;font-size:12px"><select class="finp" id="alertOp" style="width:100px;padding:6px 10px;font-size:12px"><option value="exceeds">exceeds</option><option value="falls below">falls below</option></select><input class="finp" id="alertVal" type="number" step="any" placeholder="5" style="width:70px;padding:6px 10px;font-size:12px"><input class="finp" id="alertUnit" placeholder="hrs" style="width:60px;padding:6px 10px;font-size:12px"><span style="font-size:12px;color:var(--muted)">→ via</span><select class="finp" id="alertChan" style="width:100px;padding:6px 10px;font-size:12px"><option value="teams">Teams</option><option value="email">Email</option></select><button class="btn btn-accent" style="font-size:11px;padding:6px 12px" onclick="addAlertRule()">+ Add</button></div></div></div>';el.innerHTML=html;}
 function toggleAlert(i){alertRules[i].active=!alertRules[i].active;saveAlerts();renderAlertConfig();}
 function deleteAlert(i){alertRules.splice(i,1);saveAlerts();renderAlertConfig();}
 function addAlertRule(){if(!isEditor()){toast('Editor access required','error');return;}const kpi=document.getElementById('alertKpi').value.trim();const op=document.getElementById('alertOp').value;const val=parseFloat(document.getElementById('alertVal').value);const unit=document.getElementById('alertUnit').value.trim();const chan=document.getElementById('alertChan').value;if(!kpi||isNaN(val)){toast('Fill in KPI name and threshold value','error');return;}alertRules.push({kpiName:kpi,operator:op,value:val,unit:unit,channel:chan,active:true});saveAlerts();renderAlertConfig();toast('Alert rule added');}
@@ -1046,7 +1132,7 @@ function getShiftData(machId,month){if(!shiftData[machId])shiftData[machId]={};i
 function genDemoShiftData(m,pi){const sd=getShiftData(m.id,pi);const rng=(seed)=>{let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};};m.kpis.forEach(k=>{const base=(m.data.monthly.cyActual[k.code]||[])[pi];if(base==null)return;SHIFTS.forEach((sh,si)=>{const r=rng(pi*100+si*17+parseInt(k.code)*3);const variance=0.85+r()*0.3;sd[sh.id][k.code]=+(base*variance).toFixed(4);});});return sd;}
 let shiftCharts={};
 window._shiftMonth=4;
-function renderShiftAnalysis(){const el=document.getElementById('shiftContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('analyticsContent').style.display='none';Object.values(shiftCharts).forEach(c=>c.destroy());shiftCharts={};const m=state.machines.find(x=>x.id===state.activeMachine);if(!m){el.innerHTML='<div class="empty"><div class="empty-ico">&#9201;</div><div class="empty-title">Select a Machine</div><div class="empty-sub">Choose a machine from the sidebar to view shift-level breakdowns</div></div>';return;}const pi=window._shiftMonth;const sd=genDemoShiftData(m,pi);let html='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;">Shift Analysis — '+m.name+'</div><div style="font-size:12px;color:var(--muted);">Performance breakdown by shift · '+MONTHS[pi]+' 2026</div></div><button class="btn btn-outline" onclick="openShiftDataEntry()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Shift Data</button></div><div class="month-bar" style="margin-bottom:16px"><span class="month-lbl">Month:</span>'+MONTHS.map((lbl,i)=>'<div class="mpill '+(i===pi?'active':'')+'" onclick="window._shiftMonth='+i+';renderShiftAnalysis()">'+lbl+'</div>').join('')+'</div><div class="shift-grid">';SHIFTS.forEach(sh=>{const data=sd[sh.id]||{};html+='<div class="shift-card" style="border-top:3px solid '+sh.color+'"><div class="shift-card-hdr"><div><div class="shift-name" style="color:'+sh.color+'">'+sh.name+'</div></div><div class="shift-time">'+sh.time+'</div></div><div class="shift-body">';m.kpis.forEach(k=>{const v=data[k.code];const t=(m.data.monthly.cyTarget[k.code]||[])[pi];const good=v!=null&&t!=null?(k.lowerBetter?v<=t:v>=t):null;html+='<div class="shift-kpi-row"><div class="shift-kpi-nm">'+k.name+'</div><div class="shift-kpi-val" style="color:'+(good===null?'var(--muted)':good?'var(--green)':'var(--accent)')+'">'+f(v)+'</div></div>';});html+='</div></div>';});html+='</div><div class="shift-compare-chart"><div class="chart-title">Shift Comparison — All KPIs</div><div class="chart-sub">Side-by-side performance across shifts for '+MONTHS[pi]+' 2026</div><div style="height:240px"><canvas id="shiftCompareChart"></canvas></div></div>';html+='<div class="tbl-wrap"><div class="tbl-bar"><div class="tbl-bar-title">Shift Performance Summary</div><div style="font-size:11px;color:var(--muted);font-family:\'JetBrains Mono\',monospace">'+MONTHS[pi]+' 2026</div></div><table class="sc-kpi-tbl"><thead><tr><th>KPI</th><th class="r">1st Shift</th><th class="r">2nd Shift</th><th class="r">3rd Shift</th><th class="r">Best</th><th class="r">Gap</th></tr></thead><tbody>';m.kpis.forEach(k=>{const vals=SHIFTS.map(s=>(sd[s.id]||{})[k.code]||null);const valid=vals.filter(v=>v!=null);let bestIdx=-1,bestVal=null;if(valid.length){bestVal=k.lowerBetter?Math.min(...valid):Math.max(...valid);bestIdx=vals.indexOf(bestVal);}const worstVal=valid.length?(k.lowerBetter?Math.max(...valid):Math.min(...valid)):null;const gap=bestVal!=null&&worstVal!=null&&bestVal!==0?Math.abs(((worstVal-bestVal)/bestVal)*100).toFixed(1):'--';html+='<tr><td style="font-weight:500">'+k.name+'</td>';vals.forEach((v,i)=>{html+='<td class="r" style="'+(i===bestIdx?'font-weight:700;color:var(--green)':'')+'">'+f(v)+'</td>';});html+='<td class="r" style="font-weight:600">'+(bestIdx>=0?SHIFTS[bestIdx].name:'--')+'</td><td class="r" style="color:var(--accent);font-weight:600">'+gap+'%</td></tr>';});html+='</tbody></table></div>';el.innerHTML=html;const ctx=document.getElementById('shiftCompareChart');if(ctx){const kpiLabels=m.kpis.map(k=>k.name);const datasets=SHIFTS.map(sh=>({label:sh.name,data:m.kpis.map(k=>(sd[sh.id]||{})[k.code]||0),backgroundColor:sh.color+'cc',borderColor:sh.color,borderWidth:1,borderRadius:3}));shiftCharts.compare=new Chart(ctx,{type:'bar',data:{labels:kpiLabels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'Barlow Condensed',size:11}}},y:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'JetBrains Mono',size:10}}}}}});}}
+function renderShiftAnalysis(){const el=document.getElementById('shiftContent');el.style.display='';document.getElementById('dashContent').style.display='none';document.getElementById('emptyState').style.display='none';document.getElementById('compContent').style.display='none';document.getElementById('alertContent').style.display='none';document.getElementById('analyticsContent').style.display='none';document.getElementById('heatmapContent').style.display='none';Object.values(shiftCharts).forEach(c=>c.destroy());shiftCharts={};const m=state.machines.find(x=>x.id===state.activeMachine);if(!m){el.innerHTML='<div class="empty"><div class="empty-ico">&#9201;</div><div class="empty-title">Select a Machine</div><div class="empty-sub">Choose a machine from the sidebar to view shift-level breakdowns</div></div>';return;}const pi=window._shiftMonth;const sd=genDemoShiftData(m,pi);let html='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;">Shift Analysis — '+m.name+'</div><div style="font-size:12px;color:var(--muted);">Performance breakdown by shift · '+MONTHS[pi]+' 2026</div></div><button class="btn btn-outline" onclick="openShiftDataEntry()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Enter Shift Data</button></div><div class="month-bar" style="margin-bottom:16px"><span class="month-lbl">Month:</span>'+MONTHS.map((lbl,i)=>'<div class="mpill '+(i===pi?'active':'')+'" onclick="window._shiftMonth='+i+';renderShiftAnalysis()">'+lbl+'</div>').join('')+'</div><div class="shift-grid">';SHIFTS.forEach(sh=>{const data=sd[sh.id]||{};html+='<div class="shift-card" style="border-top:3px solid '+sh.color+'"><div class="shift-card-hdr"><div><div class="shift-name" style="color:'+sh.color+'">'+sh.name+'</div></div><div class="shift-time">'+sh.time+'</div></div><div class="shift-body">';m.kpis.forEach(k=>{const v=data[k.code];const t=(m.data.monthly.cyTarget[k.code]||[])[pi];const good=v!=null&&t!=null?(k.lowerBetter?v<=t:v>=t):null;html+='<div class="shift-kpi-row"><div class="shift-kpi-nm">'+k.name+'</div><div class="shift-kpi-val" style="color:'+(good===null?'var(--muted)':good?'var(--green)':'var(--accent)')+'">'+f(v)+'</div></div>';});html+='</div></div>';});html+='</div><div class="shift-compare-chart"><div class="chart-title">Shift Comparison — All KPIs</div><div class="chart-sub">Side-by-side performance across shifts for '+MONTHS[pi]+' 2026</div><div style="height:240px"><canvas id="shiftCompareChart"></canvas></div></div>';html+='<div class="tbl-wrap"><div class="tbl-bar"><div class="tbl-bar-title">Shift Performance Summary</div><div style="font-size:11px;color:var(--muted);font-family:\'JetBrains Mono\',monospace">'+MONTHS[pi]+' 2026</div></div><table class="sc-kpi-tbl"><thead><tr><th>KPI</th><th class="r">1st Shift</th><th class="r">2nd Shift</th><th class="r">3rd Shift</th><th class="r">Best</th><th class="r">Gap</th></tr></thead><tbody>';m.kpis.forEach(k=>{const vals=SHIFTS.map(s=>(sd[s.id]||{})[k.code]||null);const valid=vals.filter(v=>v!=null);let bestIdx=-1,bestVal=null;if(valid.length){bestVal=k.lowerBetter?Math.min(...valid):Math.max(...valid);bestIdx=vals.indexOf(bestVal);}const worstVal=valid.length?(k.lowerBetter?Math.max(...valid):Math.min(...valid)):null;const gap=bestVal!=null&&worstVal!=null&&bestVal!==0?Math.abs(((worstVal-bestVal)/bestVal)*100).toFixed(1):'--';html+='<tr><td style="font-weight:500">'+k.name+'</td>';vals.forEach((v,i)=>{html+='<td class="r" style="'+(i===bestIdx?'font-weight:700;color:var(--green)':'')+'">'+f(v)+'</td>';});html+='<td class="r" style="font-weight:600">'+(bestIdx>=0?SHIFTS[bestIdx].name:'--')+'</td><td class="r" style="color:var(--accent);font-weight:600">'+gap+'%</td></tr>';});html+='</tbody></table></div>';el.innerHTML=html;const ctx=document.getElementById('shiftCompareChart');if(ctx){const kpiLabels=m.kpis.map(k=>k.name);const datasets=SHIFTS.map(sh=>({label:sh.name,data:m.kpis.map(k=>(sd[sh.id]||{})[k.code]||0),backgroundColor:sh.color+'cc',borderColor:sh.color,borderWidth:1,borderRadius:3}));shiftCharts.compare=new Chart(ctx,{type:'bar',data:{labels:kpiLabels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{family:'Barlow',size:11},boxWidth:12}},tooltip:{backgroundColor:'#1a1a1a',titleFont:{family:'Barlow Condensed',size:13},bodyFont:{family:'JetBrains Mono',size:11},padding:10,cornerRadius:2}},scales:{x:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'Barlow Condensed',size:11}}},y:{grid:{color:'#eeece8'},ticks:{color:'#888',font:{family:'JetBrains Mono',size:10}}}}}});}}
 function openShiftDataEntry(){const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const pi=window._shiftMonth;const sd=getShiftData(m.id,pi);let body='<div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Enter KPI values per shift for <strong>'+m.name+'</strong> · '+MONTHS[pi]+' 2026</div><div style="overflow-x:auto"><table class="sc-kpi-tbl"><thead><tr><th>KPI</th>';SHIFTS.forEach(s=>{body+='<th class="r" style="color:'+s.color+'">'+s.name+'</th>';});body+='</tr></thead><tbody>';m.kpis.forEach(k=>{body+='<tr><td style="font-weight:500">'+k.name+'</td>';SHIFTS.forEach(s=>{const v=(sd[s.id]||{})[k.code];body+='<td class="r"><input class="kfi shift-inp" data-shift="'+s.id+'" data-kpi="'+k.code+'" value="'+(v!=null?v:'')+'" type="number" step="any" style="width:80px;text-align:center"></td>';});body+='</tr>';});body+='</tbody></table></div>';document.getElementById('dataModalTitle').textContent='Shift Data — '+m.name+' · '+MONTHS[pi];document.getElementById('dataModalBody').innerHTML=body;const footer=document.querySelector('#dataModal .mod-foot');footer.innerHTML='<button class="btn btn-light" onclick="closeModal(\'dataModal\')">Cancel</button><button class="btn btn-accent" onclick="saveShiftEntry()">Save Shift Data</button>';document.getElementById('dataModal').classList.add('open');}
 function saveShiftEntry(){if(!isEditor()){toast('Editor access required','error');return;}const m=state.machines.find(x=>x.id===state.activeMachine);if(!m)return;const pi=window._shiftMonth;const sd=getShiftData(m.id,pi);document.querySelectorAll('.shift-inp').forEach(inp=>{const sh=inp.dataset.shift,kpi=inp.dataset.kpi;if(!sd[sh])sd[sh]={};const v=inp.value.trim();sd[sh][kpi]=v===''?null:parseFloat(v);});saveShiftData();closeModal('dataModal');renderShiftAnalysis();toast('Shift data saved');}
 
@@ -1245,8 +1331,243 @@ async function initGDrive(){
   if(lbl){lbl.textContent='Drive (sign in)';lbl.style.color='#888';}
 }
 
+
+
+// ── DARK MODE ──
+const DM_KEY='supplyone_darkmode';
+function toggleDarkMode(){
+  const isDark=document.body.classList.toggle('dark-mode');
+  localStorage.setItem(DM_KEY,isDark?'1':'0');
+  const btn=document.getElementById('dmToggle');
+  if(btn)btn.style.color=isDark?'#f59e0b':'#666';
+  // Update Chart.js colors
+  Object.values(charts).forEach(c=>{
+    if(!c||!c.options)return;
+    try{
+      c.options.scales.x.grid.color=isDark?'#2a2a28':'#eeece8';
+      c.options.scales.y.grid.color=isDark?'#2a2a28':'#eeece8';
+      c.options.scales.x.ticks.color=isDark?'#6a6a60':'#bbb';
+      c.options.scales.y.ticks.color=isDark?'#6a6a60':'#bbb';
+      c.options.plugins.legend.labels.color=isDark?'#6a6a60':'#888';
+      c.update();
+    }catch(e){}
+  });
+}
+function initDarkMode(){
+  const saved=localStorage.getItem(DM_KEY);
+  if(saved==='1'){document.body.classList.add('dark-mode');const btn=document.getElementById('dmToggle');if(btn)btn.style.color='#f59e0b';}
+}
+
+// ── ALERT BANNER (auto-scan thresholds) ──
+function renderAlertBanner(){
+  const strip=document.getElementById('alertBannerStrip');
+  if(!strip)return;
+  const mode=window._viewMode||'monthly';
+  const pi=window._activePeriod;
+  const alerts=[];
+  state.machines.forEach(m=>{
+    if(m.plant!==state.plant)return;
+    m.kpis.forEach(k=>{
+      const a=safeDataArr(m,mode,'cyActual',k.code)[pi];
+      const t=safeDataArr(m,mode,'cyTarget',k.code)[pi];
+      if(a==null||t==null)return;
+      const pct=((a-t)/Math.abs(t))*100;
+      const bad=k.lowerBetter?a>t:a<t;
+      const gap=Math.abs(pct);
+      if(bad&&gap>15){
+        alerts.push({machine:m.name,kpi:k.name,actual:a,target:t,gap:gap.toFixed(1),cls:'red'});
+      }else if(bad&&gap>5){
+        alerts.push({machine:m.name,kpi:k.name,actual:a,target:t,gap:gap.toFixed(1),cls:'amber'});
+      }
+    });
+  });
+  if(!alerts.length){strip.classList.remove('has-alerts');strip.innerHTML='';return;}
+  strip.classList.add('has-alerts');
+  strip.innerHTML=alerts.map(a=>'<div class="alert-item '+a.cls+'"><div class="alert-item-dot"></div>'+a.machine+': '+a.kpi+' at '+f(a.actual)+' ('+a.gap+'% '+(a.cls==='red'?'off':'near')+' target)</div>').join('');
+}
+
+// ── PLANT HEALTH HEATMAP ──
+function renderHeatmap(){
+  const el=document.getElementById('heatmapContent');
+  el.style.display='';
+  document.getElementById('dashContent').style.display='none';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('compContent').style.display='none';
+  document.getElementById('alertContent').style.display='none';
+  document.getElementById('shiftContent').style.display='none';
+  document.getElementById('analyticsContent').style.display='none';
+  const mode='monthly';
+  const pi=window._activePeriod;
+  let totalOees=[],allAlerts=[];
+  let plantCards='';
+  Object.entries(PLANT_NAMES).forEach(([pk,pn])=>{
+    const ms=state.machines.filter(m=>m.plant===pk);
+    if(!ms.length)return;
+    let plantOees=[],machRows='';
+    ms.forEach(m=>{
+      const oee=calcOEE(m,pi,mode);
+      const oeeVal=oee?oee.oee:null;
+      if(oeeVal!=null){plantOees.push(oeeVal);totalOees.push(oeeVal);}
+      const dots=m.kpis.map(k=>{
+        const a=safeDataArr(m,mode,'cyActual',k.code)[pi];
+        const t=safeDataArr(m,mode,'cyTarget',k.code)[pi];
+        if(a==null||t==null)return'<div class="heatmap-dot n" title="'+k.name+': No data"></div>';
+        const good=k.lowerBetter?a<=t:a>=t;
+        const pctOff=Math.abs(((a-t)/Math.abs(t||1))*100);
+        if(good)return'<div class="heatmap-dot g" title="'+k.name+': '+f(a)+' ✓"></div>';
+        if(pctOff<15)return'<div class="heatmap-dot a" title="'+k.name+': '+f(a)+' ('+pctOff.toFixed(0)+'% off)"></div>';
+        allAlerts.push(m.name+' '+k.name);
+        return'<div class="heatmap-dot r" title="'+k.name+': '+f(a)+' ('+pctOff.toFixed(0)+'% off)"></div>';
+      }).join('');
+      machRows+='<div class="heatmap-mach-row"><div style="display:flex;align-items:center;gap:10px"><div style="width:3px;height:18px;border-radius:2px;background:'+m.color+'"></div><div><div class="heatmap-mach-name">'+m.name+'</div></div></div><div style="display:flex;align-items:center;gap:12px"><div class="heatmap-kpi-dots">'+dots+'</div><div class="heatmap-mach-oee" style="color:'+(oeeVal?oeeColor(oeeVal):'var(--muted)')+';min-width:50px;text-align:right">'+(oeeVal?oeeVal+'%':'--')+'</div></div></div>';
+    });
+    const avgOee=plantOees.length?(plantOees.reduce((a,b)=>a+b,0)/plantOees.length).toFixed(1):'--';
+    const oc=avgOee!=='--'?oeeColor(parseFloat(avgOee)):'var(--muted)';
+    const borderColor=PLANT_COLORS[pk]||'var(--accent)';
+    plantCards+='<div class="heatmap-plant" style="border-top:3px solid '+borderColor+'" onclick="switchPlant(\''+pk+'\',null);switchView(\'dashboard\')"><div class="heatmap-plant-hdr"><div><div class="heatmap-plant-name">'+pn+'</div><div style="font-size:11px;color:var(--muted)">'+ms.length+' machine'+(ms.length!==1?'s':'')+'</div></div><div style="text-align:right"><div class="heatmap-oee-big" style="color:'+oc+'">'+avgOee+'<span style="font-size:16px">%</span></div><div class="heatmap-oee-lbl">Avg OEE</div></div></div><div class="heatmap-machines">'+machRows+'</div></div>';
+  });
+  const regionOee=totalOees.length?(totalOees.reduce((a,b)=>a+b,0)/totalOees.length).toFixed(1):'--';
+  const regionColor=regionOee!=='--'?oeeColor(parseFloat(regionOee)):'var(--muted)';
+  const alertCount=allAlerts.length;
+  let summaryHtml='<div class="heatmap-summary"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px"><div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;color:#fff">Southwest Region Overview</div><div style="font-size:12px;color:#888;margin-top:2px">'+MONTHS[pi]+' 2026 · All Plants · '+state.machines.length+' Machines</div></div><div style="display:flex;gap:24px;align-items:center"><div style="text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:36px;color:'+regionColor+'">'+regionOee+'%</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.1em">Region OEE</div></div><div style="text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:800;font-size:36px;color:'+(alertCount>0?'var(--accent)':'var(--green)')+'">'+alertCount+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.1em">Alerts</div></div></div></div></div>';
+  // AI summary placeholder
+  summaryHtml+='<div class="ai-summary-block" id="aiSummaryBlock"><div class="ai-summary-hdr"><span class="ai-summary-badge">AI Insight</span><span style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--muted)">Powered by Claude</span></div><div class="ai-summary-text" id="aiSummaryText"><span class="ai-summary-loading">Generating executive analysis...</span></div></div>';
+  el.innerHTML=summaryHtml+'<div class="heatmap-grid">'+plantCards+'</div>';
+  generateAISummary(pi);
+}
+
+// ── AI EXECUTIVE SUMMARY ──
+async function generateAISummary(pi){
+  const el=document.getElementById('aiSummaryText');
+  if(!el)return;
+  // Build context for Claude
+  const mode='monthly';
+  let context='Southwest Region KPI Dashboard — '+MONTHS[pi]+' 2026.\n';
+  Object.entries(PLANT_NAMES).forEach(([pk,pn])=>{
+    const ms=state.machines.filter(m=>m.plant===pk);
+    if(!ms.length)return;
+    context+=pn+' Plant:\n';
+    ms.forEach(m=>{
+      const oee=calcOEE(m,pi,mode);
+      context+='  '+m.name+' ('+m.code+'): OEE='+(oee?oee.oee+'%':'N/A')+'\n';
+      m.kpis.forEach(k=>{
+        const a=safeDataArr(m,mode,'cyActual',k.code)[pi];
+        const t=safeDataArr(m,mode,'cyTarget',k.code)[pi];
+        const prev=pi>0?safeDataArr(m,mode,'cyActual',k.code)[pi-1]:null;
+        context+='    '+k.name+': Actual='+f(a)+', Target='+f(t)+', PrevMonth='+f(prev)+(k.lowerBetter?' (lower better)':' (higher better)')+'\n';
+      });
+    });
+  });
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:'You are an operations analyst for SupplyOne Packaging\'s Southwest Region (OKC, Dallas, Albuquerque, Tucson). Write a 3-4 sentence executive summary for the VP of Operations based on this KPI data. Be specific with numbers. Flag concerns with urgency. Celebrate wins. Sound like a sharp analyst, not a robot. Do NOT use bullet points or headers — pure prose paragraph.\n\n'+context}]
+      })
+    });
+    if(!resp.ok)throw new Error('API '+resp.status);
+    const data=await resp.json();
+    const text=data.content.map(c=>c.text||'').join('');
+    el.innerHTML=text;
+  }catch(e){
+    // Fallback to the local narrative generator
+    let fallback='';
+    Object.entries(PLANT_NAMES).forEach(([pk,pn])=>{
+      const ms=state.machines.filter(m=>m.plant===pk);
+      if(!ms.length)return;
+      let oees=[];
+      ms.forEach(m=>{const o=calcOEE(m,pi,mode);if(o)oees.push(o.oee);});
+      const avg=oees.length?(oees.reduce((a,b)=>a+b,0)/oees.length).toFixed(1):'N/A';
+      fallback+=pn+' averaging '+avg+'% OEE across '+ms.length+' machines. ';
+    });
+    el.innerHTML=fallback+'<span style="font-size:11px;color:var(--muted);display:block;margin-top:6px">(Connect Claude API for AI-powered analysis)</span>';
+  }
+}
+
+// ── ANIMATED KPI VALUES (count-up effect) ──
+function animateValue(el,target,decimals,duration){
+  if(target==null||isNaN(target)){el.textContent='--';return;}
+  const start=0;const range=target-start;const startTime=performance.now();
+  function step(now){
+    const elapsed=Math.min((now-startTime)/duration,1);
+    const eased=1-Math.pow(1-elapsed,3);
+    const current=start+range*eased;
+    el.textContent=Number(current).toLocaleString('en-US',{maximumFractionDigits:decimals});
+    if(elapsed<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function animateKPICards(){
+  document.querySelectorAll('.kpi-val[data-target]').forEach(el=>{
+    const target=parseFloat(el.dataset.target);
+    const decimals=parseInt(el.dataset.decimals||'3');
+    animateValue(el,target,decimals,800);
+  });
+}
+
+// ── PDF EXECUTIVE REPORT ──
+async function generatePDF(){
+  toast('Generating PDF report...');
+  try{
+    // Use the scorecard overlay approach - render to a print-friendly layout
+    openScorecard();
+    setTimeout(()=>{
+      const scBody=document.getElementById('scorecardBody');
+      if(!scBody)return;
+      // Trigger browser print dialog focused on scorecard
+      const printWin=window.open('','_blank','width=900,height=700');
+      printWin.document.write('<!DOCTYPE html><html><head><title>SupplyOne KPI Report</title>');
+      printWin.document.write('<style>body{font-family:"Barlow",sans-serif;color:#1a1a1a;padding:24px;margin:0;}table{width:100%;border-collapse:collapse;}th,td{padding:6px 10px;text-align:left;border-bottom:1px solid #eee;font-size:12px;}th{background:#f5f4f2;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#999;border-bottom:2px solid #ddd;}.sc-oee-val{font-size:24px;font-weight:800;}.sc-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;}.sc-dot-g{background:#1a7a46;}.sc-dot-a{background:#b45309;}.sc-dot-r{background:#c8102e;}.sc-dot-m{background:#ccc;}</style>');
+      printWin.document.write('</head><body>'+scBody.innerHTML+'</body></html>');
+      printWin.document.close();
+      printWin.focus();
+      setTimeout(()=>{printWin.print();},500);
+      document.getElementById('scorecardOverlay').classList.remove('open');
+      toast('PDF ready — use Save as PDF in print dialog');
+    },300);
+  }catch(e){
+    toast('PDF generation failed: '+e.message,'error');
+  }
+}
+
+// ── REFRESH ──
+async function refreshDashboard(){
+  toast('Refreshing...');
+  // Try Google Drive first
+  if(gdriveToken&&gdriveCfg){
+    try{
+      const loaded=await gdriveLoadFromCloud();
+      if(loaded){
+        renderSidebar();
+        if(state.activeMachine&&state.machines.find(m=>m.id===state.activeMachine)){
+          renderDashboard();
+        }else{
+          const first=state.machines.find(m=>m.plant===state.plant);
+          if(first)selectMachine(first.id);
+        }
+        toast('Synced from Google Drive');
+        return;
+      }
+    }catch(e){console.warn('GDrive refresh failed:',e);}
+  }
+  // Fall back: reload from localStorage
+  loadState();
+  renderSidebar();
+  applyEditorUI();
+  if(state.activeMachine&&state.machines.find(m=>m.id===state.activeMachine)){
+    renderDashboard();
+  }else{
+    const first=state.machines.find(m=>m.plant===state.plant);
+    if(first)selectMachine(first.id);
+  }
+  toast('Dashboard refreshed');
+}
+
 // ── INIT ──
-loadState();loadAlerts();loadShiftData();
+loadState();loadAlerts();loadShiftData();initDarkMode();
 renderSidebar();
 applyEditorUI();
 initGDrive();
