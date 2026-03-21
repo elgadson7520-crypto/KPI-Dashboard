@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SupplyOne Quality Activity Report | QMF-1801-121</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+:root {
+  --white: #FFFFFF;
+  --black: #111111;
+  --grey-50: #F8F8F8;
+  --grey-100: #EFEFEF;
+  --grey-200: #D9D9D9;
+  --grey-300: #B0B0B0;
+  --grey-400: #888888;
+  --grey-500: #666666;
+  --grey-600: #444444;
+  --grey-700: #2A2A2A;
+  --red-primary: #C00000;
+  --red-light: #FFE5E5;
+  --red-dark: #8B0000;
+  --green: #1A7A3A;
+  --green-light: #E6F5EC;
+  --amber: #B8860B;
+  --amber-light: #FFF8E1;
+  --navy: #1F4E79;
+  --blue: #2E75B6;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--grey-50);
+  color: var(--black);
+  min-height: 100vh;
+}
+
+/* ─── HEADER ─── */
+.header {
+  background: var(--black);
+  color: var(--white);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 4px solid var(--red-primary);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-mark {
+  width: 42px; height: 42px;
+  background: var(--red-primary);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 18px; color: var(--white);
+  letter-spacing: -1px;
+}
+
+.header h1 {
+  font-size: 20px; font-weight: 700; letter-spacing: -0.5px;
+}
+
+.header .subtitle {
+  font-size: 12px; color: var(--grey-300); margin-top: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.header-right {
+  display: flex; align-items: center; gap: 24px;
+}
+
+.header-meta {
+  text-align: right;
+  font-size: 12px; color: var(--grey-300);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.header-meta strong { color: var(--white); font-size: 14px; }
+
+/* ─── TAB NAVIGATION ─── */
+.tab-bar {
+  background: var(--white);
+  display: flex;
+  border-bottom: 1px solid var(--grey-200);
+  overflow-x: auto;
+  padding: 0 24px;
+}
+
+.tab-bar button {
+  background: none; border: none;
+  padding: 14px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  color: var(--grey-500);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all .2s;
+}
+
+.tab-bar button:hover { color: var(--black); }
+.tab-bar button.active {
+  color: var(--red-primary);
+  border-bottom-color: var(--red-primary);
+  font-weight: 700;
+}
+
+/* ─── MAIN CONTENT ─── */
+.main { padding: 24px 32px; max-width: 1440px; margin: 0 auto; }
+
+.tab-panel { display: none; animation: fadeIn .3s; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--grey-100);
+}
+
+.card-title {
+  font-size: 15px; font-weight: 700; color: var(--black);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.card-title .badge {
+  font-size: 10px; padding: 3px 8px;
+  border-radius: 4px; font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.badge-red { background: var(--red-light); color: var(--red-primary); }
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-amber { background: var(--amber-light); color: var(--amber); }
+
+/* ─── KPI ROW ─── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: 8px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+
+.kpi-card.red::before { background: var(--red-primary); }
+.kpi-card.green::before { background: var(--green); }
+.kpi-card.amber::before { background: var(--amber); }
+.kpi-card.black::before { background: var(--black); }
+
+.kpi-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--grey-500); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.kpi-value {
+  font-size: 28px; font-weight: 700; color: var(--black);
+  letter-spacing: -1px;
+}
+
+.kpi-sub {
+  font-size: 11px; color: var(--grey-400); margin-top: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.kpi-trend { font-size: 12px; margin-top: 6px; font-weight: 600; }
+.trend-up { color: var(--red-primary); }
+.trend-down { color: var(--green); }
+
+/* ─── TABLES ─── */
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table thead th {
+  background: var(--black);
+  color: var(--white);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  position: sticky; top: 0;
+}
+
+.data-table thead th:first-child { border-radius: 6px 0 0 0; }
+.data-table thead th:last-child { border-radius: 0 6px 0 0; }
+
+.data-table tbody tr { border-bottom: 1px solid var(--grey-100); transition: background .15s; }
+.data-table tbody tr:hover { background: var(--grey-50); }
+
+.data-table td {
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+}
+
+.data-table .total-row {
+  background: var(--grey-700);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.data-table .total-row td { border: none; }
+
+.money { text-align: right; font-variant-numeric: tabular-nums; }
+.pct { text-align: right; }
+.neg { color: var(--red-primary); font-weight: 600; }
+.pos { color: var(--green); font-weight: 600; }
+
+/* ─── DEFECT ENTRY FORM ─── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.form-group label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--grey-500); text-transform: uppercase;
+  letter-spacing: 0.5px; margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  background: var(--white);
+  transition: border .2s;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--red-primary);
+  box-shadow: 0 0 0 3px var(--red-light);
+}
+
+.btn {
+  padding: 10px 24px;
+  border: none; border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+
+.btn-primary {
+  background: var(--red-primary); color: var(--white);
+}
+
+.btn-primary:hover { background: var(--red-dark); }
+
+.btn-secondary {
+  background: var(--grey-100); color: var(--black);
+}
+
+.btn-secondary:hover { background: var(--grey-200); }
+
+.btn-row { display: flex; gap: 12px; margin-top: 20px; }
+
+/* ─── CHART CONTAINERS ─── */
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart-row.full { grid-template-columns: 1fr; }
+
+canvas { width: 100% !important; max-height: 320px; }
+
+/* ─── DEFECT CODE REFERENCE ─── */
+.defect-group-title {
+  font-size: 13px; font-weight: 700;
+  padding: 8px 14px;
+  background: var(--grey-700);
+  color: var(--white);
+  border-radius: 4px;
+  margin: 12px 0 4px 0;
+}
+
+/* ─── COMPLAINTS LOG ─── */
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.status-open { background: var(--red-primary); }
+.status-closed { background: var(--green); }
+
+/* ─── PRINT ─── */
+.print-btn {
+  background: none; border: 1px solid var(--grey-300);
+  color: var(--grey-300); border-radius: 6px;
+  padding: 6px 16px; font-size: 12px; cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all .2s;
+}
+
+.print-btn:hover { background: var(--grey-700); color: var(--white); }
+
+@media print {
+  .tab-bar, .header-right, .print-btn, .btn-row { display: none; }
+  .tab-panel { display: block !important; page-break-after: always; }
+  .header { border-bottom: 2px solid var(--black); }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .header { flex-direction: column; gap: 12px; text-align: center; }
+  .header-right { justify-content: center; }
+  .main { padding: 16px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .chart-row { grid-template-columns: 1fr; }
+  .tab-bar { padding: 0 8px; }
+  .tab-bar button { padding: 12px 14px; font-size: 12px; }
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--grey-200), transparent);
+  margin: 24px 0;
+}
+
+.memo-block {
+  background: var(--grey-50);
+  border-left: 4px solid var(--red-primary);
+  padding: 16px 20px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 20px;
+}
+
+.memo-block h3 {
+  font-size: 13px;
+  color: var(--grey-500);
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.memo-block p {
+  font-size: 14px; line-height: 1.6;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+}
+
+.pill-red { background: var(--red-light); color: var(--red-primary); }
+.pill-green { background: var(--green-light); color: var(--green); }
+
+.clickable-row { cursor: pointer; }
+.clickable-row:hover { background: var(--red-light) !important; }
+
+/* Scrollable table wrapper */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--grey-200);
+}
+
+.table-wrap .data-table { border: none; }
+
+/* Filter controls */
+.filter-bar {
+  display: flex; gap: 12px; align-items: center;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+
+.filter-bar input, .filter-bar select {
+  padding: 8px 12px;
+  border: 1px solid var(--grey-200);
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+}
+
+.filter-bar input:focus, .filter-bar select:focus {
+  outline: none;
+  border-color: var(--red-primary);
+}
+
+.encore-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--grey-100); border: 1px solid var(--grey-200);
+  border-radius: 4px; padding: 2px 8px;
+  font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+  color: var(--grey-600); font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">S1</div>
+    <div>
+      <h1>Quality Activity Report</h1>
+      <div class="subtitle">QMF-1801-121 Rev. E &nbsp;|&nbsp; Corrugated Packaging Operations</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-meta">
+      <strong id="reportMonth">June 2025</strong><br>
+      Plant: <span id="plantName">Oklahoma City</span>
+    </div>
+    <div class="header-meta">
+      <span class="encore-tag">&#9654; EnCore ERP</span>
+    </div>
+    <button class="print-btn" onclick="window.print()">&#9113; Print Report</button>
+  </div>
+</div>
+
+<div class="tab-bar" id="tabBar">
+  <button class="active" data-tab="cover">Cover Sheet</button>
+  <button data-tab="comparison">Cost Comparison</button>
+  <button data-tab="defects">Defects by Type</button>
+  <button data-tab="reject-log">Reject Log</button>
+  <button data-tab="complaints">Customer Complaints</button>
+  <button data-tab="salvage">Salvage Entries</button>
+  <button data-tab="entry">Data Entry</button>
+  <button data-tab="reference">Defect Code Reference</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════ COVER SHEET ═══════════════ -->
+<div class="tab-panel active" id="panel-cover">
+
+  <div class="memo-block">
+    <h3>Memorandum</h3>
+    <p>
+      <strong>Date:</strong> <span id="memoDate">June 30, 2025</span><br>
+      <strong>Reply To / Attn Of:</strong> QA Manager<br>
+      <strong>Subject:</strong> Monthly Quality Activity Report<br>
+      <strong>To:</strong> Plant Manager &nbsp;&nbsp; <strong>CC:</strong> All Factory Staff
+    </p>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card red">
+      <div class="kpi-label">Internal Cost of Non-Conformance</div>
+      <div class="kpi-value" id="kpiCONC">$8,247.33</div>
+      <div class="kpi-sub">Account 654200</div>
+    </div>
+    <div class="kpi-card black">
+      <div class="kpi-label">EnCore Account 654200</div>
+      <div class="kpi-value" id="kpiAcct">$69,472.43</div>
+      <div class="kpi-sub">Per EnCore FAGL Report</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Open Customer Notifications</div>
+      <div class="kpi-value" id="kpiOpenCN">12</div>
+      <div class="kpi-sub">Quality Notifications Active</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Cost Redeemed — Salvage</div>
+      <div class="kpi-value" id="kpiSalvage">$4,891.00</div>
+      <div class="kpi-sub">Material recovered this period</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Cost of Return Items</div>
+      <div class="kpi-value" id="kpiReturns">$1,247.50</div>
+      <div class="kpi-sub">Rework / Warranty credits</div>
+    </div>
+    <div class="kpi-card black">
+      <div class="kpi-label">Total Cost of Quality</div>
+      <div class="kpi-value" id="kpiTotalCOQ">$74,076.26</div>
+      <div class="kpi-sub">CONC + Acct 654200 + Returns − Salvage</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Points to Remember <span class="badge badge-red">ACTION ITEMS</span></div>
+    </div>
+    <div id="coverNotes" contenteditable="true" style="min-height:120px;line-height:1.8;font-size:14px;outline:none;">
+      <p>&#8226; Corrugator board warp remains the leading defect — 42% of all vendor defects this month.</p>
+      <p>&#8226; Flexo print mis-registration on the Langston 4-Color decreased 18% after die lock calibration.</p>
+      <p>&#8226; New EnCore reject notification workflow deployed — all red tags now auto-log to EnCore QM module.</p>
+      <p>&#8226; Glue joint failures on the FFG down 27% month-over-month.</p>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Cost of Quality Trend</div>
+      </div>
+      <canvas id="chartCOQTrend"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Reject % of Production</div>
+      </div>
+      <canvas id="chartRejectPct"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ COST COMPARISON BY DEPARTMENT ═══════════════ -->
+<div class="tab-panel" id="panel-comparison">
+  <div class="kpi-grid">
+    <div class="kpi-card red">
+      <div class="kpi-label">This Month Total Rejects</div>
+      <div class="kpi-value">$12,437.80</div>
+    </div>
+    <div class="kpi-card black">
+      <div class="kpi-label">Prior Month Total</div>
+      <div class="kpi-value">$11,148.10</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Difference</div>
+      <div class="kpi-value trend-up">+$1,289.70</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Monthly Cost Comparison by Department / Machine Center</div>
+      <span class="encore-tag">EnCore Work Center Codes</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table" id="deptCompTable">
+        <thead>
+          <tr>
+            <th>Department / Machine</th>
+            <th style="text-align:right">This Month ($)</th>
+            <th style="text-align:right">Prior Month ($)</th>
+            <th style="text-align:right">Difference ($)</th>
+            <th style="text-align:right">% Change</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Reject Cost by Department</div></div>
+      <canvas id="chartDeptBar"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Department % of Facility</div></div>
+      <canvas id="chartDeptPie"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DEFECTS BY TYPE ═══════════════ -->
+<div class="tab-panel" id="panel-defects">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Comparison by Defect Category</div>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Defect Category</th>
+            <th style="text-align:right">Cost ($)</th>
+            <th style="text-align:right">% of Total</th>
+            <th>Severity</th>
+          </tr>
+        </thead>
+        <tbody id="defectSummaryBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Defect Pareto Analysis</div></div>
+      <canvas id="chartPareto"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Defect Category Distribution</div></div>
+      <canvas id="chartDefectDist"></canvas>
+    </div>
+  </div>
+
+  <!-- Expandable detail for each code series -->
+  <div id="defectDetailPanels"></div>
+</div>
+
+<!-- ═══════════════ REJECT LOG ═══════════════ -->
+<div class="tab-panel" id="panel-reject-log">
+  <div class="filter-bar">
+    <input type="text" id="rejectSearch" placeholder="Search W.O. #, Part #, Description..." style="flex:1;min-width:200px;">
+    <select id="rejectFilterDept">
+      <option value="">All Departments</option>
+      <option value="Corrugator">Corrugator</option>
+      <option value="Flexo Folder-Gluer">Flexo Folder-Gluer</option>
+      <option value="Rotary Die Cutter">Rotary Die Cutter</option>
+      <option value="Flatbed Die Cutter">Flatbed Die Cutter</option>
+      <option value="Specialty Gluer">Specialty Gluer</option>
+      <option value="Ink Room">Ink Room</option>
+      <option value="Shipping">Shipping</option>
+      <option value="Receiving">Receiving</option>
+    </select>
+    <select id="rejectFilterSeverity">
+      <option value="">All Severity</option>
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+    </select>
+    <button class="btn btn-secondary" onclick="resetRejectFilters()">Reset</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Reject Entries — Red Tag Log <span class="badge badge-red" id="rejectCount">0 ENTRIES</span></div>
+      <span class="encore-tag">EnCore W.O. Integration</span>
+    </div>
+    <div class="table-wrap" style="max-height:520px;overflow-y:auto;">
+      <table class="data-table" id="rejectTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>W.O. #</th>
+            <th>Part #</th>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Dept / Machine</th>
+            <th>Defect Code</th>
+            <th>Severity</th>
+            <th style="text-align:right">Material Cost</th>
+          </tr>
+        </thead>
+        <tbody id="rejectBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CUSTOMER COMPLAINTS ═══════════════ -->
+<div class="tab-panel" id="panel-complaints">
+  <div class="kpi-grid">
+    <div class="kpi-card red">
+      <div class="kpi-label">Total Notifications</div>
+      <div class="kpi-value" id="kpiTotalNotif">28</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Open Claims</div>
+      <div class="kpi-value" id="kpiOpenClaims">12</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Closed This Period</div>
+      <div class="kpi-value" id="kpiClosedClaims">16</div>
+    </div>
+    <div class="kpi-card black">
+      <div class="kpi-label">Cost of Pending Claims</div>
+      <div class="kpi-value">$29,789.91</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Customer Quality Notification Summary</div>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Complaint Category</th>
+            <th style="text-align:center">Count</th>
+            <th style="text-align:right">Est. Cost ($)</th>
+          </tr>
+        </thead>
+        <tbody id="complaintSummary"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Complaint Detail Log <span class="badge badge-amber">EnCore QM11</span></div>
+    </div>
+    <div class="table-wrap" style="max-height:400px;overflow-y:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Description</th>
+            <th>Material</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody id="complaintDetail"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Complaints by Category</div></div>
+      <canvas id="chartComplaints"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Open vs Closed Trend</div></div>
+      <canvas id="chartOpenClosed"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SALVAGE ENTRIES ═══════════════ -->
+<div class="tab-panel" id="panel-salvage">
+  <div class="kpi-grid">
+    <div class="kpi-card green">
+      <div class="kpi-label">Total Material Salvaged ($)</div>
+      <div class="kpi-value">$4,891.00</div>
+    </div>
+    <div class="kpi-card black">
+      <div class="kpi-label">Pieces Salvaged</div>
+      <div class="kpi-value">147</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Labor Cost (Salvage)</div>
+      <div class="kpi-value">$1,230.40</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Net Savings</div>
+      <div class="kpi-value">$3,660.60</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Salvage Log</div>
+      <span class="encore-tag">EnCore Salvage Module</span>
+    </div>
+    <div class="table-wrap" style="max-height:400px;overflow-y:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>W.O. #</th>
+            <th>Part #</th>
+            <th>Qty</th>
+            <th>Defect Code</th>
+            <th style="text-align:right">Material ($)</th>
+            <th style="text-align:right">Labor ($)</th>
+            <th style="text-align:right">Net Saved ($)</th>
+          </tr>
+        </thead>
+        <tbody id="salvageBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DATA ENTRY ═══════════════ -->
+<div class="tab-panel" id="panel-entry">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">New Reject Entry (Red Tag)</div>
+      <span class="encore-tag">Logs to EnCore QM</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="entryDate">
+      </div>
+      <div class="form-group">
+        <label>EnCore Work Order #</label>
+        <input type="text" id="entryWO" placeholder="e.g. 10741025">
+      </div>
+      <div class="form-group">
+        <label>Part / Item Number</label>
+        <input type="text" id="entryPart" placeholder="e.g. RSC-24x18x12-200C">
+      </div>
+      <div class="form-group">
+        <label>Quantity Rejected</label>
+        <input type="number" id="entryQty" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label>Department / Machine</label>
+        <select id="entryDept">
+          <option value="">Select...</option>
+          <option>Corrugator</option>
+          <option>Flexo Folder-Gluer</option>
+          <option>Rotary Die Cutter</option>
+          <option>Flatbed Die Cutter</option>
+          <option>Specialty Gluer</option>
+          <option>Ink Room</option>
+          <option>Banding / Strapping</option>
+          <option>Shipping / Staging</option>
+          <option>Receiving / Raw Material</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Defect Code</label>
+        <select id="entryDefect">
+          <option value="">Select Defect Code...</option>
+          <optgroup label="100-Series: Board / Material Defects">
+            <option value="101">101 — Board Warp / Twist</option>
+            <option value="102">102 — Delamination (Liner from Medium)</option>
+            <option value="103">103 — Crushed Flutes</option>
+            <option value="104">104 — Moisture Damage / Wet Board</option>
+            <option value="105">105 — Wrong Flute Profile / Caliper</option>
+            <option value="106">106 — Liner Defects (Pinholes / Tears)</option>
+            <option value="107">107 — Incorrect Board Grade</option>
+            <option value="108">108 — Vendor Damaged Material</option>
+            <option value="109">109 — Medium Fracture / Split</option>
+            <option value="110">110 — Washboarding</option>
+            <option value="111">111 — Edge Crush Failure (ECT below spec)</option>
+            <option value="112">112 — Dimensional Out-of-Spec (Board)</option>
+            <option value="113">113 — Board Material Other</option>
+          </optgroup>
+          <optgroup label="400-Series: Operational / Converting Defects">
+            <option value="401">401 — Setup Error (Operator)</option>
+            <option value="402">402 — Dimensional Out-of-Spec (Converted)</option>
+            <option value="403">403 — Out of Square (Box)</option>
+            <option value="404">404 — Score / Crease Misalignment</option>
+            <option value="405">405 — Slotter Error (Slot Too Deep / Shallow)</option>
+            <option value="406">406 — Die Cut Misregistration</option>
+            <option value="407">407 — Trim / Knife Cut Error</option>
+            <option value="408">408 — Feed Jam / Crush Damage</option>
+            <option value="409">409 — Print Plate Damage</option>
+            <option value="410">410 — Blanket Impression Error</option>
+            <option value="411">411 — Folding Error (Fold Line Off)</option>
+            <option value="412">412 — Machine Mark / Score Damage</option>
+            <option value="413">413 — Factory Handling Damage</option>
+            <option value="414">414 — Machine Malfunction / Breakdown</option>
+            <option value="415">415 — Missing Between Operations</option>
+            <option value="416">416 — Destructive Test Sample</option>
+            <option value="417">417 — Shipping / Trailer Damage</option>
+            <option value="418">418 — Forklift Damage</option>
+            <option value="419">419 — Water Damage (In-Plant)</option>
+            <option value="420">420 — Factory Other</option>
+          </optgroup>
+          <optgroup label="600-Series: Gluing / Joining Defects">
+            <option value="601">601 — Glue Joint Failure (Open Flap)</option>
+            <option value="602">602 — Excess Glue / Squeeze Out</option>
+            <option value="603">603 — Glue Pattern Misalignment</option>
+            <option value="604">604 — Cold Glue / No Bond</option>
+            <option value="605">605 — Stitching / Staple Error</option>
+            <option value="606">606 — Taping Defect</option>
+            <option value="607">607 — Manufacturer Joint Gap</option>
+            <option value="608">608 — Glue Contamination</option>
+          </optgroup>
+          <optgroup label="700-Series: Print / Graphics Defects">
+            <option value="701">701 — Color Out of Spec / ΔE Variance</option>
+            <option value="702">702 — Ink Smear / Set-Off</option>
+            <option value="703">703 — Print Mis-Registration</option>
+            <option value="704">704 — Dot Gain / Plugging</option>
+            <option value="705">705 — Banding / Streaking</option>
+            <option value="706">706 — Plate Wear / Image Loss</option>
+            <option value="707">707 — Anilox Scoring / Pattern</option>
+            <option value="708">708 — Ink Adhesion Failure</option>
+          </optgroup>
+          <optgroup label="800-Series: Coating / Finishing Defects">
+            <option value="801">801 — Coating Coverage Insufficient</option>
+            <option value="802">802 — Coating Orange Peel / Texture</option>
+            <option value="803">803 — Coating Contamination</option>
+            <option value="804">804 — Aqueous Coat Failure</option>
+            <option value="805">805 — Wax Curtain Coat Uneven</option>
+            <option value="806">806 — Lamination Defect</option>
+            <option value="807">807 — UV Cure Failure</option>
+            <option value="808">808 — Varnish Blister / Bubble</option>
+          </optgroup>
+          <optgroup label="900-Series: Packing / Shipping / Palletizing">
+            <option value="901">901 — Palletizing Crush Damage</option>
+            <option value="902">902 — Banding / Strapping Damage</option>
+            <option value="903">903 — Stretch Wrap Failure</option>
+            <option value="904">904 — Count / Quantity Error</option>
+            <option value="905">905 — Labeling Error (Wrong SKU)</option>
+            <option value="906">906 — Load Shift / Pallet Damage</option>
+            <option value="907">907 — Shipping Handling Damage</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Severity</label>
+        <select id="entrySeverity">
+          <option value="Low">Low (Scrap / Rework Minor)</option>
+          <option value="Medium">Medium (Customer-Impacting)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Material Cost ($)</label>
+        <input type="number" id="entryCost" placeholder="0.00" step="0.01" min="0">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label>Notes / Root Cause Description</label>
+      <textarea id="entryNotes" rows="3" placeholder="Describe the defect, root cause hypothesis, and any corrective actions taken..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="addRejectEntry()">&#10003; Add Reject Entry</button>
+      <button class="btn btn-secondary" onclick="clearEntryForm()">Clear Form</button>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Data Entry Reference <span class="badge badge-amber">MANUAL INPUT FIELDS</span></div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>EnCore Account 654200 ($)</label>
+        <input type="number" id="manualAcct654" value="69472.43" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Cost of Return Items ($)</label>
+        <input type="number" id="manualReturns" value="1247.50" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Cost of Pending Claims ($)</label>
+        <input type="number" id="manualPending" value="29789.91" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Material Sent: Low to Medium ($)</label>
+        <input type="number" id="manualLowMed" value="31909.30" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Production for Medium ($)</label>
+        <input type="number" id="manualProdMed" value="79677.97" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Plant</label>
+        <select id="manualPlant" onchange="document.getElementById('plantName').textContent=this.value;">
+          <option>Oklahoma City</option>
+          <option>Dallas</option>
+          <option>Albuquerque</option>
+          <option>Tucson</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="updateManualData()">&#10003; Update Cover Sheet Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DEFECT CODE REFERENCE ═══════════════ -->
+<div class="tab-panel" id="panel-reference">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Corrugated Packaging — Defect Code Reference</div>
+      <span class="encore-tag">SupplyOne Standard Codes</span>
+    </div>
+    <div id="defectRefBody"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ─── TAB SWITCHING ───
+document.querySelectorAll('.tab-bar button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ─── CORRUGATED DEFECT CODES ───
+const defectCodes = {
+  '100': { title: 'Board / Material Defects (Vendor)', codes: {
+    101:'Board Warp / Twist', 102:'Delamination (Liner from Medium)', 103:'Crushed Flutes',
+    104:'Moisture Damage / Wet Board', 105:'Wrong Flute Profile / Caliper',
+    106:'Liner Defects (Pinholes / Tears)', 107:'Incorrect Board Grade',
+    108:'Vendor Damaged Material', 109:'Medium Fracture / Split', 110:'Washboarding',
+    111:'Edge Crush Failure (ECT Below Spec)', 112:'Dimensional Out-of-Spec (Board)',
+    113:'Board Material Other'
+  }},
+  '400': { title: 'Operational / Converting Defects', codes: {
+    401:'Setup Error (Operator)', 402:'Dimensional Out-of-Spec (Converted)',
+    403:'Out of Square (Box)', 404:'Score / Crease Misalignment',
+    405:'Slotter Error (Slot Too Deep / Shallow)', 406:'Die Cut Misregistration',
+    407:'Trim / Knife Cut Error', 408:'Feed Jam / Crush Damage',
+    409:'Print Plate Damage', 410:'Blanket Impression Error',
+    411:'Folding Error (Fold Line Off)', 412:'Machine Mark / Score Damage',
+    413:'Factory Handling Damage', 414:'Machine Malfunction / Breakdown',
+    415:'Missing Between Operations', 416:'Destructive Test Sample',
+    417:'Shipping / Trailer Damage', 418:'Forklift Damage',
+    419:'Water Damage (In-Plant)', 420:'Factory Other'
+  }},
+  '600': { title: 'Gluing / Joining Defects', codes: {
+    601:'Glue Joint Failure (Open Flap)', 602:'Excess Glue / Squeeze Out',
+    603:'Glue Pattern Misalignment', 604:'Cold Glue / No Bond',
+    605:'Stitching / Staple Error', 606:'Taping Defect',
+    607:'Manufacturer Joint Gap', 608:'Glue Contamination'
+  }},
+  '700': { title: 'Print / Graphics Defects', codes: {
+    701:'Color Out of Spec / ΔE Variance', 702:'Ink Smear / Set-Off',
+    703:'Print Mis-Registration', 704:'Dot Gain / Plugging',
+    705:'Banding / Streaking', 706:'Plate Wear / Image Loss',
+    707:'Anilox Scoring / Pattern', 708:'Ink Adhesion Failure'
+  }},
+  '800': { title: 'Coating / Finishing Defects', codes: {
+    801:'Coating Coverage Insufficient', 802:'Coating Orange Peel / Texture',
+    803:'Coating Contamination', 804:'Aqueous Coat Failure',
+    805:'Wax Curtain Coat Uneven', 806:'Lamination Defect',
+    807:'UV Cure Failure', 808:'Varnish Blister / Bubble'
+  }},
+  '900': { title: 'Packing / Shipping / Palletizing', codes: {
+    901:'Palletizing Crush Damage', 902:'Banding / Strapping Damage',
+    903:'Stretch Wrap Failure', 904:'Count / Quantity Error',
+    905:'Labeling Error (Wrong SKU)', 906:'Load Shift / Pallet Damage',
+    907:'Shipping Handling Damage'
+  }}
+};
+
+// ─── BUILD DEFECT REFERENCE ───
+const refBody = document.getElementById('defectRefBody');
+Object.entries(defectCodes).forEach(([series, data]) => {
+  refBody.innerHTML += `<div class="defect-group-title">${series}-Series: ${data.title}</div>`;
+  let html = '<table class="data-table"><thead><tr><th style="width:80px">Code</th><th>Description</th></tr></thead><tbody>';
+  Object.entries(data.codes).forEach(([code, desc]) => {
+    html += `<tr><td><strong>${code}</strong></td><td>${desc}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  refBody.innerHTML += html;
+});
+
+// ─── DEPARTMENT DATA ───
+const departments = [
+  { name: 'Corrugator', thisMonth: 2847.30, priorMonth: 2490.00 },
+  { name: 'Flexo Folder-Gluer', thisMonth: 3215.40, priorMonth: 2875.60 },
+  { name: 'Rotary Die Cutter', thisMonth: 1892.10, priorMonth: 2104.30 },
+  { name: 'Flatbed Die Cutter', thisMonth: 987.50, priorMonth: 743.20 },
+  { name: 'Specialty Gluer', thisMonth: 1124.80, priorMonth: 1247.90 },
+  { name: 'Ink Room', thisMonth: 423.60, priorMonth: 312.40 },
+  { name: 'Banding / Strapping', thisMonth: 312.00, priorMonth: 287.60 },
+  { name: 'Shipping / Staging', thisMonth: 847.90, priorMonth: 592.10 },
+  { name: 'Receiving / Raw Material', thisMonth: 787.20, priorMonth: 495.00 },
+];
+
+function buildDeptTable() {
+  const tbody = document.querySelector('#deptCompTable tbody');
+  let totalThis = 0, totalPrior = 0;
+  departments.forEach(d => {
+    const diff = d.thisMonth - d.priorMonth;
+    const pctChange = d.priorMonth === 0 ? 100 : (diff / d.priorMonth * 100);
+    const cls = diff > 0 ? 'neg' : 'pos';
+    totalThis += d.thisMonth;
+    totalPrior += d.priorMonth;
+    tbody.innerHTML += `<tr>
+      <td><strong>${d.name}</strong></td>
+      <td class="money">$${d.thisMonth.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      <td class="money">$${d.priorMonth.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      <td class="money ${cls}">${diff>=0?'+':''}$${diff.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      <td class="pct ${cls}">${diff>=0?'+':''}${pctChange.toFixed(1)}%</td>
+    </tr>`;
+  });
+  const totalDiff = totalThis - totalPrior;
+  const totalPct = totalPrior === 0 ? 100 : (totalDiff / totalPrior * 100);
+  tbody.innerHTML += `<tr class="total-row">
+    <td>TOTAL</td>
+    <td class="money">$${totalThis.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+    <td class="money">$${totalPrior.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+    <td class="money">${totalDiff>=0?'+':''}$${totalDiff.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+    <td class="pct">${totalDiff>=0?'+':''}${totalPct.toFixed(1)}%</td>
+  </tr>`;
+}
+buildDeptTable();
+
+// ─── DEFECT SUMMARY DATA ───
+const defectSummary = [
+  { cat: 'Board / Material (100s)', cost: 2847.30, pct: 22.9, severity: 'high' },
+  { cat: 'Operational / Converting (400s)', cost: 4312.60, pct: 34.7, severity: 'critical' },
+  { cat: 'Gluing / Joining (600s)', cost: 1124.80, pct: 9.0, severity: 'medium' },
+  { cat: 'Print / Graphics (700s)', cost: 2315.40, pct: 18.6, severity: 'high' },
+  { cat: 'Coating / Finishing (800s)', cost: 847.90, pct: 6.8, severity: 'low' },
+  { cat: 'Packing / Shipping (900s)', cost: 989.80, pct: 8.0, severity: 'medium' },
+];
+
+const dsBody = document.getElementById('defectSummaryBody');
+defectSummary.forEach(d => {
+  const sevCls = d.severity==='critical' ? 'pill-red' : d.severity==='high' ? 'pill-red' : d.severity==='medium' ? 'pill-red' : 'pill-green';
+  dsBody.innerHTML += `<tr>
+    <td><strong>${d.cat}</strong></td>
+    <td class="money">$${d.cost.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+    <td class="pct">${d.pct.toFixed(1)}%</td>
+    <td><span class="pill ${d.severity==='low'?'pill-green':'pill-red'}">${d.severity.toUpperCase()}</span></td>
+  </tr>`;
+});
+const totalDefCost = defectSummary.reduce((a,b) => a + b.cost, 0);
+dsBody.innerHTML += `<tr class="total-row">
+  <td>TOTAL</td>
+  <td class="money">$${totalDefCost.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+  <td class="pct">100.0%</td>
+  <td></td>
+</tr>`;
+
+// ─── REJECT LOG DATA ───
+const rejectEntries = [
+  { date:'2025-06-03', wo:'10740278', part:'RSC-24x18x12-200C', desc:'RSC 24x18x12 C-Flute', qty:50, dept:'Corrugator', code:'101', sev:'Low', cost:127.50 },
+  { date:'2025-06-03', wo:'10740280', part:'FOL-18x12x8-ECT32', desc:'FOL 18x12x8 ECT32', qty:25, dept:'Flexo Folder-Gluer', code:'703', sev:'Medium', cost:312.40 },
+  { date:'2025-06-04', wo:'10740810', part:'DC-36x24-B200', desc:'Die Cut Pad B-200', qty:100, dept:'Flatbed Die Cutter', code:'406', sev:'Low', cost:89.70 },
+  { date:'2025-06-04', wo:'10741069', part:'RSC-20x16x10-ECT44', desc:'RSC Heavy Duty ECT44', qty:30, dept:'Corrugator', code:'103', sev:'Low', cost:245.80 },
+  { date:'2025-06-05', wo:'10741025', part:'CSSC-30x20x15-BC', desc:'CSS BC Double Wall', qty:15, dept:'Specialty Gluer', code:'601', sev:'Medium', cost:487.60 },
+  { date:'2025-06-05', wo:'10741528', part:'FFG-22x14x10-200C', desc:'FFG 22x14x10 C-Flute', qty:75, dept:'Flexo Folder-Gluer', code:'401', sev:'Low', cost:198.30 },
+  { date:'2025-06-05', wo:'10741654', part:'RSC-16x12x8-200C', desc:'RSC 16x12x8 C-Flute', qty:40, dept:'Rotary Die Cutter', code:'404', sev:'Low', cost:156.20 },
+  { date:'2025-06-06', wo:'10741810', part:'PAD-48x40-C23', desc:'Corrugated Pad', qty:200, dept:'Corrugator', code:'110', sev:'Low', cost:94.80 },
+  { date:'2025-06-06', wo:'10741916', part:'SFF-24x18x6-E200', desc:'SFF E-Flute', qty:60, dept:'Flexo Folder-Gluer', code:'702', sev:'Medium', cost:334.10 },
+  { date:'2025-06-06', wo:'10741917', part:'RSC-28x20x14-BC', desc:'RSC BC Double Wall', qty:20, dept:'Shipping / Staging', code:'418', sev:'Medium', cost:612.40 },
+  { date:'2025-06-06', wo:'10741918', part:'HSC-12x10x8-200C', desc:'HSC 12x10x8', qty:100, dept:'Flexo Folder-Gluer', code:'411', sev:'Low', cost:187.60 },
+  { date:'2025-06-06', wo:'10741975', part:'DC-PART-CUSTOM', desc:'Custom Die Cut Insert', qty:35, dept:'Flatbed Die Cutter', code:'407', sev:'Low', cost:76.50 },
+  { date:'2025-06-06', wo:'10741976', part:'RSC-32x24x16-EC44', desc:'RSC 32x24x16 ECT44', qty:10, dept:'Corrugator', code:'104', sev:'Medium', cost:423.70 },
+  { date:'2025-06-06', wo:'10741978', part:'FOL-20x14x6-175C', desc:'FOL 20x14x6 175C', qty:80, dept:'Ink Room', code:'701', sev:'Medium', cost:523.60 },
+  { date:'2025-06-06', wo:'10742035', part:'RSC-18x14x10-200C', desc:'RSC 18x14x10', qty:45, dept:'Rotary Die Cutter', code:'414', sev:'Low', cost:267.90 },
+  { date:'2025-06-06', wo:'10742048', part:'TRAY-24x16x4-E', desc:'E-Flute Tray', qty:150, dept:'Flexo Folder-Gluer', code:'405', sev:'Low', cost:112.30 },
+  { date:'2025-06-06', wo:'10742051', part:'RSC-14x10x6-200C', desc:'RSC 14x10x6', qty:55, dept:'Banding / Strapping', code:'902', sev:'Low', cost:68.40 },
+  { date:'2025-06-09', wo:'10742190', part:'PAD-40x32-BC', desc:'BC Double Wall Pad', qty:80, dept:'Receiving / Raw Material', code:'108', sev:'Low', cost:312.00 },
+  { date:'2025-06-09', wo:'10742216', part:'RSC-26x20x12-200C', desc:'RSC 26x20x12', qty:35, dept:'Corrugator', code:'102', sev:'Medium', cost:478.30 },
+  { date:'2025-06-13', wo:'10742580', part:'FFG-30x22x14-EC32', desc:'FFG 30x22x14', qty:20, dept:'Flexo Folder-Gluer', code:'704', sev:'Low', cost:134.80 },
+];
+
+function renderRejectLog(entries) {
+  const tbody = document.getElementById('rejectBody');
+  tbody.innerHTML = '';
+  entries.forEach(e => {
+    const codeName = getAllDefectName(e.code);
+    tbody.innerHTML += `<tr>
+      <td>${e.date}</td>
+      <td>${e.wo}</td>
+      <td>${e.part}</td>
+      <td>${e.desc}</td>
+      <td style="text-align:center">${e.qty}</td>
+      <td>${e.dept}</td>
+      <td title="${codeName}"><strong>${e.code}</strong> — ${codeName.substring(0,30)}${codeName.length>30?'...':''}</td>
+      <td><span class="pill ${e.sev==='Medium'?'pill-red':'pill-green'}">${e.sev.toUpperCase()}</span></td>
+      <td class="money">$${e.cost.toFixed(2)}</td>
+    </tr>`;
+  });
+  document.getElementById('rejectCount').textContent = entries.length + ' ENTRIES';
+}
+
+function getAllDefectName(code) {
+  for (const [, data] of Object.entries(defectCodes)) {
+    if (data.codes[code]) return data.codes[code];
+  }
+  return 'Unknown';
+}
+
+renderRejectLog(rejectEntries);
+
+// Filter logic
+document.getElementById('rejectSearch').addEventListener('input', filterRejects);
+document.getElementById('rejectFilterDept').addEventListener('change', filterRejects);
+document.getElementById('rejectFilterSeverity').addEventListener('change', filterRejects);
+
+function filterRejects() {
+  const q = document.getElementById('rejectSearch').value.toLowerCase();
+  const dept = document.getElementById('rejectFilterDept').value;
+  const sev = document.getElementById('rejectFilterSeverity').value;
+  const filtered = rejectEntries.filter(e => {
+    const matchQ = !q || e.wo.includes(q) || e.part.toLowerCase().includes(q) || e.desc.toLowerCase().includes(q);
+    const matchD = !dept || e.dept === dept;
+    const matchS = !sev || e.sev === sev;
+    return matchQ && matchD && matchS;
+  });
+  renderRejectLog(filtered);
+}
+
+function resetRejectFilters() {
+  document.getElementById('rejectSearch').value = '';
+  document.getElementById('rejectFilterDept').value = '';
+  document.getElementById('rejectFilterSeverity').value = '';
+  renderRejectLog(rejectEntries);
+}
+
+// ─── COMPLAINT DATA ───
+const complaintCategories = [
+  { cat: 'Carrier Transport — Concealed Damage', count: 7, cost: 4230 },
+  { cat: 'Manufacturer — Quality Defect', count: 8, cost: 6120 },
+  { cat: 'Order Entry Error', count: 3, cost: 1890 },
+  { cat: 'Wrong Item Shipped', count: 2, cost: 2450 },
+  { cat: 'Missed Delivery Date', count: 4, cost: 3100 },
+  { cat: 'Re/Credit Request', count: 4, cost: 2870 },
+];
+
+const cSumBody = document.getElementById('complaintSummary');
+let totalCnt = 0, totalCCost = 0;
+complaintCategories.forEach(c => {
+  totalCnt += c.count; totalCCost += c.cost;
+  cSumBody.innerHTML += `<tr>
+    <td>${c.cat}</td>
+    <td style="text-align:center"><strong>${c.count}</strong></td>
+    <td class="money">$${c.cost.toLocaleString()}</td>
+  </tr>`;
+});
+cSumBody.innerHTML += `<tr class="total-row">
+  <td>TOTAL</td>
+  <td style="text-align:center">${totalCnt}</td>
+  <td class="money">$${totalCCost.toLocaleString()}</td>
+</tr>`;
+
+const complaintLog = [
+  { date:'2025-06-03', status:'Closed', desc:'Carrier Damage', material:'RSC-24x18x12', cat:'Carrier' },
+  { date:'2025-06-03', status:'Open', desc:'Manufacturing Quality — Print Defect', material:'FFG-22x14', cat:'Manufacturer' },
+  { date:'2025-06-03', status:'Open', desc:'Carrier Damage — Concealed', material:'DC-36x24', cat:'Carrier' },
+  { date:'2025-06-04', status:'Closed', desc:'Wrong Item Shipped', material:'RSC-16x12x8', cat:'Wrong Item' },
+  { date:'2025-06-05', status:'Open', desc:'Order Entry Error', material:'TRAY-24x16', cat:'Order Error' },
+  { date:'2025-06-05', status:'Closed', desc:'Manufacturing Quality — Score Off', material:'RSC-28x20', cat:'Manufacturer' },
+  { date:'2025-06-06', status:'Open', desc:'Missed Delivery Date', material:'HSC-12x10x8', cat:'Missed Delivery' },
+  { date:'2025-06-06', status:'Open', desc:'Carrier Damage', material:'SFF-24x18x6', cat:'Carrier' },
+  { date:'2025-06-10', status:'Open', desc:'Manufacturing Defect — Glue Failure', material:'CSSC-30x20', cat:'Manufacturer' },
+  { date:'2025-06-13', status:'Closed', desc:'Re/Credit — Customer Return', material:'PAD-48x40', cat:'Re/Credit' },
+];
+
+const cDetBody = document.getElementById('complaintDetail');
+complaintLog.forEach(c => {
+  const isOpen = c.status === 'Open';
+  cDetBody.innerHTML += `<tr>
+    <td>${c.date}</td>
+    <td><span class="status-dot ${isOpen?'status-open':'status-closed'}"></span>${c.status}</td>
+    <td>${c.desc}</td>
+    <td style="font-family:'IBM Plex Mono',monospace;font-size:11px">${c.material}</td>
+    <td>${c.cat}</td>
+  </tr>`;
+});
+
+// ─── SALVAGE DATA ───
+const salvageLog = [
+  { date:'2025-06-09', wo:'10742190', part:'PAD-40x32-BC', qty:40, code:'103', matCost:156.00, laborCost:38.40, net:117.60 },
+  { date:'2025-06-09', wo:'10742216', part:'RSC-26x20x12-200C', qty:15, code:'110', matCost:189.50, laborCost:42.00, net:147.50 },
+  { date:'2025-06-23', wo:'10746091', part:'FFG-22x14x10-200C', qty:30, code:'701', matCost:267.30, laborCost:67.50, net:199.80 },
+  { date:'2025-06-23', wo:'10746233', part:'RSC-18x14x10-200C', qty:22, code:'404', matCost:134.80, laborCost:36.00, net:98.80 },
+];
+
+const salBody = document.getElementById('salvageBody');
+salvageLog.forEach(s => {
+  salBody.innerHTML += `<tr>
+    <td>${s.date}</td><td>${s.wo}</td><td>${s.part}</td>
+    <td style="text-align:center">${s.qty}</td>
+    <td><strong>${s.code}</strong></td>
+    <td class="money">$${s.matCost.toFixed(2)}</td>
+    <td class="money">$${s.laborCost.toFixed(2)}</td>
+    <td class="money pos">$${s.net.toFixed(2)}</td>
+  </tr>`;
+});
+
+// ─── ADD ENTRY ───
+function addRejectEntry() {
+  const entry = {
+    date: document.getElementById('entryDate').value || new Date().toISOString().slice(0,10),
+    wo: document.getElementById('entryWO').value || '—',
+    part: document.getElementById('entryPart').value || '—',
+    desc: document.getElementById('entryNotes').value.substring(0,40) || 'Manual Entry',
+    qty: parseInt(document.getElementById('entryQty').value) || 0,
+    dept: document.getElementById('entryDept').value || '—',
+    code: document.getElementById('entryDefect').value || '420',
+    sev: document.getElementById('entrySeverity').value || 'Low',
+    cost: parseFloat(document.getElementById('entryCost').value) || 0,
+  };
+  rejectEntries.push(entry);
+  renderRejectLog(rejectEntries);
+  clearEntryForm();
+  document.querySelector('[data-tab="reject-log"]').click();
+}
+
+function clearEntryForm() {
+  ['entryDate','entryWO','entryPart','entryQty','entryCost','entryNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('entryDept').value = '';
+  document.getElementById('entryDefect').value = '';
+}
+
+function updateManualData() {
+  document.getElementById('kpiAcct').textContent = '$' + parseFloat(document.getElementById('manualAcct654').value).toLocaleString('en-US',{minimumFractionDigits:2});
+  document.getElementById('kpiReturns').textContent = '$' + parseFloat(document.getElementById('manualReturns').value).toLocaleString('en-US',{minimumFractionDigits:2});
+}
+
+// ─── CHARTS ───
+const chartColors = {
+  red: '#C00000', black: '#111111', grey: '#888888',
+  greyLight: '#D9D9D9', redLight: 'rgba(192,0,0,0.15)',
+  palette: ['#C00000','#111111','#666666','#B8860B','#1F4E79','#2E75B6','#8B0000','#444444','#B0B0B0']
+};
+
+// COQ Trend
+new Chart(document.getElementById('chartCOQTrend'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [{
+      label: 'Cost of Quality ($)',
+      data: [82400,78300,81100,76200,71800,74076],
+      borderColor: chartColors.red, backgroundColor: chartColors.redLight,
+      fill: true, tension: 0.3, borderWidth: 2, pointRadius: 4,
+      pointBackgroundColor: chartColors.red
+    }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}},
+    scales:{ y:{beginAtZero:false,ticks:{callback:v=>'$'+v.toLocaleString()}}} }
+});
+
+// Reject % of Production
+new Chart(document.getElementById('chartRejectPct'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [
+      { label:'Low %', data:[1.8,1.6,1.5,1.4,1.3,1.5], backgroundColor: chartColors.greyLight, borderRadius:4 },
+      { label:'Medium %', data:[2.4,2.3,2.1,2.0,1.9,2.2], backgroundColor: chartColors.red, borderRadius:4 }
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+    scales:{ y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}} }
+});
+
+// Dept bar chart
+new Chart(document.getElementById('chartDeptBar'), {
+  type: 'bar',
+  data: {
+    labels: departments.map(d=>d.name),
+    datasets: [
+      { label:'This Month', data:departments.map(d=>d.thisMonth), backgroundColor:chartColors.red, borderRadius:4 },
+      { label:'Prior Month', data:departments.map(d=>d.priorMonth), backgroundColor:chartColors.greyLight, borderRadius:4 }
+    ]
+  },
+  options: { responsive:true, indexAxis:'horizontal',
+    plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+    scales:{x:{ticks:{maxRotation:45}}, y:{ticks:{callback:v=>'$'+v}}} }
+});
+
+// Dept pie
+new Chart(document.getElementById('chartDeptPie'), {
+  type: 'doughnut',
+  data: {
+    labels: departments.map(d=>d.name),
+    datasets: [{ data:departments.map(d=>d.thisMonth), backgroundColor:chartColors.palette, borderWidth:1 }]
+  },
+  options: { responsive:true, plugins:{legend:{position:'right',labels:{font:{size:10}}}} }
+});
+
+// Pareto
+const paretoLabels = defectSummary.map(d=>d.cat.split('(')[0].trim());
+const paretoCosts = defectSummary.map(d=>d.cost).sort((a,b)=>b-a);
+let cumPct = 0;
+const cumPcts = paretoCosts.map(c => { cumPct += c/totalDefCost*100; return cumPct; });
+
+new Chart(document.getElementById('chartPareto'), {
+  type: 'bar',
+  data: {
+    labels: ['Operational','Board/Mat','Print/Graph','Gluing','Packing','Coating'],
+    datasets: [
+      { type:'bar', label:'Cost', data:paretoCosts, backgroundColor:chartColors.red, borderRadius:4, yAxisID:'y' },
+      { type:'line', label:'Cumulative %', data:cumPcts, borderColor:chartColors.black,
+        backgroundColor:'transparent', borderWidth:2, pointRadius:4, yAxisID:'y1' }
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+    scales:{ y:{beginAtZero:true,ticks:{callback:v=>'$'+v}}, y1:{position:'right',min:0,max:100,ticks:{callback:v=>v+'%'}} }}
+});
+
+// Defect distribution
+new Chart(document.getElementById('chartDefectDist'), {
+  type: 'polarArea',
+  data: {
+    labels: defectSummary.map(d=>d.cat.split('(')[0].trim()),
+    datasets: [{ data:defectSummary.map(d=>d.cost), backgroundColor:chartColors.palette.slice(0,6).map(c=>c+'CC') }]
+  },
+  options: { responsive:true, plugins:{legend:{position:'right',labels:{font:{size:10}}}} }
+});
+
+// Complaints chart
+new Chart(document.getElementById('chartComplaints'), {
+  type: 'bar',
+  data: {
+    labels: complaintCategories.map(c=>c.cat.split('—')[0].trim()),
+    datasets: [{ label:'Count', data:complaintCategories.map(c=>c.count), backgroundColor:chartColors.red, borderRadius:4 }]
+  },
+  options: { responsive:true, indexAxis:'y', plugins:{legend:{display:false}} }
+});
+
+// Open vs Closed
+new Chart(document.getElementById('chartOpenClosed'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [
+      { label:'Open', data:[8,6,9,7,10,12], backgroundColor:chartColors.red, borderRadius:4 },
+      { label:'Closed', data:[14,18,12,16,15,16], backgroundColor:chartColors.greyLight, borderRadius:4 }
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+    scales:{ x:{stacked:true}, y:{stacked:true} }}
+});
+
+// Set today's date on entry form
+document.getElementById('entryDate').valueAsDate = new Date();
+</script>
+</body>
+</html>
