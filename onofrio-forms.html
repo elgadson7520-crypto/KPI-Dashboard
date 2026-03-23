@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jack Onofrio Dog Shows - Online Forms</title>
+<style>
+  :root {
+    --primary: #1a5276;
+    --primary-light: #2980b9;
+    --accent: #c0392b;
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --border: #dcdde1;
+    --success: #27ae60;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff; padding: 20px 30px; display: flex; align-items: center; gap: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.2);
+  }
+  .header img { height: 60px; }
+  .header h1 { font-size: 1.6rem; font-weight: 700; }
+  .header p { font-size: .85rem; opacity: .85; }
+
+  /* LAYOUT */
+  .layout { display: flex; min-height: calc(100vh - 100px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 300px; min-width: 300px; background: var(--card); border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 0;
+  }
+  .sidebar h3 {
+    padding: 15px 20px; font-size: .75rem; text-transform: uppercase; letter-spacing: 1px;
+    color: #7f8c8d; background: #ecf0f1; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 1;
+  }
+  .sidebar a {
+    display: block; padding: 10px 20px; text-decoration: none; color: var(--text);
+    border-bottom: 1px solid #f0f0f0; font-size: .85rem; transition: .15s;
+  }
+  .sidebar a:hover { background: #ebf5fb; color: var(--primary); }
+  .sidebar a.active { background: var(--primary); color: #fff; font-weight: 600; }
+
+  /* MAIN CONTENT */
+  .main { flex: 1; padding: 30px; overflow-y: auto; }
+  .form-container { max-width: 900px; margin: 0 auto; }
+  .form-card {
+    background: var(--card); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    padding: 30px; margin-bottom: 20px; display: none;
+  }
+  .form-card.active { display: block; }
+  .form-card h2 { color: var(--primary); margin-bottom: 5px; font-size: 1.4rem; }
+  .form-card .form-subtitle { color: #7f8c8d; font-size: .85rem; margin-bottom: 20px; }
+  .form-card .pdf-link { font-size: .8rem; color: var(--accent); text-decoration: none; float: right; }
+  .form-card .pdf-link:hover { text-decoration: underline; }
+
+  /* FORM ELEMENTS */
+  .form-section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+  .form-section:last-child { border-bottom: none; }
+  .form-section h3 { font-size: 1rem; color: var(--primary); margin-bottom: 12px; }
+  .form-row { display: flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap; }
+  .form-group { flex: 1; min-width: 200px; }
+  .form-group.full { flex-basis: 100%; }
+  .form-group.half { flex: 0 0 calc(50% - 8px); }
+  .form-group.third { flex: 0 0 calc(33.33% - 10px); }
+  .form-group.quarter { flex: 0 0 calc(25% - 12px); min-width: 120px; }
+  .form-group label {
+    display: block; font-size: .78rem; font-weight: 600; margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: .5px; color: #555;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px;
+    font-size: .9rem; font-family: inherit; transition: .2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--primary-light); outline: none; box-shadow: 0 0 0 3px rgba(41,128,185,.15);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  /* CHECKBOXES & RADIOS */
+  .check-group { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 12px; }
+  .check-item { display: flex; align-items: center; gap: 6px; font-size: .88rem; }
+  .check-item input { width: auto; }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 24px; border: none; border-radius: 5px; font-size: .9rem; font-weight: 600;
+    cursor: pointer; transition: .2s; font-family: inherit;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-light); }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { background: #219a52; }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* WELCOME */
+  .welcome { text-align: center; padding: 60px 20px; }
+  .welcome h2 { font-size: 1.8rem; color: var(--primary); margin-bottom: 15px; }
+  .welcome p { color: #7f8c8d; max-width: 500px; margin: 0 auto 20px; line-height: 1.6; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 30px; right: 30px; background: var(--success); color: #fff;
+    padding: 14px 24px; border-radius: 6px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    transform: translateY(100px); opacity: 0; transition: .3s; z-index: 999;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* EMAIL CONFIG */
+  .email-config {
+    background: #fef9e7; border: 1px solid #f9e79f; border-radius: 6px; padding: 15px 20px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .email-config label { font-weight: 600; font-size: .85rem; white-space: nowrap; }
+  .email-config input { flex: 1; min-width: 250px; padding: 8px 12px; border: 1px solid #f0c040; border-radius: 4px; font-size: .9rem; }
+  .email-config .btn { white-space: nowrap; }
+
+  /* REPEATING ROWS */
+  .repeat-row { background: #f8f9fa; padding: 10px 15px; border-radius: 4px; margin-bottom: 8px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; max-height: 300px; }
+    .form-group.half, .form-group.third, .form-group.quarter { flex-basis: 100%; }
+  }
+
+  /* PRINT */
+  @media print {
+    .sidebar, .header, .btn-row, .email-config, .pdf-link { display: none !important; }
+    .form-card { display: block !important; box-shadow: none; border: 1px solid #ccc; }
+    .main { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Jack Onofrio Dog Shows, LLC</h1>
+    <p>Online Forms Portal &mdash; Fill out and submit forms electronically</p>
+  </div>
+</div>
+
+<div class="email-config">
+  <label>Submission Email:</label>
+  <input type="email" id="submissionEmail" placeholder="Enter the email address for form submissions..." />
+  <button class="btn btn-primary" onclick="saveEmail()">Save</button>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <h3>General Forms</h3>
+    <a href="#" data-form="welcome" class="active">Home</a>
+    <a href="#" data-form="entry">Standard Entry Form</a>
+    <a href="#" data-form="addrchng">Change of Address</a>
+    <a href="#" data-form="canclreq">Request for Entry Cancellation</a>
+    <a href="#" data-form="classchg">Change of Class</a>
+    <a href="#" data-form="entrycor">Entry Form Correction</a>
+    <a href="#" data-form="maillist">Request Addition to Mailing List</a>
+    <a href="#" data-form="plrequest">Premium List / Judging Program Request</a>
+    <a href="#" data-form="breedlst">Confirmation of Judge Assignment</a>
+
+    <h3>Advertising</h3>
+    <a href="#" data-form="addlist">Advertisement Listing Sheet</a>
+    <a href="#" data-form="advord">Advertiser's Order</a>
+
+    <h3>Club Administration</h3>
+    <a href="#" data-form="officers">Club Officers Addresses</a>
+    <a href="#" data-form="suptinfo">Superintendent Information</a>
+
+    <h3>Ribbon Orders</h3>
+    <a href="#" data-form="ribnakc">AKC Ribbon Order</a>
+    <a href="#" data-form="ribnmtch">Match Ribbon Order</a>
+    <a href="#" data-form="ribnspec">AKC Specialty Ribbon Order</a>
+
+    <h3>Judging Sheets</h3>
+    <a href="#" data-form="judgesworksheet">Judges Worksheet</a>
+    <a href="#" data-form="windog">Judges Sheet Dogs</a>
+    <a href="#" data-form="winbitch">Judges Sheet Bitches</a>
+    <a href="#" data-form="bestmtch">Best In Match</a>
+    <a href="#" data-form="nonreg">Non-Regular Class</a>
+    <a href="#" data-form="winners">Winners Sheet</a>
+
+    <h3>Obedience Judge Sheets</h3>
+    <a href="#" data-form="obed-begnova">Beginner Novice A</a>
+    <a href="#" data-form="obed-begnovb">Beginner Novice B</a>
+    <a href="#" data-form="obed-brace">Brace Class</a>
+    <a href="#" data-form="obed-gradnov">Graduate Novice</a>
+    <a href="#" data-form="obed-gradopen">Graduate Open</a>
+    <a href="#" data-form="obed-nova">Novice A</a>
+    <a href="#" data-form="obed-novb">Novice B</a>
+    <a href="#" data-form="obed-opena">Open A</a>
+    <a href="#" data-form="obed-openb">Open B</a>
+    <a href="#" data-form="obed-prenov">Preferred Novice</a>
+    <a href="#" data-form="obed-preopen">Preferred Open</a>
+    <a href="#" data-form="obed-preutil">Preferred Utility</a>
+    <a href="#" data-form="obed-team">Team Class</a>
+    <a href="#" data-form="obed-utila">Utility A</a>
+    <a href="#" data-form="obed-utilb">Utility B</a>
+    <a href="#" data-form="obed-versa">Versatility</a>
+    <a href="#" data-form="obed-veteran">Veteran</a>
+  </nav>
+
+  <div class="main">
+    <div class="form-container">
+
+      <!-- WELCOME -->
+      <div class="form-card active" id="form-welcome">
+        <div class="welcome">
+          <h2>Welcome to Onofrio Online Forms</h2>
+          <p>Select a form from the sidebar to fill it out online. When complete, click "Submit via Email" to send the completed form data to the configured email address.</p>
+          <p style="font-size:.8rem;color:#95a5a6;">All 38 official Onofrio Dog Shows forms are available here. Original PDF versions can be downloaded from <a href="https://www.onofrio.com/forms/forms.html" target="_blank">onofrio.com</a>.</p>
+        </div>
+      </div>
+
+      <!-- ===== STANDARD ENTRY FORM ===== -->
+      <div class="form-card" id="form-entry">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/entry.pdf" target="_blank">Download Original PDF</a>
+        <h2>Official AKC Entry Form</h2>
+        <p class="form-subtitle">Both sides of entry form must be submitted</p>
+        <form onsubmit="return submitForm(event, 'Standard Entry Form')">
+          <div class="form-section">
+            <h3>Show Information</h3>
+            <div class="form-row">
+              <div class="form-group full"><label>Show Name</label><input type="text" name="show_name" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Entry Fees Enclosed $</label><input type="text" name="entry_fees"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Dog Information</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Breed</label><input type="text" name="breed" required></div>
+              <div class="form-group quarter"><label>Variety</label><input type="text" name="variety"></div>
+              <div class="form-group quarter"><label>Sex</label>
+                <select name="sex"><option value="">--</option><option>Dog</option><option>Bitch</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Dog Show Class</label><input type="text" name="dog_class"></div>
+              <div class="form-group"><label>Show Division</label><input type="text" name="show_division"></div>
+              <div class="form-group"><label>Class (Weight, Color, Etc.)</label><input type="text" name="class_detail"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group quarter"><label>Additional Classes</label><input type="text" name="additional_classes"></div>
+              <div class="form-group quarter"><label>Obedience Class (Jump Ht)</label><input type="text" name="obedience_class"></div>
+              <div class="form-group quarter"><label>Rally Class (Jump Ht)</label><input type="text" name="rally_class"></div>
+              <div class="form-group quarter"><label>Jr. Showmanship Class</label><input type="text" name="jr_showmanship_class"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Name of Junior Handler (if any)</label><input type="text" name="jr_handler_name"></div>
+              <div class="form-group quarter"><label>Jr. Handler AKC #</label><input type="text" name="jr_handler_akc"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group full"><label>Full Name of Dog</label><input type="text" name="dog_name" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Registration Type</label>
+                <select name="reg_type">
+                  <option value="AKC">AKC Reg. No.</option>
+                  <option value="PAL">PAL No.</option>
+                  <option value="Foreign">Foreign Reg. No. &amp; Country</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Registration Number</label><input type="text" name="reg_number"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group half"><label>Date of Birth</label><input type="date" name="dob"></div>
+              <div class="form-group half"><label>Place of Birth (Country)</label><input type="text" name="place_of_birth"></div>
+            </div>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="do_not_print"> Do not print the above in the catalog</label>
+            </div>
+            <div class="form-row">
+              <div class="form-group full"><label>Breeder</label><input type="text" name="breeder"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group half"><label>Sire</label><input type="text" name="sire"></div>
+              <div class="form-group half"><label>Dam</label><input type="text" name="dam"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Owner Information</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Exhibitor's Code</label><input type="text" name="exhibitor_code" maxlength="5"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group full"><label>Actual Owner(s)</label><input type="text" name="owner_name" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group full"><label>Owner's Address</label><input type="text" name="owner_address"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>City</label><input type="text" name="owner_city"></div>
+              <div class="form-group quarter"><label>State</label><input type="text" name="owner_state" maxlength="2"></div>
+              <div class="form-group quarter"><label>ZIP+4</label><input type="text" name="owner_zip"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Name of Owner's Agent (if any) at This Show</label><input type="text" name="agent_name"></div>
+              <div class="form-group quarter"><label>Agent Code #</label><input type="text" name="agent_code"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Certification &amp; Contact</h3>
+            <div class="form-row">
+              <div class="form-group full"><label>Signature (Type Full Name)</label><input type="text" name="signature" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Telephone</label><input type="tel" name="telephone"></div>
+              <div class="form-group"><label>Email Address</label><input type="email" name="email"></div>
+            </div>
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="new_exhibitor" value="yes"> New Exhibitor: Yes</label>
+              <label class="check-item"><input type="radio" name="new_exhibitor" value="no"> New Exhibitor: No</label>
+              <label class="check-item"><input type="radio" name="owner_handled" value="yes"> Owner-Handled Eligible: Yes</label>
+              <label class="check-item"><input type="radio" name="owner_handled" value="no"> Owner-Handled Eligible: No</label>
+            </div>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="printed_program"> Check to receive a printed judging program</label>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Emergency Contact</label><input type="text" name="emergency_contact"></div>
+              <div class="form-group"><label>Emergency Telephone</label><input type="tel" name="emergency_phone"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Junior Showmanship (if applicable)</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Jr's Date of Birth</label><input type="date" name="jr_dob"></div>
+              <div class="form-group"><label>AKC Jr Handler Number</label><input type="text" name="jr_akc_number"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group full"><label>Jr Handler Address</label><input type="text" name="jr_address"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>City</label><input type="text" name="jr_city"></div>
+              <div class="form-group quarter"><label>State</label><input type="text" name="jr_state" maxlength="2"></div>
+              <div class="form-group quarter"><label>ZIP</label><input type="text" name="jr_zip"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('entry')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== CHANGE OF ADDRESS ===== -->
+      <div class="form-card" id="form-addrchng">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/addrchng.pdf" target="_blank">Download Original PDF</a>
+        <h2>Change of Address</h2>
+        <p class="form-subtitle">Form ADDRCH 1007</p>
+        <form onsubmit="return submitForm(event, 'Change of Address')">
+          <div class="form-section">
+            <h3>Old Information</h3>
+            <div class="form-row"><div class="form-group full"><label>Name</label><input type="text" name="old_name" required></div></div>
+            <div class="form-row"><div class="form-group full"><label>Address</label><input type="text" name="old_address"></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>City</label><input type="text" name="old_city"></div>
+              <div class="form-group quarter"><label>State</label><input type="text" name="old_state" maxlength="2"></div>
+              <div class="form-group quarter"><label>ZIP</label><input type="text" name="old_zip"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>New Information</h3>
+            <div class="form-row"><div class="form-group full"><label>Name</label><input type="text" name="new_name" required></div></div>
+            <div class="form-row"><div class="form-group full"><label>Address</label><input type="text" name="new_address"></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>City</label><input type="text" name="new_city"></div>
+              <div class="form-group quarter"><label>State</label><input type="text" name="new_state" maxlength="2"></div>
+              <div class="form-group quarter"><label>ZIP</label><input type="text" name="new_zip"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Type</h3>
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="type" value="breed" required> Breed Only</label>
+              <label class="check-item"><input type="radio" name="type" value="obedience"> Obedience Only</label>
+              <label class="check-item"><input type="radio" name="type" value="both"> Breed &amp; Obedience</label>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Breed</label><input type="text" name="breed"></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('addrchng')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== REQUEST FOR CANCELLATION ===== -->
+      <div class="form-card" id="form-canclreq">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/canclreq.pdf" target="_blank">Download Original PDF</a>
+        <h2>Request for Entry Cancellation</h2>
+        <p class="form-subtitle">Form 1009</p>
+        <form onsubmit="return submitForm(event, 'Request for Entry Cancellation')">
+          <div class="form-section">
+            <h3>Reason for Cancellation</h3>
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="reason" value="judge_change" required> Due to Change of Judge</label>
+              <label class="check-item"><input type="radio" name="reason" value="bitch_season"> Due to Bitch in Season (Obedience &amp; Agility only when offered)</label>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Entry Details</h3>
+            <div class="form-row"><div class="form-group full"><label>Show</label><input type="text" name="show" required></div></div>
+            <div class="form-row">
+              <div class="form-group half"><label>Day</label><input type="text" name="day"></div>
+              <div class="form-group half"><label>Date</label><input type="date" name="date"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group half"><label>Breed</label><input type="text" name="breed"></div>
+              <div class="form-group quarter"><label>Class</label><input type="text" name="class"></div>
+              <div class="form-group quarter"><label>Armband No.</label><input type="text" name="armband"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Dog's Name</label><input type="text" name="dog_name" required></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Send Refund To</h3>
+            <p style="font-size:.8rem;color:#7f8c8d;margin-bottom:10px;">Entries submitted with credit card will be refunded to the original card.</p>
+            <div class="form-row"><div class="form-group full"><label>Name</label><input type="text" name="refund_name"></div></div>
+            <div class="form-row"><div class="form-group full"><label>Address</label><input type="text" name="refund_address"></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>City</label><input type="text" name="refund_city"></div>
+              <div class="form-group quarter"><label>State</label><input type="text" name="refund_state" maxlength="2"></div>
+              <div class="form-group quarter"><label>ZIP</label><input type="text" name="refund_zip"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Signature (Type Full Name)</label><input type="text" name="signature" required></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('canclreq')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== CHANGE OF CLASS ===== -->
+      <div class="form-card" id="form-classchg">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/classchg.pdf" target="_blank">Download Original PDF</a>
+        <h2>Change of Class Authorization</h2>
+        <p class="form-subtitle">Form 1005</p>
+        <form onsubmit="return submitForm(event, 'Change of Class Authorization')">
+          <div class="form-section">
+            <h3>Category</h3>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="cat_bob"> BOB/BOV</label>
+              <label class="check-item"><input type="checkbox" name="cat_puppy"> Puppy Class</label>
+              <label class="check-item"><input type="checkbox" name="cat_jr"> Junior Showmanship</label>
+              <label class="check-item"><input type="checkbox" name="cat_obed"> Obed/Rally</label>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Show Entries</h3>
+            <div id="classchange-shows"></div>
+          </div>
+          <div class="form-section">
+            <h3>Dog Information</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Breed</label><input type="text" name="breed"></div>
+              <div class="form-group quarter"><label>Variety</label><input type="text" name="variety"></div>
+              <div class="form-group quarter"><label>Sex</label><select name="sex"><option value="">--</option><option>Dog</option><option>Bitch</option></select></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group half"><label>Dog Show Class Originally In</label><input type="text" name="original_class"></div>
+              <div class="form-group half"><label>Indicate New Class</label><input type="text" name="new_class"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Full Name of Dog</label><input type="text" name="dog_name" required></div></div>
+            <div class="form-row">
+              <div class="form-group half"><label>AKC Reg #</label><input type="text" name="akc_reg"></div>
+              <div class="form-group half"><label>Name of Junior Handler</label><input type="text" name="jr_handler"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Signature (Type Full Name)</label><input type="text" name="signature" required></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('classchg')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== ENTRY FORM CORRECTION ===== -->
+      <div class="form-card" id="form-entrycor">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/entrycor.pdf" target="_blank">Download Original PDF</a>
+        <h2>Correction for Entry Form</h2>
+        <p class="form-subtitle">Form ENTRY 1003 &mdash; To be mailed to AKC, ATTN: Event Records</p>
+        <form onsubmit="return submitForm(event, 'Entry Form Correction')">
+          <div class="form-section">
+            <div class="form-row"><div class="form-group full"><label>Show</label><input type="text" name="show" required></div></div>
+            <div class="form-row">
+              <div class="form-group half"><label>Arm Band #</label><input type="text" name="armband" required></div>
+              <div class="form-group half"><label>Date</label><input type="date" name="date"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group half"><label>Breed</label><input type="text" name="breed"></div>
+              <div class="form-group half"><label>AKC Registration / Litter #</label><input type="text" name="akc_reg"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group full"><label>Correction to Be Made</label><textarea name="correction" rows="5" required></textarea></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Signature (Type Full Name)</label><input type="text" name="signature" required></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('entrycor')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== MAILING LIST ===== -->
+      <div class="form-card" id="form-maillist">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/maillist.pdf" target="_blank">Download Original PDF</a>
+        <h2>Request to Be Put on Mailing List</h2>
+        <p class="form-subtitle">Form 1010</p>
+        <form onsubmit="return submitForm(event, 'Request Addition to Mailing List')">
+          <div class="form-section">
+            <div class="form-row"><div class="form-group full"><label>Name</label><input type="text" name="name" required></div></div>
+            <div class="form-row"><div class="form-group full"><label>Address</label><input type="text" name="address"></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>City</label><input type="text" name="city"></div>
+              <div class="form-group quarter"><label>State</label><input type="text" name="state" maxlength="2"></div>
+              <div class="form-group quarter"><label>ZIP</label><input type="text" name="zip"></div>
+            </div>
+            <div class="form-row"><div class="form-group half"><label>Registration Number</label><input type="text" name="reg_number"></div></div>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="obedience_only"> Obedience Only</label>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Breed</label><input type="text" name="breed"></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Previous Mailing List Address (if applicable)</h3>
+            <div class="form-row"><div class="form-group full"><label>Old Address</label><input type="text" name="old_address"></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>City</label><input type="text" name="old_city"></div>
+              <div class="form-group quarter"><label>State</label><input type="text" name="old_state" maxlength="2"></div>
+              <div class="form-group quarter"><label>ZIP</label><input type="text" name="old_zip"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('maillist')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== PREMIUM LIST REQUEST ===== -->
+      <div class="form-card" id="form-plrequest">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/plrequest.pdf" target="_blank">Download Original PDF</a>
+        <h2>Premium List / Judging Program Request</h2>
+        <p class="form-subtitle">Form 1001</p>
+        <form onsubmit="return submitForm(event, 'Premium List / Judging Program Request')">
+          <div class="form-section">
+            <div class="form-row"><div class="form-group full"><label>Name</label><input type="text" name="name" required></div></div>
+            <div class="form-row"><div class="form-group full"><label>Address</label><input type="text" name="address"></div></div>
+            <div class="form-row"><div class="form-group full"><label>Address Line 2</label><input type="text" name="address2"></div></div>
+            <div class="form-row"><div class="form-group full"><label>PL Request (Show Name/Date)</label><input type="text" name="pl_request"></div></div>
+            <div class="form-row"><div class="form-group full"><label>JP Request (Show Name/Date)</label><input type="text" name="jp_request"></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Change of Address (if applicable)</h3>
+            <div class="form-row"><div class="form-group full"><label>Old Address Line 1</label><input type="text" name="old_address1"></div></div>
+            <div class="form-row"><div class="form-group full"><label>Old Address Line 2</label><input type="text" name="old_address2"></div></div>
+            <div class="form-row"><div class="form-group full"><label>Old Address Line 3</label><input type="text" name="old_address3"></div></div>
+          </div>
+          <div class="form-section">
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="add_mailing" value="yes"> Add to mailing list: Yes</label>
+              <label class="check-item"><input type="radio" name="add_mailing" value="no"> Add to mailing list: No</label>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Breeds</label><input type="text" name="breeds"></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('plrequest')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== JUDGE ASSIGNMENT CONFIRMATION ===== -->
+      <div class="form-card" id="form-breedlst">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/breedlst.pdf" target="_blank">Download Original PDF</a>
+        <h2>Confirmation of Judge Assignment (List of Breeds)</h2>
+        <form onsubmit="return submitForm(event, 'Confirmation of Judge Assignment')">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Name of Club</label><input type="text" name="club_name" required></div>
+              <div class="form-group quarter"><label>Show Date</label><input type="date" name="show_date"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Location</label><input type="text" name="location"></div></div>
+            <div class="form-row"><div class="form-group full"><label>Judge Name</label><input type="text" name="judge_name" required></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Breed Assignments (list all assigned breeds)</h3>
+            <div class="form-row"><div class="form-group full"><label>Assigned Breeds</label><textarea name="assigned_breeds" rows="6" placeholder="List each breed on a new line..."></textarea></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Additional Assignments</h3>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="best_in_show"> Best in Show</label>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Obedience Classes</label><input type="text" name="obedience_classes" placeholder="e.g., Novice, Open, Utility..."></div></div>
+            <div class="form-row"><div class="form-group full"><label>Rally Classes</label><input type="text" name="rally_classes" placeholder="e.g., Novice, Advanced, Excellent..."></div></div>
+            <div class="form-row"><div class="form-group full"><label>Non-Regular Classes</label><input type="text" name="nonreg_classes"></div></div>
+          </div>
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Club Official Name &amp; Title</label><input type="text" name="official_name"></div>
+              <div class="form-group"><label>Signature (Type Full Name)</label><input type="text" name="signature"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('breedlst')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== ADVERTISEMENT LISTING SHEET ===== -->
+      <div class="form-card" id="form-addlist">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/addlist.pdf" target="_blank">Download Original PDF</a>
+        <h2>Advertisement Listing Sheet</h2>
+        <p class="form-subtitle">To be filled in by Ad Chairman and returned with ad package</p>
+        <form onsubmit="return submitForm(event, 'Advertisement Listing Sheet')">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Kennel Club</label><input type="text" name="kennel_club" required></div>
+              <div class="form-group"><label>Ad Chairman</label><input type="text" name="ad_chairman"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group third"><label>Show Date</label><input type="date" name="show_date"></div>
+              <div class="form-group third"><label>Email</label><input type="email" name="email"></div>
+              <div class="form-group third"><label>Phone</label><input type="tel" name="phone"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Ad Entries</h3>
+            <div id="adlist-rows"></div>
+            <button type="button" class="btn btn-outline" onclick="addAdRow()" style="margin-top:8px;">+ Add Ad Entry</button>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('addlist')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== ADVERTISER'S ORDER ===== -->
+      <div class="form-card" id="form-advord">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/advord.pdf" target="_blank">Download Original PDF</a>
+        <h2>Advertiser's Order</h2>
+        <p class="form-subtitle">All advertising orders are subject to club approval</p>
+        <form onsubmit="return submitForm(event, 'Advertisers Order')">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Club Name</label><input type="text" name="club_name" required></div>
+              <div class="form-group quarter"><label>Show Date</label><input type="date" name="show_date"></div>
+              <div class="form-group quarter"><label>Ad Number</label><input type="text" name="ad_number"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Advertiser's Name (Signature)</label><input type="text" name="advertiser_name" required></div>
+              <div class="form-group quarter"><label>Amount Enclosed $</label><input type="text" name="amount"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Address</label><input type="text" name="address"></div></div>
+            <div class="form-row">
+              <div class="form-group half"><label>Telephone</label><input type="tel" name="phone"></div>
+              <div class="form-group half"><label>Email</label><input type="email" name="email"></div>
+            </div>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="bill_later"> Bill Me Later</label>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Ad Size</h3>
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="ad_size" value="full"> Full Page (4.5" x 7.33")</label>
+              <label class="check-item"><input type="radio" name="ad_size" value="half"> Half Page (4.5" x 3.667")</label>
+              <label class="check-item"><input type="radio" name="ad_size" value="quarter"> Quarter Page (4.5" x 1.833")</label>
+            </div>
+            <div class="form-row">
+              <div class="form-group half"><label>Deadline Due to Ad Chairman</label><input type="date" name="deadline"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Options</h3>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="photo_enclosed"> Photo Enclosed</label>
+              <label class="check-item"><input type="checkbox" name="return_art"> Return Art</label>
+              <label class="check-item"><input type="checkbox" name="reuse_ad"> Reuse Ad from Past Catalog</label>
+              <label class="check-item"><input type="checkbox" name="do_not_edit"> Do Not Edit Ad</label>
+              <label class="check-item"><input type="checkbox" name="bleed_ad"> Bleed Ad</label>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Placement Preference</label><input type="text" name="placement" placeholder="e.g., near front, within Poodle entries..."></div></div>
+            <div class="form-row"><div class="form-group full"><label>Reuse Info (Club Name &amp; Date)</label><input type="text" name="reuse_info"></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Ad Content / Description</h3>
+            <div class="form-row"><div class="form-group full"><label>Ad Text / Instructions</label><textarea name="ad_content" rows="6" placeholder="Describe the ad content, text, and layout..."></textarea></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('advord')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== CLUB OFFICERS ===== -->
+      <div class="form-card" id="form-officers">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/officers.pdf" target="_blank">Download Original PDF</a>
+        <h2>Club Officers Addresses</h2>
+        <form onsubmit="return submitForm(event, 'Club Officers Addresses')">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Club Name</label><input type="text" name="club" required></div>
+              <div class="form-group quarter"><label>Show Date</label><input type="date" name="show_date"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Club's Web Site Address</label><input type="url" name="website"></div></div>
+          </div>
+          <div id="officers-list"></div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('officers')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== SUPERINTENDENT INFO ===== -->
+      <div class="form-card" id="form-suptinfo">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/suptinfo.pdf" target="_blank">Download Original PDF</a>
+        <h2>For Superintendent's Information Only</h2>
+        <form onsubmit="return submitForm(event, 'Superintendent Information')">
+          <div class="form-section">
+            <div class="form-row"><div class="form-group full"><label>Time Superintendent Will Have Access</label><input type="text" name="access_time"></div></div>
+          </div>
+          <div class="form-section" id="supt-contacts"></div>
+          <div class="form-section">
+            <h3>Single Breed Specialties</h3>
+            <div class="check-group">
+              <label class="check-item"><input type="radio" name="address_labels" value="yes"> Sending address labels: Yes</label>
+              <label class="check-item"><input type="radio" name="address_labels" value="no"> No</label>
+            </div>
+            <div class="form-row"><div class="form-group quarter"><label>How Many?</label><input type="number" name="label_count"></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Catalog Cover</h3>
+            <div class="form-row">
+              <div class="form-group half"><label>Primary Ink Color</label><input type="text" name="primary_ink"></div>
+              <div class="form-group half"><label>Secondary Ink Color</label><input type="text" name="secondary_ink"></div>
+            </div>
+            <div class="check-group">
+              <label class="check-item"><input type="checkbox" name="use_previous"> Use previous design from:</label>
+              <label class="check-item"><input type="checkbox" name="different_design"> Different design from last show</label>
+              <label class="check-item"><input type="checkbox" name="club_artwork"> Artwork will be submitted by club</label>
+              <label class="check-item"><input type="checkbox" name="no_preference"> No preference</label>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Previous Design From (Date)</label><input type="text" name="previous_date"></div></div>
+            <div class="form-row"><div class="form-group full"><label>Special Instructions for Catalog Covers</label><textarea name="cover_instructions" rows="3"></textarea></div></div>
+          </div>
+          <div class="form-section">
+            <h3>Combined Catalog (if applicable)</h3>
+            <div class="form-row">
+              <div class="form-group half"><label>Show 1</label><input type="text" name="combined_show1"></div>
+              <div class="form-group half"><label>Show 2</label><input type="text" name="combined_show2"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group half"><label>Show 3</label><input type="text" name="combined_show3"></div>
+              <div class="form-group half"><label>Show 4</label><input type="text" name="combined_show4"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Premium List</h3>
+            <div class="form-row"><div class="form-group half"><label>Color of Ink</label><input type="text" name="pl_ink_color"></div></div>
+            <div class="form-row"><div class="form-group full"><label>Special Instructions for Premium Lists</label><textarea name="pl_instructions" rows="3"></textarea></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('suptinfo')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== RIBBON ORDER FORMS ===== -->
+      <!-- AKC Ribbon Order -->
+      <div class="form-card" id="form-ribnakc">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/ribnakc.pdf" target="_blank">Download Original PDF</a>
+        <h2>AKC Ribbon Order</h2>
+        <form onsubmit="return submitForm(event, 'AKC Ribbon Order')">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Show</label><input type="text" name="show" required></div>
+              <div class="form-group"><label>Location</label><input type="text" name="location"></div>
+            </div>
+            <div class="form-row"><div class="form-group half"><label>Date of Show</label><input type="date" name="show_date"></div></div>
+          </div>
+          <div class="form-section" id="ribbon-akc-fields"></div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('ribnakc')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Match Ribbon Order -->
+      <div class="form-card" id="form-ribnmtch">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/ribnmtch.pdf" target="_blank">Download Original PDF</a>
+        <h2>Match Ribbon Order Information &amp; Price List</h2>
+        <form onsubmit="return submitForm(event, 'Match Ribbon Order')">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Club Name</label><input type="text" name="club" required></div>
+              <div class="form-group quarter"><label>Match Date</label><input type="date" name="match_date"></div>
+            </div>
+            <div class="form-row"><div class="form-group full"><label>Location</label><input type="text" name="location"></div></div>
+            <div class="form-row">
+              <div class="form-group"><label>Contact Name</label><input type="text" name="contact_name"></div>
+              <div class="form-group"><label>Phone</label><input type="tel" name="phone"></div>
+              <div class="form-group"><label>Email</label><input type="email" name="email"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h3>Ribbon Quantities</h3>
+            <div class="form-row"><div class="form-group full"><label>Ribbon Order Details</label><textarea name="ribbon_order" rows="8" placeholder="List ribbon types and quantities needed..."></textarea></div></div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('ribnmtch')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- AKC Specialty Ribbon Order -->
+      <div class="form-card" id="form-ribnspec">
+        <a class="pdf-link" href="https://www.onofrio.com/forms/ribnspec.pdf" target="_blank">Download Original PDF</a>
+        <h2>AKC Specialty Ribbon Order</h2>
+        <form onsubmit="return submitForm(event, 'AKC Specialty Ribbon Order')">
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group"><label>Show</label><input type="text" name="show" required></div>
+              <div class="form-group"><label>Location</label><input type="text" name="location"></div>
+            </div>
+            <div class="form-row"><div class="form-group half"><label>Date of Show</label><input type="date" name="show_date"></div></div>
+          </div>
+          <div class="form-section" id="ribbon-spec-fields"></div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-success">Submit via Email</button>
+            <button type="button" class="btn btn-outline" onclick="printForm('ribnspec')">Print</button>
+            <button type="reset" class="btn btn-outline">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===== JUDGING SHEET FORMS (template-based) ===== -->
+    </div><!-- form-container -->
+  </div><!-- main -->
+</div><!-- layout -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DYNAMIC FORM GENERATION =====
+
+// Generate judging sheet forms
+const judgingSheets = [
+  { id: 'judgesworksheet', title: 'Judges Worksheet', pdf: 'judgesworksheet.pdf' },
+  { id: 'windog', title: 'Judges Sheet - Dogs', pdf: 'windog.pdf' },
+  { id: 'winbitch', title: 'Judges Sheet - Bitches', pdf: 'winbitch.pdf' },
+  { id: 'bestmtch', title: 'Best In Match', pdf: 'bestmtch.pdf' },
+  { id: 'nonreg', title: 'Non-Regular Class', pdf: 'nonreg.pdf' },
+  { id: 'winners', title: 'Winners Sheet', pdf: 'winners.pdf' },
+];
+
+const obedSheets = [
+  { id: 'obed-begnova', title: 'Beginner Novice A Class', pdf: 'obed-begnova.pdf' },
+  { id: 'obed-begnovb', title: 'Beginner Novice B Class', pdf: 'obed-begnovb.pdf' },
+  { id: 'obed-brace', title: 'Brace Class', pdf: 'obed-brace.pdf' },
+  { id: 'obed-gradnov', title: 'Graduate Novice Class', pdf: 'obed-gradnov.pdf' },
+  { id: 'obed-gradopen', title: 'Graduate Open Class', pdf: 'obed-gradopen.pdf' },
+  { id: 'obed-nova', title: 'Novice A Class', pdf: 'obed-nova.pdf' },
+  { id: 'obed-novb', title: 'Novice B Class', pdf: 'obed-novb.pdf' },
+  { id: 'obed-opena', title: 'Open A Class', pdf: 'obed-opena.pdf' },
+  { id: 'obed-openb', title: 'Open B Class', pdf: 'obed-openb.pdf' },
+  { id: 'obed-prenov', title: 'Preferred Novice Class', pdf: 'obed-prenov.pdf' },
+  { id: 'obed-preopen', title: 'Preferred Open Class', pdf: 'obed-preopen.pdf' },
+  { id: 'obed-preutil', title: 'Preferred Utility Class', pdf: 'obed-preutil.pdf' },
+  { id: 'obed-team', title: 'Team Class', pdf: 'obed-team.pdf' },
+  { id: 'obed-utila', title: 'Utility A Class', pdf: 'obed-utila.pdf' },
+  { id: 'obed-utilb', title: 'Utility B Class', pdf: 'obed-utilb.pdf' },
+  { id: 'obed-versa', title: 'Versatility Class', pdf: 'obed-versa.pdf' },
+  { id: 'obed-veteran', title: 'Veteran Class', pdf: 'obed-veteran.pdf' },
+];
+
+function makeJudgingForm(sheet, isObed) {
+  const baseUrl = 'https://www.onofrio.com/forms/';
+  let html = `
+    <div class="form-card" id="form-${sheet.id}">
+      <a class="pdf-link" href="${baseUrl}${sheet.pdf}" target="_blank">Download Original PDF</a>
+      <h2>${sheet.title}</h2>
+      <p class="form-subtitle">${isObed ? 'Obedience Judge Sheet' : 'Judging Sheet'}</p>
+      <form onsubmit="return submitForm(event, '${sheet.title}')">
+        <div class="form-section">
+          <div class="form-row">
+            <div class="form-group"><label>Show</label><input type="text" name="show" required></div>
+            <div class="form-group quarter"><label>Date</label><input type="date" name="date"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Judge Name</label><input type="text" name="judge"></div>
+            <div class="form-group quarter"><label>Ring #</label><input type="text" name="ring"></div>
+          </div>
+          ${!isObed ? `
+          <div class="form-row">
+            <div class="form-group"><label>Breed</label><input type="text" name="breed"></div>
+            <div class="form-group quarter"><label>Variety</label><input type="text" name="variety"></div>
+            <div class="form-group quarter"><label>Sex</label><select name="sex"><option value="">--</option><option>Dog</option><option>Bitch</option></select></div>
+          </div>` : `
+          <div class="form-row">
+            <div class="form-group"><label>Class</label><input type="text" name="class" value="${sheet.title}"></div>
+          </div>`}
+        </div>
+        <div class="form-section">
+          <h3>Entries</h3>`;
+
+  const entryCount = isObed ? 10 : 8;
+  for (let i = 1; i <= entryCount; i++) {
+    html += `
+          <div class="repeat-row">
+            <div class="form-row">
+              <div class="form-group quarter"><label>#${i} Armband</label><input type="text" name="entry${i}_armband"></div>
+              <div class="form-group"><label>Dog Name</label><input type="text" name="entry${i}_name"></div>
+              ${isObed ? `
+              <div class="form-group quarter"><label>Score</label><input type="number" name="entry${i}_score" step="0.5"></div>
+              <div class="form-group quarter"><label>Qualifying</label><select name="entry${i}_qualifying"><option value="">--</option><option>Yes</option><option>No</option></select></div>
+              ` : `
+              <div class="form-group quarter"><label>Placement</label><select name="entry${i}_place"><option value="">--</option><option>1st</option><option>2nd</option><option>3rd</option><option>4th</option><option>ABS</option><option>WD</option><option>DQ</option></select></div>
+              `}
+            </div>
+          </div>`;
+  }
+
+  html += `
+        </div>
+        <div class="form-section">
+          <h3>Results</h3>
+          ${isObed ? `
+          <div class="form-row">
+            <div class="form-group"><label>Highest Scoring Dog</label><input type="text" name="highest_scoring"></div>
+            <div class="form-group quarter"><label>Score</label><input type="number" name="highest_score" step="0.5"></div>
+          </div>` : `
+          <div class="form-row">
+            <div class="form-group half"><label>Winners</label><input type="text" name="winners"></div>
+            <div class="form-group half"><label>Reserve Winners</label><input type="text" name="reserve"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group half"><label>Best of Breed/Variety</label><input type="text" name="bob"></div>
+            <div class="form-group half"><label>Best of Opposite Sex</label><input type="text" name="bos"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group half"><label>Best of Winners</label><input type="text" name="bow"></div>
+          </div>`}
+          <div class="form-row"><div class="form-group full"><label>Notes</label><textarea name="notes" rows="3"></textarea></div></div>
+          <div class="form-row"><div class="form-group full"><label>Judge Signature (Type Full Name)</label><input type="text" name="signature"></div></div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-success">Submit via Email</button>
+          <button type="button" class="btn btn-outline" onclick="printForm('${sheet.id}')">Print</button>
+          <button type="reset" class="btn btn-outline">Clear Form</button>
+        </div>
+      </form>
+    </div>`;
+  return html;
+}
+
+// Inject all dynamic forms
+const container = document.querySelector('.form-container');
+judgingSheets.forEach(s => container.insertAdjacentHTML('beforeend', makeJudgingForm(s, false)));
+obedSheets.forEach(s => container.insertAdjacentHTML('beforeend', makeJudgingForm(s, true)));
+
+// Generate Change of Class show rows
+(function() {
+  const el = document.getElementById('classchange-shows');
+  let html = '';
+  for (let i = 1; i <= 6; i++) {
+    html += `<div class="repeat-row"><div class="form-row">
+      <div class="form-group"><label>Show ${i}</label><input type="text" name="show${i}"></div>
+      <div class="form-group quarter"><label>Ring #</label><input type="text" name="ring${i}"></div>
+      <div class="form-group quarter"><label>Time</label><input type="time" name="time${i}"></div>
+      <div class="form-group quarter"><label>Armband #</label><input type="text" name="armband${i}"></div>
+    </div></div>`;
+  }
+  el.innerHTML = html;
+})();
+
+// Generate Ad Listing rows
+function addAdRow() {
+  const el = document.getElementById('adlist-rows');
+  const n = el.querySelectorAll('.repeat-row').length + 1;
+  el.insertAdjacentHTML('beforeend', `<div class="repeat-row"><div class="form-row">
+    <div class="form-group quarter"><label>Ad #${n}</label><input type="text" name="ad${n}_num" value="${n}" style="width:50px"></div>
+    <div class="form-group"><label>Advertiser</label><input type="text" name="ad${n}_name"></div>
+    <div class="form-group quarter"><label>Page Size</label><select name="ad${n}_size"><option>F</option><option>1/2</option><option>1/4</option></select></div>
+    <div class="form-group quarter"><label># Photos</label><input type="number" name="ad${n}_photos" min="0"></div>
+  </div><div class="form-row">
+    <div class="form-group quarter"><label><input type="checkbox" name="ad${n}_sameaslast"> Same as Last Yr</label></div>
+    <div class="form-group quarter"><label><input type="checkbox" name="ad${n}_color"> Color</label></div>
+    <div class="form-group quarter"><label><input type="checkbox" name="ad${n}_cameraready"> Camera-Ready</label></div>
+    <div class="form-group"><label>Placement</label><input type="text" name="ad${n}_placement"></div>
+  </div></div>`);
+}
+// Start with 4 rows
+for (let i = 0; i < 4; i++) addAdRow();
+
+// Generate Officer fields
+(function() {
+  const roles = ['President', 'Vice President', 'Treasurer', 'Corresponding Secretary', 'Show Chairman', 'Obedience Chairman'];
+  const el = document.getElementById('officers-list');
+  let html = '';
+  roles.forEach(role => {
+    const key = role.toLowerCase().replace(/\s+/g, '_');
+    html += `<div class="form-section"><h3>${role}</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Name</label><input type="text" name="${key}_name"></div>
+        <div class="form-group"><label>Email</label><input type="email" name="${key}_email"></div>
+      </div>
+      <div class="form-row"><div class="form-group full"><label>Address</label><input type="text" name="${key}_address"></div></div>
+      <div class="form-row">
+        <div class="form-group"><label>City</label><input type="text" name="${key}_city"></div>
+        <div class="form-group quarter"><label>State</label><input type="text" name="${key}_state" maxlength="2"></div>
+        <div class="form-group quarter"><label>ZIP</label><input type="text" name="${key}_zip"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" name="${key}_phone"></div>
+      </div></div>`;
+  });
+  el.innerHTML = html;
+})();
+
+// Generate Superintendent contacts
+(function() {
+  const roles = ['President', 'Secretary', 'Show Chairman'];
+  const el = document.getElementById('supt-contacts');
+  let html = '<h3>Club Contacts</h3>';
+  roles.forEach(role => {
+    const key = role.toLowerCase().replace(/\s+/g, '_');
+    html += `<div class="form-row">
+      <div class="form-group"><label>${role} Name</label><input type="text" name="${key}_name"></div>
+      <div class="form-group"><label>Email</label><input type="email" name="${key}_email"></div>
+    </div><div class="form-row">
+      <div class="form-group half"><label>Phone (Home)</label><input type="tel" name="${key}_home"></div>
+      <div class="form-group half"><label>Phone (Office)</label><input type="tel" name="${key}_office"></div>
+    </div>`;
+  });
+  el.innerHTML = html;
+})();
+
+// Generate AKC Ribbon order fields
+(function() {
+  const ribbons = [
+    'First (Blue)', 'Second (Red)', 'Third (Yellow)', 'Fourth (White)',
+    'Winners (Purple)', 'Reserve Winners (Purple & White)',
+    'Best of Breed (Purple & Gold)', 'Best of Winners (Blue & White)',
+    'Best of Opposite Sex (Red & White)', 'Grand Champion Select (Lt Blue & White)',
+    'Best Puppy (Dark Green)', 'Best Bred-by-Exhibitor (Dark Green)',
+    'Highest Scoring Dog (Blue/Gold)', 'Qualifying Ribbon (Dark Green)',
+  ];
+  const el = document.getElementById('ribbon-akc-fields');
+  let html = '<h3>Ribbon &amp; Rosette Quantities</h3>';
+  ribbons.forEach(r => {
+    const key = r.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    html += `<div class="form-row">
+      <div class="form-group"><label>${r}</label></div>
+      <div class="form-group quarter"><label>Ribbons</label><input type="number" name="${key}_ribbon" min="0"></div>
+      <div class="form-group quarter"><label>Rosettes</label><input type="number" name="${key}_rosette" min="0"></div>
+    </div>`;
+  });
+  html += `<div class="form-section"><h3>Badges</h3>
+    <div class="form-row"><div class="form-group full"><label>Badge Names &amp; Titles (list each on a new line)</label>
+    <textarea name="badges" rows="5" placeholder="e.g., President: John Smith&#10;Show Chairman: Jane Doe"></textarea></div></div></div>`;
+  el.innerHTML = html;
+})();
+
+// Generate Specialty Ribbon order fields
+(function() {
+  const ribbons = [
+    'Regular: First (Blue)', 'Regular: Second (Red)', 'Regular: Third (Yellow)', 'Regular: Fourth (White)',
+    'Non-Regular: First (Rose)', 'Non-Regular: Second (Brown)', 'Non-Regular: Third (Lt. Green)', 'Non-Regular: Fourth (Gray)',
+    'Winners (Purple)', 'Reserve Winners (Purple & White)',
+    'Best of Breed (Purple & Gold)', 'Best of Variety (Purple & Gold)',
+    'Best of Winners (Blue & White)', 'Best of Opposite Sex (Red & White)',
+    'Grand Champion Select (Lt Blue & White)',
+    'Best Puppy (Dark Green)', 'Best Bred-by-Exhibitor (Dark Green)',
+    'Jr. Showmanship: First (Rose)', 'Jr. Showmanship: Second (Brown)',
+    'Jr. Showmanship: Third (Lt.Green)', 'Jr. Showmanship: Fourth (Gray)',
+    'Best Junior Handler (Rose/Green)', 'Reserve Best Junior Handler (Rose/Gray)',
+    'Sweepstakes: First (Rose)', 'Sweepstakes: Second (Brown)',
+    'Sweepstakes: Third (Lt.Green)', 'Sweepstakes: Fourth (Gray)',
+    'Best in Sweeps (Green/Pink)', 'BOS to Best in Sweeps (Lavender)',
+  ];
+  const el = document.getElementById('ribbon-spec-fields');
+  let html = '<h3>Specialty Ribbon &amp; Rosette Quantities</h3>';
+  ribbons.forEach(r => {
+    const key = r.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    html += `<div class="form-row">
+      <div class="form-group"><label>${r}</label></div>
+      <div class="form-group quarter"><label>Ribbons</label><input type="number" name="${key}_ribbon" min="0"></div>
+      <div class="form-group quarter"><label>Rosettes</label><input type="number" name="${key}_rosette" min="0"></div>
+    </div>`;
+  });
+  html += `<div class="form-section"><h3>Obedience Ribbons</h3>
+    <div class="form-row"><div class="form-group full"><label>Additional Ribbon Needs</label>
+    <textarea name="obed_ribbons" rows="4" placeholder="List obedience ribbon types and quantities..."></textarea></div></div></div>
+    <div class="form-section"><h3>Rally Trial Ribbons</h3>
+    <div class="form-row"><div class="form-group full"><label>Rally Ribbon Needs</label>
+    <textarea name="rally_ribbons" rows="4" placeholder="List rally ribbon types and quantities..."></textarea></div></div></div>
+    <div class="form-section"><h3>Badges</h3>
+    <div class="form-row"><div class="form-group full"><label>Badge Names &amp; Titles</label>
+    <textarea name="badges" rows="5" placeholder="e.g., President: John Smith&#10;Show Chairman: Jane Doe"></textarea></div></div></div>`;
+  el.innerHTML = html;
+})();
+
+// ===== NAVIGATION =====
+document.querySelectorAll('.sidebar a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar a').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    document.querySelectorAll('.form-card').forEach(f => f.classList.remove('active'));
+    const formId = 'form-' + link.dataset.form;
+    const target = document.getElementById(formId);
+    if (target) target.classList.add('active');
+  });
+});
+
+// ===== EMAIL FUNCTIONALITY =====
+function saveEmail() {
+  const email = document.getElementById('submissionEmail').value.trim();
+  if (email) {
+    localStorage.setItem('onofrio_submit_email', email);
+    showToast('Email address saved!');
+  }
+}
+
+// Load saved email
+(function() {
+  const saved = localStorage.getItem('onofrio_submit_email');
+  if (saved) document.getElementById('submissionEmail').value = saved;
+})();
+
+function submitForm(e, formTitle) {
+  e.preventDefault();
+  const email = document.getElementById('submissionEmail').value.trim();
+  if (!email) {
+    alert('Please set a submission email address at the top of the page first.');
+    document.getElementById('submissionEmail').focus();
+    return false;
+  }
+
+  const form = e.target;
+  const data = new FormData(form);
+  let body = `=== ${formTitle.toUpperCase()} ===\n`;
+  body += `Submitted: ${new Date().toLocaleString()}\n`;
+  body += '='.repeat(40) + '\n\n';
+
+  for (const [key, value] of data.entries()) {
+    if (value && value.toString().trim()) {
+      const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      body += `${label}: ${value}\n`;
+    }
+  }
+
+  body += '\n' + '='.repeat(40);
+  body += '\nSubmitted via Onofrio Online Forms Portal';
+
+  const subject = encodeURIComponent(`Onofrio Form Submission: ${formTitle}`);
+  const mailBody = encodeURIComponent(body);
+  const mailtoUrl = `mailto:${email}?subject=${subject}&body=${mailBody}`;
+
+  // Try mailto
+  window.location.href = mailtoUrl;
+  showToast(`Opening email client for: ${formTitle}`);
+  return false;
+}
+
+function printForm(formId) {
+  const card = document.getElementById('form-' + formId);
+  if (!card) return;
+  // Temporarily show for print
+  card.classList.add('active');
+  window.print();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
