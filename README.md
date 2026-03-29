@@ -115,3 +115,8 @@ kpi-dashboard-deploy/
 ---
 
 Built with ❤️ for Oklahoma City Manufacturing
+
+
+## Value Stream Mapping Stencil Prototype
+
+A standalone prototype is available at `value-stream-stencil.html`. Open it directly in a browser to drag VSM symbols from the stencil, place them on a canvas, connect process steps, and export/import map JSON.
