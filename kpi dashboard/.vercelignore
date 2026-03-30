@@ -1,0 +1,8 @@
+node_modules
+.git
+.claude
+*.zip
+*.docx
+OKC_Metrics_*
+OKC_ALL_*
+OneDrive_*
